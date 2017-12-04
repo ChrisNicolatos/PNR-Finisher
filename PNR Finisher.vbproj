@@ -1,0 +1,372 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B42C8989-99A7-4CCA-BC48-6F6342998EAE}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>PNR_Finisher.My.MyApplication</StartupObject>
+    <RootNamespace>PNR_Finisher</RootNamespace>
+    <AssemblyName>PNRFinisher</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>WindowsForms</MyType>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ManifestCertificateThumbprint>F7E0F90E6B6F8D0302C021642E1D6BBEB5E7CFE8</ManifestCertificateThumbprint>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>\\ath2-svrdc1\PNRFinisher\</PublishUrl>
+    <Install>false</Install>
+    <InstallFrom>Unc</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <WebPage>publish.htm</WebPage>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>70</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>PNRFinisher.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>PNR Finisher.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>PNRFinisher.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <CodeAnalysisRuleSet>PNR Finisher.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Forms\ATPI PNR.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>Custom</TargetZone>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Windows.Forms" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\AirlineNotes.vb" />
+    <Compile Include="Classes\AirlinePoints.vb" />
+    <Compile Include="Classes\AmadeusExisting.vb" />
+    <Compile Include="Classes\AmadeusNew.vb" />
+    <Compile Include="Classes\AmadeusTickets.vb" />
+    <Compile Include="Classes\AmadeusUser.vb" />
+    <Compile Include="Classes\Config.vb" />
+    <Compile Include="Classes\CRM.vb" />
+    <Compile Include="Classes\Customers.vb" />
+    <Compile Include="Classes\CustomProperties.vb" />
+    <Compile Include="Classes\ExportDataGrid.vb" />
+    <Compile Include="Classes\FrequentFlyer.vb" />
+    <Compile Include="Classes\FrequentFlyerColl.vb" />
+    <Compile Include="Classes\GreekToLatin.vb" />
+    <Compile Include="Classes\gtmAirlines.vb" />
+    <Compile Include="Classes\gtmAirports.vb" />
+    <Compile Include="Classes\gtmAmadeusNumberParser.vb" />
+    <Compile Include="Classes\gtmAmadeusPax.vb" />
+    <Compile Include="Classes\gtmAmadeusPaxColl.vb" />
+    <Compile Include="Classes\gtmAmadeusPNR.vb" />
+    <Compile Include="Classes\gtmAmadeusSeg.vb" />
+    <Compile Include="Classes\gtmAmadeusSegColl.vb" />
+    <Compile Include="Classes\gtmTicket.vb" />
+    <Compile Include="Classes\gtmTicketColl.vb" />
+    <Compile Include="Classes\osmVessels.vb" />
+    <Compile Include="Classes\PriceLookup.vb" />
+    <Compile Include="Classes\ReadPNR.vb" />
+    <Compile Include="Classes\SubDepartments.vb" />
+    <Compile Include="Classes\Vessels.vb" />
+    <Compile Include="Forms\frmApis.designer.vb">
+      <DependentUpon>frmApis.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmApis.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmCostCentre.Designer.vb">
+      <DependentUpon>frmCostCentre.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmCostCentre.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmItnMSReportDates.Designer.vb">
+      <DependentUpon>frmItnMSReportDates.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmItnMSReportDates.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmOptions.Designer.vb">
+      <DependentUpon>frmOptions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmOptions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmOSMAddVessel.Designer.vb">
+      <DependentUpon>frmOSMAddVessel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmOSMAddVessel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmOSMAgents.Designer.vb">
+      <DependentUpon>frmOSMAgents.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmOSMAgents.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmOSMVessels.Designer.vb">
+      <DependentUpon>frmOSMVessels.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmOSMVessels.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmPNR.Designer.vb">
+      <DependentUpon>frmPNR.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmPNR.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmTables.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmTables.Designer.vb">
+      <DependentUpon>frmTables.vb</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmVesselForPNR.Designer.vb">
+      <DependentUpon>frmVesselForPNR.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmVesselForPNR.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Classes\PaxApisDB.vb" />
+    <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="Modules\modPNR.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Classes\osmPax.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\frmApis.resx">
+      <DependentUpon>frmApis.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmCostCentre.resx">
+      <DependentUpon>frmCostCentre.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmItnMSReportDates.resx">
+      <DependentUpon>frmItnMSReportDates.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmOptions.resx">
+      <DependentUpon>frmOptions.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmOSMAddVessel.resx">
+      <DependentUpon>frmOSMAddVessel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmOSMAgents.resx">
+      <DependentUpon>frmOSMAgents.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmOSMVessels.resx">
+      <DependentUpon>frmOSMVessels.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmPNR.resx">
+      <DependentUpon>frmPNR.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmTables.resx">
+      <DependentUpon>frmTables.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmVesselForPNR.resx">
+      <DependentUpon>frmVesselForPNR.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Griffin PNR_TemporaryKey.pfx" />
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="PNR Finisher.ruleset" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Notes\PNRFinisher.txt">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Forms\ATPI PNR.ico" />
+    <Content Include="Notes\GDS Commands.txt" />
+    <Content Include="Notes\My Notes.txt" />
+    <Content Include="Notes\Airline Points Commands.txt" />
+    <Content Include="Notes\PARTIAL PNR DISPLAY ELEMENT CODES.txt" />
+    <Content Include="Notes\PNR History Display Codes.txt" />
+    <Content Include="Notes\SSR Docs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="k1aHostConstantsLib">
+      <Guid>{24103141-FAF1-11D1-BE3C-000083270237}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="k1aHostInterface">
+      <Guid>{A4D24A60-0756-11D2-BE3E-000083270237}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="k1aHostToolKit">
+      <Guid>{F7BB0B4D-0783-11D2-BE3E-000083270237}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="s1aAirlineDate">
+      <Guid>{405DE3B7-0CBA-11D1-80ED-000083262C75}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="s1aPNR">
+      <Guid>{2B999FE1-68B2-11D0-9771-00008322DB13}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
