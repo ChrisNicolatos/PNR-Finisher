@@ -69,7 +69,6 @@ Module modPNR
                             mAccUserName = pValues(1).Trim
                         Case "DATAUSERPASSWORDACC"
                             mAccPassword = pValues(1).Trim
-
                         Case "DATASOURCEPNR"
                             mPnrDataSource = pValues(1).Trim
                         Case "DATACATALOGPNR"

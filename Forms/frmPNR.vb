@@ -15,7 +15,6 @@
 
     Private mobjReadPNR As New ReadPNR
     Private mflgReadPNR As Boolean
-    'Private mflgNoPNR As Boolean
     Private mMaxString As Integer = 80
 
     Private mobjAirlinePoints As New AirlinePoints.Collection
@@ -41,15 +40,10 @@
 
     Private mflgExpiryDateOK As Boolean
     Private mflgAPISUpdate As Boolean
-
     Private Sub cmdExit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdExit.Click, cmdItnExit.Click
-
         Me.Close()
-
     End Sub
-
     Private Sub cmdReadPNR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdReadPNR.Click
-
         Try
             ClearForm()
             ReadPNR()
@@ -57,10 +51,8 @@
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
     Private Sub cmdNoPNR_Click(sender As Object, e As EventArgs)
-
         Try
             ClearForm()
             NoPNR()
@@ -68,9 +60,7 @@
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub ClearForm()
 
         Try
@@ -205,7 +195,6 @@
         End Try
 
     End Sub
-
     Private Sub SetLabelColor(ByRef TextLabel As Label)
         Try
             If TextLabel.Enabled Then
@@ -218,7 +207,6 @@
         End Try
     End Sub
     Private Sub ReadPNR()
-
         Dim pDMI As String
         Try
             With mobjReadPNR
@@ -232,7 +220,15 @@
                         Throw New Exception("PNR Finisher cancelled because of itinerary check")
                     End If
                 End If
+                If .OfficeOfResponsibility <> MySettings.AmadeusPCC Then
+                    Dim mAmadeusUser As New AmadeusUser
+                    InitSettings(mAmadeusUser)
+                    If MySettings.AmadeusPCC = "" Or MySettings.AmadeusUser = "" Then
+                        Throw New Exception("User is not valid for this PCC")
+                    End If
+                End If
                 mflgReadPNR = True
+                .PrepareNewAmadeusElements()
                 lblPNR.Text = .PnrNumber
                 lblPax.Text = .PaxName
                 lblSegs.Text = .Itinerary
@@ -250,11 +246,8 @@
         Catch ex As Exception
             Throw New Exception("ReadPNR()" & vbCrLf & ex.Message)
         End Try
-
     End Sub
-
     Private Sub NoPNR()
-
         Try
             mflgReadPNR = False
             lblPNR.Text = ""
@@ -390,7 +383,6 @@
             For Each pSeg As s1aPNR.AirSegment In mobjReadPNR.AirSegments
                 mobjAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline)
                 For Each pItem As AirlinePoints.Item In mobjAirlinePoints.Values
-                    'Dim pFound As Boolean = False
                     If txtAirlineEntries.Text.IndexOf(pItem.PointsCommand) < 0 Then
                         txtAirlineEntries.AppendText(pItem.PointsCommand & vbCrLf)
                     End If
@@ -403,7 +395,6 @@
                         With pItem
                             If Not .Seaman Or Not mobjVesselSelected Is Nothing Then
                                 Dim pAmadeusText As String = .AmadeusText
-                                'Dim pFound As Boolean = False
 
                                 If pAmadeusText.Contains("<?VESSEL NAME>") Then
                                     If Not mobjVesselSelected Is Nothing Then
@@ -413,9 +404,6 @@
                                         Else
                                             pAmadeusText = pAmadeusText.Replace("<?VESSEL NAME>", mobjVesselSelected.Name.Replace("(", "-").Replace(")", "-").Replace("&", "-"))
                                         End If
-                                        'pAmadeusText = pAmadeusText.Replace("<?VESSEL NAME>", mobjVesselSelected.Name.Replace("(", "-").Replace(")", "-").Replace("&", "-"))
-                                        'Else
-                                        '    pFound = True
                                     End If
                                 End If
 
@@ -426,9 +414,6 @@
                                         Else
                                             pAmadeusText = pAmadeusText.Replace("<?VESSEL REGISTRATION>", mobjVesselSelected.Flag.Replace("(", "-").Replace(")", "-").Replace("&", "-"))
                                         End If
-                                        'pAmadeusText = pAmadeusText.Replace("<?VESSEL REGISTRATION>", mobjVesselSelected.Flag.Replace("(", "-").Replace(")", "-").Replace("&", "-"))
-                                        'Else
-                                        '    pFound = True
                                     End If
                                 End If
 
@@ -474,7 +459,7 @@
             Dim mAmadeusUser As New AmadeusUser
             InitSettings(mAmadeusUser)
             If MySettings.AmadeusPCC <> "" And MySettings.AmadeusUser <> "" Then
-                Text = "Athens PNR Finisher (21/10/2017 15:34) " & MySettings.AmadeusPCC & " " & MySettings.AmadeusUser
+                Text = "Athens PNR Finisher (23/01/2018 14:59) " & MySettings.AmadeusPCC & " " & MySettings.AmadeusUser
             Else
                 Throw New Exception("Please start Amadeus and restart the program")
             End If
@@ -496,7 +481,10 @@
                     optItnAirportCityName.Checked = True
                     optItnAirportBoth.Checked = True
                 End If
+
                 optItnFormatDefault.Checked = True
+                SetITNEnabled(True)
+
                 chkItnVessel.Checked = MySettings.Vessel
                 chkItnClass.Checked = MySettings.ClassOfService
                 chkItnAirlineLocator.Checked = MySettings.AirlineLocator
@@ -505,10 +493,10 @@
                 chkItnSeating.Checked = MySettings.Seating
                 chkItnStopovers.Checked = MySettings.ShowStopovers
                 chkItnTerminal.Checked = MySettings.ShowTerminal
-                chkFlyingTime.Checked = MySettings.FlyingTime
+                chkItnFlyingTime.Checked = MySettings.FlyingTime
                 chkItnCostCentre.Checked = MySettings.CostCentre
 
-                chkElecItemsBan.Checked = MySettings.BanElectricalEquipment
+                chkItnElecItemsBan.Checked = MySettings.BanElectricalEquipment
                 chkItnBrazilText.Checked = MySettings.BrazilText
                 chkItnUSAText.Checked = MySettings.USAText
 
@@ -547,7 +535,6 @@
     End Sub
 
     Private Function CheckOptions() As Boolean
-
         Try
             With MySettings
                 While Not .isValid
@@ -1183,12 +1170,13 @@
 
         Try
             Cursor = System.Windows.Forms.Cursors.WaitCursor
-
+            lblItnPNRCounter.Text = ""
             ProcessRequestedPNRs(txtItnPNR)
 
             rtbItnDoc.SelectAll()
             Clipboard.Clear()
             Clipboard.SetText(rtbItnDoc.Rtf, TextDataFormat.Rtf)
+            Clipboard.SetText(rtbItnDoc.SelectedText, TextDataFormat.Text)
             cmdItnRefresh.Enabled = False
             Cursor = Cursors.Default
             MessageBox.Show("Ready", "Read PNR", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -1202,6 +1190,7 @@
     Private Sub cmdItnReadQueue_Click(sender As Object, e As EventArgs) Handles cmdItnReadQueue.Click
 
         Try
+            lblItnPNRCounter.Text = ""
             If optItnFormatMSReport.Checked Then
                 If ItnReadFromToDates() = Windows.Forms.DialogResult.Cancel Then
                     Exit Sub
@@ -1215,6 +1204,7 @@
             rtbItnDoc.SelectAll()
             Clipboard.Clear()
             Clipboard.SetText(rtbItnDoc.Rtf, TextDataFormat.Rtf)
+            Clipboard.SetText(rtbItnDoc.SelectedText, TextDataFormat.Text)
             cmdItnRefresh.Enabled = False
             Cursor = Cursors.Default
             MessageBox.Show("Ready", "Read PNR", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -1266,6 +1256,7 @@
             ReDim mPaxNames(0)
 
             For i As Integer = pPNR.GetLowerBound(0) To pPNR.GetUpperBound(0)
+                lblItnPNRCounter.Text = i + 1 & " of " & pPNR.GetUpperBound(0) + 1
                 If pPNR(i).Trim <> "" Then
                     readAmadeus(pPNR(i).Trim)
                     If Not optItnFormatMSReport.Checked Or (mobjAmadeus.LastSegment.DepartureDate >= mItnFromDate And mobjAmadeus.LastSegment.DepartureDate <= mItnToDate) Then
@@ -1295,17 +1286,18 @@
 
         Try
             If optItnFormatMSReport.Checked Then
-
-                'TODO - Fix length of output line total 78 characters including spaces
-
-
-
                 If optItnFormatMSReport.Checked AndAlso rtbItnDoc.TextLength = 0 Then
                     pString.AppendLine("FROM " & mItnFromDate.ToShortDateString & " : To " & mItnToDate.ToShortDateString)
                     pString.AppendLine("Last Name" & vbTab & "First Name" & vbTab & "ID No." & vbTab & "Department" & vbTab & "Vessel Name" & vbTab & "Date Of Travel" & vbTab & "Airline" & vbTab & "Flight No." & vbTab & "Dep.Time" & vbTab & "Dep.City" & vbTab & "Arr.Time" & vbTab & "Arr.City" & vbTab & "PNR" & vbTab & "PaxNo")
                 End If
                 pString.Append(MakeRTBMSReport)
+            ElseIf optItnFormatOPTReport.Checked Then
+                If optItnFormatOPTReport.Checked AndAlso rtbItnDoc.TextLength = 0 Then
+                    pString.AppendLine("PNR" & vbTab & "Departure Date" & vbTab & "Itinerary" & vbTab & "PAX" & vbTab & "Amount" & vbTab & "Agent" & vbTab & "Date" & vbTab & "Total" & vbTab & "Error")
+                End If
+                pString.Append(MakeRTBOPTReport)
             Else
+                'TODO - Fix length of output line total 78 characters including spaces
                 pString.Append(MakeRTBDocPart1)
                 pString.Append(MakeRTBDocTickets)
                 If Not optItnFormatSeaChefs.Checked And mMaxString > 0 Then
@@ -1374,7 +1366,6 @@
         End Try
 
     End Sub
-
     Private Function MakeRTBMSReport() As String
 
         Try
@@ -1406,7 +1397,25 @@
         End Try
 
     End Function
+    Private Function MakeRTBOPTReport()
 
+        Try
+            Dim pString As New System.Text.StringBuilder
+
+            With mobjAmadeus
+                If .HasSegments Then
+                    pString.AppendLine(.RequestedPNR & vbTab & .Segments.First.Value.DepartureDateIATA & vbTab & .Segments.Itinerary & vbTab & .Passengers.Count _
+                                       & vbTab & .Opt1 & vbTab & .Opt2 & vbTab & .Opt3 & vbTab & .Opt4 & IIf(.Opt4 = 0, vbTab & "****", ""))
+                    Return pString.ToString
+                Else
+                    Return ""
+                End If
+            End With
+        Catch ex As Exception
+            Throw New Exception("MakeRTBMSReport()" & vbCrLf & ex.Message)
+        End Try
+
+    End Function
     Private Function MakeRTBMSReportOutsiderange() As String
 
         Try
@@ -1784,6 +1793,7 @@
     Private Sub cmdItnReadCurrent_Click(sender As Object, e As EventArgs) Handles cmdItnReadCurrent.Click
 
         Try
+            lblItnPNRCounter.Text = ""
             ReadPNRandCreateItn(False)
             cmdItnRefresh.Enabled = True
         Catch ex As Exception
@@ -2001,10 +2011,10 @@
 
     End Sub
 
-    Private Sub chkFlyingTime_CheckedChanged(sender As Object, e As EventArgs) Handles chkFlyingTime.CheckedChanged
+    Private Sub chkItnFlyingTime_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnFlyingTime.CheckedChanged
 
         Try
-            MySettings.FlyingTime = chkFlyingTime.Checked
+            MySettings.FlyingTime = chkItnFlyingTime.Checked
             MySettings.Save()
             If cmdItnRefresh.Enabled Then
                 ReadPNRandCreateItn(True)
@@ -2028,10 +2038,10 @@
         End Try
 
     End Sub
-    Private Sub chkElecItemsBan_CheckedChanged(sender As Object, e As EventArgs) Handles chkElecItemsBan.CheckedChanged
+    Private Sub chkItnElecItemsBan_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnElecItemsBan.CheckedChanged
 
         Try
-            MySettings.BanElectricalEquipment = chkElecItemsBan.Checked
+            MySettings.BanElectricalEquipment = chkItnElecItemsBan.Checked
             MySettings.Save()
             If cmdItnRefresh.Enabled Then
                 ReadPNRandCreateItn(True)
@@ -2089,7 +2099,7 @@
             Else
                 mobjAmadeus.CancelError = False
             End If
-            mobjAmadeus.ReadPNR(RecordLocator, optItnFormatMSReport.Checked)
+            mobjAmadeus.ReadPNR(RecordLocator, (optItnFormatMSReport.Checked Or optItnFormatOPTReport.Checked))
         Catch ex As Exception
             Throw New Exception("readAmadeus()" & vbCrLf & ex.Message)
         End Try
@@ -2563,27 +2573,28 @@
         End Try
 
     End Sub
+    Private Sub SetITNEnabled(ByVal AllowOptions As Boolean)
 
-    Private Sub optItnFormatDefault_CheckedChanged(sender As Object, e As EventArgs) Handles optItnFormatDefault.CheckedChanged, optItnFormatPlain.CheckedChanged, optItnFormatSeaChefs.CheckedChanged, chkItnSeaChefsWithCode.CheckedChanged
-
-        Try
-            If cmdItnRefresh.Enabled Then
-                ReadPNRandCreateItn(True)
-            End If
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-        End Try
+        fraItnAirportName.Enabled = AllowOptions
+        fraItnOptions.Enabled = AllowOptions
+        lstItnRemarks.Enabled = AllowOptions
 
     End Sub
+    Private Sub optItnFormatDefault_CheckedChanged(sender As Object, e As EventArgs) Handles optItnFormatDefault.CheckedChanged, optItnFormatPlain.CheckedChanged, optItnFormatSeaChefs.CheckedChanged, chkItnSeaChefsWithCode.CheckedChanged, optItnFormatMSReport.CheckedChanged, optItnFormatOPTReport.CheckedChanged
 
-    Private Sub optItnFormatMSReport_CheckedChanged(sender As Object, e As EventArgs) Handles optItnFormatMSReport.CheckedChanged
         Try
             If cmdItnRefresh.Enabled Then
                 ReadPNRandCreateItn(True)
             End If
+            If sender.Name = "optItnFormatDefault" Or sender.name = "optItnFormatPlain" Then
+                SetITNEnabled(True)
+            Else
+                SetITNEnabled(False)
+            End If
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
+
     End Sub
     Private Sub lstItnRemarks_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstItnRemarks.SelectedIndexChanged
         Try
@@ -2926,6 +2937,14 @@
         dgvApis.Columns.Add("BirthDate", "Birth Date")
         dgvApis.Columns.Add("Gender", "Gender")
         dgvApis.Columns.Add("ExpiryDate", "Expiry Date")
+
+    End Sub
+    Private Sub MenuCopyItn_Click(sender As Object, e As EventArgs) Handles MenuCopyItn.Click
+
+        rtbItnDoc.SelectAll()
+        Clipboard.Clear()
+        Clipboard.SetText(rtbItnDoc.Rtf, TextDataFormat.Rtf)
+        Clipboard.SetText(rtbItnDoc.SelectedText, TextDataFormat.Text)
 
     End Sub
 

@@ -126,8 +126,8 @@
                 mflgNewPNR = False
 
                 If pStatus = 0 Or pStatus = 1005 Then
-                    GetPnrNumber()
                     GetOfficeOfResponsibility()
+                    GetPnrNumber()
                     GetCreationDate()
 
                     GetPassengers()
@@ -144,7 +144,7 @@
                     GetTickets()
                     Read = CheckDMI()
 
-                    mobjNewAmadeusElements = New AmadeusNew.Collection(OfficeOfResponsibility, CreationDate, DepartureDate, NumberOfPax)
+
                 Else
                     Throw New Exception("There is no active PNR" & vbCrLf & mstrPNRResponse)
                 End If
@@ -156,7 +156,9 @@
         End Try
 
     End Function
-
+    Public Sub PrepareNewAmadeusElements()
+        mobjNewAmadeusElements = New AmadeusNew.Collection(OfficeOfResponsibility, CreationDate, DepartureDate, NumberOfPax)
+    End Sub
     Private Function CheckDMI() As String
 
         Try

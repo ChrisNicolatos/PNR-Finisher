@@ -23,13 +23,7 @@ Partial Class frmPNR
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPNR))
-        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.cmdExit = New System.Windows.Forms.Button()
         Me.cmdReadPNR = New System.Windows.Forms.Button()
         Me.llbOptions = New System.Windows.Forms.LinkLabel()
@@ -74,9 +68,11 @@ Partial Class frmPNR
         Me.lblAvPriceDetails = New System.Windows.Forms.Label()
         Me.cmdCostCentre = New System.Windows.Forms.Button()
         Me.tabPageItinerary = New System.Windows.Forms.TabPage()
+        Me.lblItnPNRCounter = New System.Windows.Forms.Label()
         Me.cmdItnRefresh = New System.Windows.Forms.Button()
         Me.cmdItnReadQueue = New System.Windows.Forms.Button()
         Me.fraItnFormat = New System.Windows.Forms.GroupBox()
+        Me.optItnFormatOPTReport = New System.Windows.Forms.RadioButton()
         Me.optItnFormatMSReport = New System.Windows.Forms.RadioButton()
         Me.chkItnSeaChefsWithCode = New System.Windows.Forms.CheckBox()
         Me.optItnFormatSeaChefs = New System.Windows.Forms.RadioButton()
@@ -94,26 +90,28 @@ Partial Class frmPNR
         Me.optItnAirportCode = New System.Windows.Forms.RadioButton()
         Me.fraItnOptions = New System.Windows.Forms.GroupBox()
         Me.chkItnCostCentre = New System.Windows.Forms.CheckBox()
-        Me.chkFlyingTime = New System.Windows.Forms.CheckBox()
-        Me.Label6 = New System.Windows.Forms.Label()
+        Me.chkItnFlyingTime = New System.Windows.Forms.CheckBox()
+        Me.lblItnTextToBeAdded = New System.Windows.Forms.Label()
         Me.chkItnSeating = New System.Windows.Forms.CheckBox()
         Me.chkItnUSAText = New System.Windows.Forms.CheckBox()
         Me.chkItnStopovers = New System.Windows.Forms.CheckBox()
         Me.chkItnBrazilText = New System.Windows.Forms.CheckBox()
         Me.chkItnTerminal = New System.Windows.Forms.CheckBox()
-        Me.chkElecItemsBan = New System.Windows.Forms.CheckBox()
+        Me.chkItnElecItemsBan = New System.Windows.Forms.CheckBox()
         Me.chkItnPaxSegPerTicket = New System.Windows.Forms.CheckBox()
         Me.chkItnTickets = New System.Windows.Forms.CheckBox()
         Me.chkItnClass = New System.Windows.Forms.CheckBox()
         Me.chkItnVessel = New System.Windows.Forms.CheckBox()
         Me.chkItnAirlineLocator = New System.Windows.Forms.CheckBox()
         Me.rtbItnDoc = New System.Windows.Forms.RichTextBox()
+        Me.menuITNSelectCopy = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.MenuCopyItn = New System.Windows.Forms.ToolStripMenuItem()
         Me.cmdItnReadPNR = New System.Windows.Forms.Button()
         Me.txtItnPNR = New System.Windows.Forms.TextBox()
         Me.lblItnPNR = New System.Windows.Forms.Label()
         Me.tabOSM = New System.Windows.Forms.TabPage()
         Me.chkOSMVesselInUse = New System.Windows.Forms.CheckBox()
-        Me.Label7 = New System.Windows.Forms.Label()
+        Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
         Me.txtOSMAgentsFilter = New System.Windows.Forms.TextBox()
         Me.cmdOSMClearSelected = New System.Windows.Forms.Button()
         Me.cmdOSMEmailClear = New System.Windows.Forms.Button()
@@ -128,18 +126,18 @@ Partial Class frmPNR
         Me.Nationality = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.JoinerLeaver = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.VisaType = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.Label5 = New System.Windows.Forms.Label()
+        Me.lblOSMPasteEmailsHere = New System.Windows.Forms.Label()
         Me.txtOSMPax = New System.Windows.Forms.TextBox()
         Me.lblOSMVessel = New System.Windows.Forms.Label()
         Me.cmdOSMVesselsEdit = New System.Windows.Forms.Button()
-        Me.Label4 = New System.Windows.Forms.Label()
+        Me.lblOSMVessels = New System.Windows.Forms.Label()
         Me.cmdOSMAgentEdit = New System.Windows.Forms.Button()
-        Me.Label3 = New System.Windows.Forms.Label()
+        Me.lblOSMAgents = New System.Windows.Forms.Label()
         Me.lstOSMAgents = New System.Windows.Forms.ListBox()
         Me.cmdOSMCopyCC = New System.Windows.Forms.Button()
         Me.cmdOSMCopyTo = New System.Windows.Forms.Button()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lblOSMEmailsCC = New System.Windows.Forms.Label()
+        Me.lblOSMEmailsTo = New System.Windows.Forms.Label()
         Me.lstOSMCCEmail = New System.Windows.Forms.ListBox()
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
@@ -151,6 +149,7 @@ Partial Class frmPNR
         Me.fraItnFormat.SuspendLayout()
         Me.fraItnAirportName.SuspendLayout()
         Me.fraItnOptions.SuspendLayout()
+        Me.menuITNSelectCopy.SuspendLayout()
         Me.tabOSM.SuspendLayout()
         CType(Me.dgvOSMPax, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -576,33 +575,9 @@ Partial Class frmPNR
         Me.dgvApis.AllowUserToDeleteRows = False
         Me.dgvApis.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        DataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle7.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        DataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgvApis.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
         Me.dgvApis.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle8.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        DataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgvApis.DefaultCellStyle = DataGridViewCellStyle8
         Me.dgvApis.Location = New System.Drawing.Point(13, 406)
         Me.dgvApis.Name = "dgvApis"
-        DataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle9.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        DataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgvApis.RowHeadersDefaultCellStyle = DataGridViewCellStyle9
         Me.dgvApis.Size = New System.Drawing.Size(1257, 179)
         Me.dgvApis.TabIndex = 40
         '
@@ -647,6 +622,7 @@ Partial Class frmPNR
         '
         'tabPageItinerary
         '
+        Me.tabPageItinerary.Controls.Add(Me.lblItnPNRCounter)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnRefresh)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnReadQueue)
         Me.tabPageItinerary.Controls.Add(Me.fraItnFormat)
@@ -667,6 +643,20 @@ Partial Class frmPNR
         Me.tabPageItinerary.TabIndex = 1
         Me.tabPageItinerary.Text = "PNR Itinerary"
         Me.tabPageItinerary.UseVisualStyleBackColor = True
+        '
+        'lblItnPNRCounter
+        '
+        Me.lblItnPNRCounter.BackColor = System.Drawing.Color.Aqua
+        Me.lblItnPNRCounter.Cursor = System.Windows.Forms.Cursors.Default
+        Me.lblItnPNRCounter.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblItnPNRCounter.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.lblItnPNRCounter.Location = New System.Drawing.Point(13, 572)
+        Me.lblItnPNRCounter.Name = "lblItnPNRCounter"
+        Me.lblItnPNRCounter.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.lblItnPNRCounter.Size = New System.Drawing.Size(137, 13)
+        Me.lblItnPNRCounter.TabIndex = 15
+        Me.lblItnPNRCounter.Text = "PNR"
+        Me.lblItnPNRCounter.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'cmdItnRefresh
         '
@@ -689,24 +679,36 @@ Partial Class frmPNR
         '
         'fraItnFormat
         '
+        Me.fraItnFormat.Controls.Add(Me.optItnFormatOPTReport)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatMSReport)
         Me.fraItnFormat.Controls.Add(Me.chkItnSeaChefsWithCode)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatSeaChefs)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatPlain)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatDefault)
         Me.fraItnFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.fraItnFormat.Location = New System.Drawing.Point(333, 65)
+        Me.fraItnFormat.Location = New System.Drawing.Point(333, 58)
         Me.fraItnFormat.Name = "fraItnFormat"
-        Me.fraItnFormat.Size = New System.Drawing.Size(265, 111)
+        Me.fraItnFormat.Size = New System.Drawing.Size(265, 118)
         Me.fraItnFormat.TabIndex = 5
         Me.fraItnFormat.TabStop = False
         Me.fraItnFormat.Text = "Custom Format"
+        '
+        'optItnFormatOPTReport
+        '
+        Me.optItnFormatOPTReport.AutoSize = True
+        Me.optItnFormatOPTReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.optItnFormatOPTReport.Location = New System.Drawing.Point(17, 88)
+        Me.optItnFormatOPTReport.Name = "optItnFormatOPTReport"
+        Me.optItnFormatOPTReport.Size = New System.Drawing.Size(82, 17)
+        Me.optItnFormatOPTReport.TabIndex = 6
+        Me.optItnFormatOPTReport.Text = "OPT Report"
+        Me.optItnFormatOPTReport.UseVisualStyleBackColor = True
         '
         'optItnFormatMSReport
         '
         Me.optItnFormatMSReport.AutoSize = True
         Me.optItnFormatMSReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 89)
+        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 71)
         Me.optItnFormatMSReport.Name = "optItnFormatMSReport"
         Me.optItnFormatMSReport.Size = New System.Drawing.Size(76, 17)
         Me.optItnFormatMSReport.TabIndex = 5
@@ -717,7 +719,7 @@ Partial Class frmPNR
         '
         Me.chkItnSeaChefsWithCode.AutoSize = True
         Me.chkItnSeaChefsWithCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnSeaChefsWithCode.Location = New System.Drawing.Point(108, 66)
+        Me.chkItnSeaChefsWithCode.Location = New System.Drawing.Point(108, 54)
         Me.chkItnSeaChefsWithCode.Name = "chkItnSeaChefsWithCode"
         Me.chkItnSeaChefsWithCode.Size = New System.Drawing.Size(107, 17)
         Me.chkItnSeaChefsWithCode.TabIndex = 4
@@ -728,7 +730,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatSeaChefs.AutoSize = True
         Me.optItnFormatSeaChefs.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatSeaChefs.Location = New System.Drawing.Point(17, 66)
+        Me.optItnFormatSeaChefs.Location = New System.Drawing.Point(17, 54)
         Me.optItnFormatSeaChefs.Name = "optItnFormatSeaChefs"
         Me.optItnFormatSeaChefs.Size = New System.Drawing.Size(74, 17)
         Me.optItnFormatSeaChefs.TabIndex = 2
@@ -739,7 +741,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatPlain.AutoSize = True
         Me.optItnFormatPlain.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatPlain.Location = New System.Drawing.Point(17, 43)
+        Me.optItnFormatPlain.Location = New System.Drawing.Point(17, 37)
         Me.optItnFormatPlain.Name = "optItnFormatPlain"
         Me.optItnFormatPlain.Size = New System.Drawing.Size(48, 17)
         Me.optItnFormatPlain.TabIndex = 1
@@ -886,14 +888,14 @@ Partial Class frmPNR
         'fraItnOptions
         '
         Me.fraItnOptions.Controls.Add(Me.chkItnCostCentre)
-        Me.fraItnOptions.Controls.Add(Me.chkFlyingTime)
-        Me.fraItnOptions.Controls.Add(Me.Label6)
+        Me.fraItnOptions.Controls.Add(Me.chkItnFlyingTime)
+        Me.fraItnOptions.Controls.Add(Me.lblItnTextToBeAdded)
         Me.fraItnOptions.Controls.Add(Me.chkItnSeating)
         Me.fraItnOptions.Controls.Add(Me.chkItnUSAText)
         Me.fraItnOptions.Controls.Add(Me.chkItnStopovers)
         Me.fraItnOptions.Controls.Add(Me.chkItnBrazilText)
         Me.fraItnOptions.Controls.Add(Me.chkItnTerminal)
-        Me.fraItnOptions.Controls.Add(Me.chkElecItemsBan)
+        Me.fraItnOptions.Controls.Add(Me.chkItnElecItemsBan)
         Me.fraItnOptions.Controls.Add(Me.chkItnPaxSegPerTicket)
         Me.fraItnOptions.Controls.Add(Me.chkItnTickets)
         Me.fraItnOptions.Controls.Add(Me.chkItnClass)
@@ -918,25 +920,25 @@ Partial Class frmPNR
         Me.chkItnCostCentre.Text = "Cost Centre"
         Me.chkItnCostCentre.UseVisualStyleBackColor = True
         '
-        'chkFlyingTime
+        'chkItnFlyingTime
         '
-        Me.chkFlyingTime.AutoSize = True
-        Me.chkFlyingTime.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkFlyingTime.Location = New System.Drawing.Point(6, 226)
-        Me.chkFlyingTime.Name = "chkFlyingTime"
-        Me.chkFlyingTime.Size = New System.Drawing.Size(79, 17)
-        Me.chkFlyingTime.TabIndex = 12
-        Me.chkFlyingTime.Text = "Flying Time"
-        Me.chkFlyingTime.UseVisualStyleBackColor = True
+        Me.chkItnFlyingTime.AutoSize = True
+        Me.chkItnFlyingTime.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.chkItnFlyingTime.Location = New System.Drawing.Point(6, 226)
+        Me.chkItnFlyingTime.Name = "chkItnFlyingTime"
+        Me.chkItnFlyingTime.Size = New System.Drawing.Size(79, 17)
+        Me.chkItnFlyingTime.TabIndex = 12
+        Me.chkItnFlyingTime.Text = "Flying Time"
+        Me.chkItnFlyingTime.UseVisualStyleBackColor = True
         '
-        'Label6
+        'lblItnTextToBeAdded
         '
-        Me.Label6.AutoSize = True
-        Me.Label6.Location = New System.Drawing.Point(6, 270)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(127, 13)
-        Me.Label6.TabIndex = 8
-        Me.Label6.Text = "TEXT TO BE ADDED"
+        Me.lblItnTextToBeAdded.AutoSize = True
+        Me.lblItnTextToBeAdded.Location = New System.Drawing.Point(6, 270)
+        Me.lblItnTextToBeAdded.Name = "lblItnTextToBeAdded"
+        Me.lblItnTextToBeAdded.Size = New System.Drawing.Size(127, 13)
+        Me.lblItnTextToBeAdded.TabIndex = 8
+        Me.lblItnTextToBeAdded.Text = "TEXT TO BE ADDED"
         '
         'chkItnSeating
         '
@@ -995,18 +997,18 @@ Partial Class frmPNR
         Me.chkItnTerminal.Text = "Show terminal"
         Me.chkItnTerminal.UseVisualStyleBackColor = True
         '
-        'chkElecItemsBan
+        'chkItnElecItemsBan
         '
-        Me.chkElecItemsBan.AutoSize = True
-        Me.chkElecItemsBan.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.chkElecItemsBan.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkElecItemsBan.Location = New System.Drawing.Point(6, 295)
-        Me.chkElecItemsBan.Name = "chkElecItemsBan"
-        Me.chkElecItemsBan.Size = New System.Drawing.Size(127, 17)
-        Me.chkElecItemsBan.TabIndex = 9
-        Me.chkElecItemsBan.Text = "2017 Elec. Items Ban"
-        Me.ttpToolTip.SetToolTip(Me.chkElecItemsBan, resources.GetString("chkElecItemsBan.ToolTip"))
-        Me.chkElecItemsBan.UseVisualStyleBackColor = False
+        Me.chkItnElecItemsBan.AutoSize = True
+        Me.chkItnElecItemsBan.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.chkItnElecItemsBan.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.chkItnElecItemsBan.Location = New System.Drawing.Point(6, 295)
+        Me.chkItnElecItemsBan.Name = "chkItnElecItemsBan"
+        Me.chkItnElecItemsBan.Size = New System.Drawing.Size(127, 17)
+        Me.chkItnElecItemsBan.TabIndex = 9
+        Me.chkItnElecItemsBan.Text = "2017 Elec. Items Ban"
+        Me.ttpToolTip.SetToolTip(Me.chkItnElecItemsBan, resources.GetString("chkItnElecItemsBan.ToolTip"))
+        Me.chkItnElecItemsBan.UseVisualStyleBackColor = False
         '
         'chkItnPaxSegPerTicket
         '
@@ -1068,12 +1070,25 @@ Partial Class frmPNR
         Me.rtbItnDoc.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.rtbItnDoc.ContextMenuStrip = Me.menuITNSelectCopy
         Me.rtbItnDoc.Font = New System.Drawing.Font("Courier New", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.rtbItnDoc.Location = New System.Drawing.Point(315, 194)
         Me.rtbItnDoc.Name = "rtbItnDoc"
         Me.rtbItnDoc.Size = New System.Drawing.Size(1039, 391)
         Me.rtbItnDoc.TabIndex = 11
         Me.rtbItnDoc.Text = ""
+        '
+        'menuITNSelectCopy
+        '
+        Me.menuITNSelectCopy.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuCopyItn})
+        Me.menuITNSelectCopy.Name = "menuSelectCopy"
+        Me.menuITNSelectCopy.Size = New System.Drawing.Size(149, 26)
+        '
+        'MenuCopyItn
+        '
+        Me.MenuCopyItn.Name = "MenuCopyItn"
+        Me.MenuCopyItn.Size = New System.Drawing.Size(148, 22)
+        Me.MenuCopyItn.Text = "Copy Itinerary"
         '
         'cmdItnReadPNR
         '
@@ -1102,7 +1117,7 @@ Partial Class frmPNR
         Me.txtItnPNR.Name = "txtItnPNR"
         Me.txtItnPNR.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.txtItnPNR.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtItnPNR.Size = New System.Drawing.Size(134, 511)
+        Me.txtItnPNR.Size = New System.Drawing.Size(134, 495)
         Me.txtItnPNR.TabIndex = 3
         '
         'lblItnPNR
@@ -1122,7 +1137,7 @@ Partial Class frmPNR
         'tabOSM
         '
         Me.tabOSM.Controls.Add(Me.chkOSMVesselInUse)
-        Me.tabOSM.Controls.Add(Me.Label7)
+        Me.tabOSM.Controls.Add(Me.lblOSMMultipleSearchSeparator)
         Me.tabOSM.Controls.Add(Me.txtOSMAgentsFilter)
         Me.tabOSM.Controls.Add(Me.cmdOSMClearSelected)
         Me.tabOSM.Controls.Add(Me.cmdOSMEmailClear)
@@ -1131,18 +1146,18 @@ Partial Class frmPNR
         Me.tabOSM.Controls.Add(Me.cmdOSMCopyDocument)
         Me.tabOSM.Controls.Add(Me.cmdOSMPrepareDoc)
         Me.tabOSM.Controls.Add(Me.dgvOSMPax)
-        Me.tabOSM.Controls.Add(Me.Label5)
+        Me.tabOSM.Controls.Add(Me.lblOSMPasteEmailsHere)
         Me.tabOSM.Controls.Add(Me.txtOSMPax)
         Me.tabOSM.Controls.Add(Me.lblOSMVessel)
         Me.tabOSM.Controls.Add(Me.cmdOSMVesselsEdit)
-        Me.tabOSM.Controls.Add(Me.Label4)
+        Me.tabOSM.Controls.Add(Me.lblOSMVessels)
         Me.tabOSM.Controls.Add(Me.cmdOSMAgentEdit)
-        Me.tabOSM.Controls.Add(Me.Label3)
+        Me.tabOSM.Controls.Add(Me.lblOSMAgents)
         Me.tabOSM.Controls.Add(Me.lstOSMAgents)
         Me.tabOSM.Controls.Add(Me.cmdOSMCopyCC)
         Me.tabOSM.Controls.Add(Me.cmdOSMCopyTo)
-        Me.tabOSM.Controls.Add(Me.Label2)
-        Me.tabOSM.Controls.Add(Me.Label1)
+        Me.tabOSM.Controls.Add(Me.lblOSMEmailsCC)
+        Me.tabOSM.Controls.Add(Me.lblOSMEmailsTo)
         Me.tabOSM.Controls.Add(Me.lstOSMCCEmail)
         Me.tabOSM.Controls.Add(Me.lstOSMToEmail)
         Me.tabOSM.Controls.Add(Me.cmdOSMRefresh)
@@ -1166,15 +1181,15 @@ Partial Class frmPNR
         Me.chkOSMVesselInUse.Text = "In Use Only"
         Me.chkOSMVesselInUse.UseVisualStyleBackColor = True
         '
-        'Label7
+        'lblOSMMultipleSearchSeparator
         '
-        Me.Label7.AutoSize = True
-        Me.Label7.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.Label7.Location = New System.Drawing.Point(217, 317)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(112, 9)
-        Me.Label7.TabIndex = 23
-        Me.Label7.Text = "Multiple search separated with |"
+        Me.lblOSMMultipleSearchSeparator.AutoSize = True
+        Me.lblOSMMultipleSearchSeparator.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblOSMMultipleSearchSeparator.Location = New System.Drawing.Point(217, 317)
+        Me.lblOSMMultipleSearchSeparator.Name = "lblOSMMultipleSearchSeparator"
+        Me.lblOSMMultipleSearchSeparator.Size = New System.Drawing.Size(112, 9)
+        Me.lblOSMMultipleSearchSeparator.TabIndex = 23
+        Me.lblOSMMultipleSearchSeparator.Text = "Multiple search separated with |"
         '
         'txtOSMAgentsFilter
         '
@@ -1252,34 +1267,10 @@ Partial Class frmPNR
         Me.dgvOSMPax.AllowUserToDeleteRows = False
         Me.dgvOSMPax.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        DataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle10.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        DataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgvOSMPax.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle10
         Me.dgvOSMPax.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvOSMPax.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Id, Me.LastName, Me.FirstName, Me.Nationality, Me.JoinerLeaver, Me.VisaType})
-        DataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window
-        DataGridViewCellStyle11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        DataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.dgvOSMPax.DefaultCellStyle = DataGridViewCellStyle11
         Me.dgvOSMPax.Location = New System.Drawing.Point(811, 67)
         Me.dgvOSMPax.Name = "dgvOSMPax"
-        DataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle12.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        DataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText
-        DataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.dgvOSMPax.RowHeadersDefaultCellStyle = DataGridViewCellStyle12
         Me.dgvOSMPax.Size = New System.Drawing.Size(530, 332)
         Me.dgvOSMPax.TabIndex = 17
         '
@@ -1315,16 +1306,16 @@ Partial Class frmPNR
         Me.VisaType.Items.AddRange(New Object() {"Visa required", "OKTB", "No Visa required"})
         Me.VisaType.Name = "VisaType"
         '
-        'Label5
+        'lblOSMPasteEmailsHere
         '
-        Me.Label5.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Label5.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.Label5.Location = New System.Drawing.Point(509, 54)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(262, 13)
-        Me.Label5.TabIndex = 14
-        Me.Label5.Text = "PASTE OSM EMAIL HERE"
-        Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.lblOSMPasteEmailsHere.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.lblOSMPasteEmailsHere.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblOSMPasteEmailsHere.Location = New System.Drawing.Point(509, 54)
+        Me.lblOSMPasteEmailsHere.Name = "lblOSMPasteEmailsHere"
+        Me.lblOSMPasteEmailsHere.Size = New System.Drawing.Size(262, 13)
+        Me.lblOSMPasteEmailsHere.TabIndex = 14
+        Me.lblOSMPasteEmailsHere.Text = "PASTE OSM EMAIL HERE"
+        Me.lblOSMPasteEmailsHere.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'txtOSMPax
         '
@@ -1358,16 +1349,16 @@ Partial Class frmPNR
         Me.cmdOSMVesselsEdit.Text = "Edit Vessels"
         Me.cmdOSMVesselsEdit.UseVisualStyleBackColor = True
         '
-        'Label4
+        'lblOSMVessels
         '
-        Me.Label4.BackColor = System.Drawing.Color.Yellow
-        Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.Label4.Location = New System.Drawing.Point(18, 46)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(193, 13)
-        Me.Label4.TabIndex = 1
-        Me.Label4.Text = "Vessels"
-        Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.lblOSMVessels.BackColor = System.Drawing.Color.Yellow
+        Me.lblOSMVessels.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblOSMVessels.Location = New System.Drawing.Point(18, 46)
+        Me.lblOSMVessels.Name = "lblOSMVessels"
+        Me.lblOSMVessels.Size = New System.Drawing.Size(193, 13)
+        Me.lblOSMVessels.TabIndex = 1
+        Me.lblOSMVessels.Text = "Vessels"
+        Me.lblOSMVessels.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'cmdOSMAgentEdit
         '
@@ -1378,16 +1369,16 @@ Partial Class frmPNR
         Me.cmdOSMAgentEdit.Text = "Edit Agents"
         Me.cmdOSMAgentEdit.UseVisualStyleBackColor = True
         '
-        'Label3
+        'lblOSMAgents
         '
-        Me.Label3.BackColor = System.Drawing.Color.Yellow
-        Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.Label3.Location = New System.Drawing.Point(217, 275)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(285, 13)
-        Me.Label3.TabIndex = 11
-        Me.Label3.Text = "Agents"
-        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        Me.lblOSMAgents.BackColor = System.Drawing.Color.Yellow
+        Me.lblOSMAgents.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblOSMAgents.Location = New System.Drawing.Point(217, 275)
+        Me.lblOSMAgents.Name = "lblOSMAgents"
+        Me.lblOSMAgents.Size = New System.Drawing.Size(285, 13)
+        Me.lblOSMAgents.TabIndex = 11
+        Me.lblOSMAgents.Text = "Agents"
+        Me.lblOSMAgents.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         'lstOSMAgents
         '
@@ -1420,23 +1411,23 @@ Partial Class frmPNR
         Me.cmdOSMCopyTo.Text = "Copy TO"
         Me.cmdOSMCopyTo.UseVisualStyleBackColor = True
         '
-        'Label2
+        'lblOSMEmailsCC
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(217, 165)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(53, 13)
-        Me.Label2.TabIndex = 8
-        Me.Label2.Text = "emails CC"
+        Me.lblOSMEmailsCC.AutoSize = True
+        Me.lblOSMEmailsCC.Location = New System.Drawing.Point(217, 165)
+        Me.lblOSMEmailsCC.Name = "lblOSMEmailsCC"
+        Me.lblOSMEmailsCC.Size = New System.Drawing.Size(53, 13)
+        Me.lblOSMEmailsCC.TabIndex = 8
+        Me.lblOSMEmailsCC.Text = "emails CC"
         '
-        'Label1
+        'lblOSMEmailsTo
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(217, 46)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(54, 13)
-        Me.Label1.TabIndex = 5
-        Me.Label1.Text = "emails TO"
+        Me.lblOSMEmailsTo.AutoSize = True
+        Me.lblOSMEmailsTo.Location = New System.Drawing.Point(217, 46)
+        Me.lblOSMEmailsTo.Name = "lblOSMEmailsTo"
+        Me.lblOSMEmailsTo.Size = New System.Drawing.Size(54, 13)
+        Me.lblOSMEmailsTo.TabIndex = 5
+        Me.lblOSMEmailsTo.Text = "emails TO"
         '
         'lstOSMCCEmail
         '
@@ -1486,6 +1477,7 @@ Partial Class frmPNR
         Me.fraItnAirportName.PerformLayout()
         Me.fraItnOptions.ResumeLayout(False)
         Me.fraItnOptions.PerformLayout()
+        Me.menuITNSelectCopy.ResumeLayout(False)
         Me.tabOSM.ResumeLayout(False)
         Me.tabOSM.PerformLayout()
         CType(Me.dgvOSMPax, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1529,7 +1521,7 @@ Partial Class frmPNR
     Friend WithEvents tabPageItinerary As System.Windows.Forms.TabPage
     Friend WithEvents lstItnRemarks As System.Windows.Forms.CheckedListBox
     Public WithEvents lblItnRemarks As System.Windows.Forms.Label
-    Friend WithEvents chkElecItemsBan As System.Windows.Forms.CheckBox
+    Friend WithEvents chkItnElecItemsBan As System.Windows.Forms.CheckBox
     Public WithEvents cmdItnReadCurrent As System.Windows.Forms.Button
     Friend WithEvents fraItnAirportName As System.Windows.Forms.GroupBox
     Friend WithEvents optItnAirportBoth As System.Windows.Forms.RadioButton
@@ -1564,20 +1556,20 @@ Partial Class frmPNR
     Friend WithEvents chkItnSeaChefsWithCode As System.Windows.Forms.CheckBox
     Friend WithEvents tabOSM As System.Windows.Forms.TabPage
     Friend WithEvents cmdOSMRefresh As System.Windows.Forms.Button
-    Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents lblOSMEmailsCC As System.Windows.Forms.Label
+    Friend WithEvents lblOSMEmailsTo As System.Windows.Forms.Label
     Friend WithEvents lstOSMCCEmail As System.Windows.Forms.ListBox
     Friend WithEvents lstOSMToEmail As System.Windows.Forms.ListBox
     Friend WithEvents cmdOSMCopyCC As System.Windows.Forms.Button
     Friend WithEvents cmdOSMCopyTo As System.Windows.Forms.Button
-    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents lblOSMAgents As System.Windows.Forms.Label
     Friend WithEvents lstOSMAgents As System.Windows.Forms.ListBox
     Friend WithEvents cmdOSMAgentEdit As System.Windows.Forms.Button
     Friend WithEvents cmdOSMVesselsEdit As System.Windows.Forms.Button
-    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents lblOSMVessels As System.Windows.Forms.Label
     Friend WithEvents lblOSMVessel As System.Windows.Forms.Label
     Friend WithEvents txtOSMPax As System.Windows.Forms.TextBox
-    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents lblOSMPasteEmailsHere As System.Windows.Forms.Label
     Friend WithEvents dgvOSMPax As System.Windows.Forms.DataGridView
     Friend WithEvents cmdOSMCopyDocument As System.Windows.Forms.Button
     Friend WithEvents cmdOSMPrepareDoc As System.Windows.Forms.Button
@@ -1591,14 +1583,14 @@ Partial Class frmPNR
     Friend WithEvents webOSMDoc As System.Windows.Forms.WebBrowser
     Friend WithEvents cmdOSMEmailClear As System.Windows.Forms.Button
     Friend WithEvents ttpToolTip As System.Windows.Forms.ToolTip
-    Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents chkFlyingTime As System.Windows.Forms.CheckBox
+    Friend WithEvents lblItnTextToBeAdded As System.Windows.Forms.Label
+    Friend WithEvents chkItnFlyingTime As System.Windows.Forms.CheckBox
     Friend WithEvents cmdItnReadQueue As System.Windows.Forms.Button
     Friend WithEvents cmdItnRefresh As System.Windows.Forms.Button
     Friend WithEvents chkItnCostCentre As System.Windows.Forms.CheckBox
     Friend WithEvents cmdOSMClearSelected As System.Windows.Forms.Button
     Friend WithEvents txtOSMAgentsFilter As System.Windows.Forms.TextBox
-    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents lblOSMMultipleSearchSeparator As System.Windows.Forms.Label
     Friend WithEvents optItnFormatMSReport As System.Windows.Forms.RadioButton
     Friend WithEvents chkOSMVesselInUse As System.Windows.Forms.CheckBox
     Friend WithEvents dgvApis As System.Windows.Forms.DataGridView
@@ -1606,4 +1598,8 @@ Partial Class frmPNR
     Friend WithEvents txtAirlineEntries As System.Windows.Forms.TextBox
     Friend WithEvents cmdPNROnlyDocs As System.Windows.Forms.Button
     Friend WithEvents cmdPNRWriteWithDocs As System.Windows.Forms.Button
+    Friend WithEvents optItnFormatOPTReport As RadioButton
+    Friend WithEvents menuITNSelectCopy As ContextMenuStrip
+    Friend WithEvents MenuCopyItn As ToolStripMenuItem
+    Public WithEvents lblItnPNRCounter As Label
 End Class

@@ -93,3 +93,36 @@ Check for "WARNING: SECURE FLT PASSENGER DATA REQUIRED FOR TICKETING PAX 1" when
 --------------------------
 
 ---------------------------
+
+
+
+FOR DISCOVERY - email from Craig Palfrey 22/1/2018
+
+Hi Chris
+
+The required RM entries we would expect for all OSM bookings would be as follows:-
+
+Clients Account code 		RM*D,AC- (code to be advised)
+Internal Department			RM*D,DEP-1CYP
+Travel booker 				RM*D,BOOKED- (OSM travel booker name)
+Vessel 						RM*D,CC1- (Vessel name) 
+Trip Purpose				RM*D,REF2-(trip purpose)
+
+
+In addition we also have the following entries that maybe required in some bookings
+
+ATP to act as credit card merchant			RM*D,FOP- (card code) – card number – expiry date 
+
+When buying a flight from 3rd party 		RM*D,CONSOL- (supplier code) –  selling fare – selling tax – ticket number or reference -  number of passengers -  payment method to charge client ; sector numbers 
+
+To stop an invoice from being auto created	RM*D,STOPINV
+ 
+
+If you need the supplier codes for the 3rd party flight scenario please let me know and we can send over the current list used in Cyprus 
+
+
+Regards
+
+
+Craig
+

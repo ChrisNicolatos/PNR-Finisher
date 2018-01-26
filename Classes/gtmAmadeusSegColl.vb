@@ -14,20 +14,19 @@ Friend Class gtmAmadeusSegColl
 
         pobjClass.SetValues(pAirline, pBoardPoint, pClass, pDepartureDate, pArrivalDate, pElementNo, pFlightNo, pOffPoint, pStatus, pFareBase, pDepartTime, pArriveTime, pText, SegDo)
         MyBase.Add(Format(pElementNo), pobjClass)
+
         If pobjClass.BoardAirportName.Length > mMaxAirportNameLength Then
             mMaxAirportNameLength = pobjClass.BoardAirportName.Length
         End If
         If pobjClass.OffPointAirportName.Length > mMaxAirportNameLength Then
             mMaxAirportNameLength = pobjClass.OffPointAirportName.Length
         End If
-
         If pobjClass.BoardCityName.Length > mMaxCityNameLength Then
             mMaxCityNameLength = pobjClass.BoardCityName.Length
         End If
         If pobjClass.OffPointCityName.Length > mMaxCityNameLength Then
             mMaxCityNameLength = pobjClass.OffPointCityName.Length
         End If
-
         If pobjClass.BoardAirportShortName.Length > mMaxAirportShortNameLength Then
             mMaxAirportShortNameLength = pobjClass.BoardAirportShortName.Length
         End If
@@ -49,6 +48,25 @@ Friend Class gtmAmadeusSegColl
     Friend ReadOnly Property MaxAirportShortNameLength As Integer
         Get
             MaxAirportShortNameLength = mMaxAirportShortNameLength
+        End Get
+    End Property
+    Friend ReadOnly Property Itinerary As String
+        Get
+            Dim PrevOff As String = ""
+            Itinerary = ""
+            For Each Seg As gtmAmadeusSeg In MyBase.Values
+                With Seg
+                    If PrevOff = .BoardPoint Then
+                        Itinerary &= " " & .Airline & " " & .OffPoint
+                    Else
+                        If Itinerary <> "" Then
+                            Itinerary &= " *** "
+                        End If
+                        Itinerary &= .BoardPoint & " " & .Airline & " " & .OffPoint
+                    End If
+                    PrevOff = .OffPoint
+                End With
+            Next
         End Get
     End Property
 

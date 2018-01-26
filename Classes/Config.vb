@@ -8,6 +8,7 @@
         Dim CityName As String
         Dim Phone As String
         Dim AOHPhone As String
+        Dim PCCBackOffice As Integer
         Dim AgentId As Integer
         Dim AgentQueue As String
         Dim AgentOPQueue As String
@@ -45,9 +46,9 @@
             mflgIsDirtyPCC = False
             mflgIsDirtyUser = False
             mAmadeusReferences.Clear()
-            DBReadReferences()
             DBReadPCC()
             DBReadUser()
+            DBReadReferences()
 
         Catch ex As Exception
             Throw New Exception(ex.Message)
@@ -294,6 +295,14 @@
             mudtprops.AOHPhone = value
         End Set
     End Property
+    Public Property PCCBackOffice As Integer
+        Get
+            PCCBackOffice = mudtProps.PCCBackOffice
+        End Get
+        Set(value As Integer)
+            mudtProps.PCCBackOffice = value
+        End Set
+    End Property
     Public Property AgentQueue As String
         Get
             AgentQueue = mudtprops.AgentQueue
@@ -372,11 +381,11 @@
 
         With pobjComm
             .CommandType = CommandType.Text
-            .CommandText = " SELECT pfrID " & _
-                           " ,pfrKey" & _
-                           " ,pfrValue " & _
-                           " FROM [AmadeusReports].[dbo].[PNRFinisherReferences] "
-
+            .CommandText = " SELECT pfrID " &
+                           " ,pfrKey" &
+                           " ,pfrValue " &
+                           " FROM [AmadeusReports].[dbo].[PNRFinisherGDS_BOReferences] " &
+                           " WHERE pfrGDS_fkey = 1 AND pfrBO_fkey = " & mudtProps.PCCBackOffice
             pobjReader = .ExecuteReader
         End With
         With pobjReader
@@ -400,14 +409,15 @@
 
         With pobjComm
             .CommandType = CommandType.Text
-            .CommandText = " SELECT pfpId " & _
-                           " ,pfpOfficeCityCode " & _
-                           " ,pfpCountryCode " & _
-                           " ,pfpOfficeName " & _
-                           " ,pfpCityName " & _
-                           " ,pfpOfficePhone " & _
-                           " ,pfpAOHPhone " & _
-                           " FROM [AmadeusReports].[dbo].[PNRFinisherPCC] " & _
+            .CommandText = " SELECT pfpId " &
+                           " ,pfpOfficeCityCode " &
+                           " ,pfpCountryCode " &
+                           " ,pfpOfficeName " &
+                           " ,pfpCityName " &
+                           " ,pfpOfficePhone " &
+                           " ,pfpAOHPhone " &
+                           " ,pfpBO_fkey " &
+                           " FROM [AmadeusReports].[dbo].[PNRFinisherPCC] " &
                            " WHERE pfpPCC = '" & mobjAmadeusUser.PCC & "'"
 
             pobjReader = .ExecuteReader
@@ -421,6 +431,7 @@
                 mudtProps.CityName = .Item("pfpCityName")
                 mudtProps.Phone = .Item("pfpOfficePhone")
                 mudtProps.AOHPhone = .Item("pfpAOHPhone")
+                mudtProps.PCCBackOffice = .Item("pfpBO_fkey")
             Else
                 mudtProps.PCCId = 0
                 mudtProps.OfficeCityCode = ""
@@ -429,6 +440,7 @@
                 mudtProps.CityName = ""
                 mudtProps.Phone = ""
                 mudtProps.AOHPhone = ""
+                mudtProps.PCCBackOffice = 0
             End If
             .Close()
         End With
@@ -658,17 +670,18 @@
     Public ReadOnly Property isValid As Boolean
         Get
             With mudtProps
-                isValid = mobjAmadeusUser.PCC <> "" And _
-                          mobjAmadeusUser.User <> "" And _
-                          .AgentQueue <> "" And _
-                          .AgentOPQueue <> "" And _
-                          .CountryCode <> "" And _
-                          .AgentName <> "" And _
-                          .AgentEmail <> "" And _
-                          .OfficeCityCode <> "" And _
-                          .CityName <> "" And _
-                          .OfficeName <> "" And _
-                          .AOHPhone <> "" And _
+                isValid = mobjAmadeusUser.PCC <> "" And
+                          mobjAmadeusUser.User <> "" And
+                          .AgentQueue <> "" And
+                          .AgentOPQueue <> "" And
+                          .CountryCode <> "" And
+                          .AgentName <> "" And
+                          .AgentEmail <> "" And
+                          .OfficeCityCode <> "" And
+                          .CityName <> "" And
+                          .OfficeName <> "" And
+                          .AOHPhone <> "" And
+                          .PCCBackOffice <> 0 And
                           .Phone <> ""
             End With
         End Get

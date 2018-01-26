@@ -42,6 +42,9 @@ Friend Class gtmAmadeusPNR
 	Private mobjTickets As gtmTicketColl
     Private mobjFrequentFlyer As FrequentFlyerColl
     Private mstrCC As String
+    Private mstrOPT1 As String
+    Private mstrOPT2 As String
+    Private mstrOPT3 As String
 
     Private mflgCancelError As Boolean
     'Private mflgOriginalIssue As Boolean
@@ -129,7 +132,31 @@ Friend Class gtmAmadeusPNR
             CostCentre = mstrCC
         End Get
     End Property
-	Public ReadOnly Property RequestedPNR() As String
+    Public ReadOnly Property Opt1
+        Get
+            Opt1 = mstrOPT1
+        End Get
+    End Property
+    Public ReadOnly Property Opt2
+        Get
+            Opt2 = mstrOPT2
+        End Get
+    End Property
+    Public ReadOnly Property Opt3
+        Get
+            Opt3 = mstrOPT3
+        End Get
+    End Property
+    Public ReadOnly Property Opt4
+        Get
+            Try
+                Opt4 = Opt1 * mobjPax.Count
+            Catch ex As Exception
+                Opt4 = 0
+            End Try
+        End Get
+    End Property
+    Public ReadOnly Property RequestedPNR() As String
 		Get
             RequestedPNR = mudtProps.RequestedPNR
         End Get
@@ -151,36 +178,6 @@ Friend Class gtmAmadeusPNR
 
         End Set
     End Property
-    'Public ReadOnly Property Status() As String
-    '	Get
-
-    '		Status = mstrStatus
-
-    '	End Get
-    'End Property
-    '   Public ReadOnly Property isDirty() As Boolean
-    '	Get
-
-    '		isDirty = mudtProps.isDirty
-
-    '	End Get
-    'End Property
-
-    '   Public ReadOnly Property isNew() As Boolean
-    '	Get
-
-    '		isNew = mudtProps.isNew
-
-    '	End Get
-    'End Property
-
-    '   Public ReadOnly Property isValid() As Boolean
-    '	Get
-
-    '		isValid = mudtProps.isValid
-
-    '	End Get
-    'End Property
 
     Public ReadOnly Property Tickets() As gtmTicketColl
 		Get
@@ -190,20 +187,10 @@ Friend Class gtmAmadeusPNR
 		End Get
 	End Property
 
-    'Public ReadOnly Property PNR() As s1aPNR.PNR
-    '	Get
-
-    '		PNR = mobjPNR
-
-    '	End Get
-    'End Property
-
     Public ReadOnly Property Segments() As gtmAmadeusSegColl
-		Get
-			
-			Segments = mobjSegs
-			
-		End Get
+        Get
+            Segments = mobjSegs
+        End Get
     End Property
     Public ReadOnly Property HasSegments As Boolean
         Get
@@ -336,6 +323,9 @@ Friend Class gtmAmadeusPNR
         mobjTickets = New gtmTicketColl
         mstrVesselName = ""
         mstrCC = ""
+        mstrOPT1 = ""
+        mstrOPT2 = ""
+        mstrOPT3 = ""
 
         With mudtProps
 
@@ -352,6 +342,7 @@ Friend Class gtmAmadeusPNR
                     getPax()
                     getSegs(ForReportOnly)
                     getOtherServiceElements()
+                    GetRMElements()
                 Else
                     getTQT()
                     getPax()
@@ -909,7 +900,6 @@ Friend Class gtmAmadeusPNR
         Next pobjRMElement
 
     End Sub
-
     Private Sub parseRMElements(ByVal Element As s1aPNR.RemarkElement)
 
         Dim pintLen As Short
@@ -923,9 +913,18 @@ Friend Class gtmAmadeusPNR
         If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
             If pstrSplit(1) = "CC" Then
                 mstrCC = pstrSplit(2)
+            ElseIf pstrSplit(1) = "OPT" Then
+                If pstrSplit.Length >= 3 Then
+                    mstrOPT1 = pstrSplit(2).Replace(".", ",")
+                    If pstrSplit.Length >= 4 Then
+                        mstrOPT2 = pstrSplit(3).Replace(".", ",")
+                        If pstrSplit.Length >= 5 Then
+                            mstrOPT3 = pstrSplit(4).Replace(".", ",")
+                        End If
+                    End If
+                End If
             End If
         End If
-
     End Sub
     Private Sub getTQT()
 
@@ -941,7 +940,13 @@ Friend Class gtmAmadeusPNR
                     ReDim Preserve mudtTQT(mudtTQT.GetUpperBound(0) + 1)
                     If pTQT(i).Substring(1, pTQT(i).IndexOf(" ")) <> pTQT(i - 1).Substring(1, pTQT(i).IndexOf(" ")) AndAlso IsNumeric(pTQT(i).Substring(1, pTQT(i).IndexOf(" "))) Then
                         mudtTQT(mudtTQT.GetUpperBound(0)).TQTElement = pTQT(i).Substring(1, pTQT(i).IndexOf(" "))
-                        Dim pSeg() As String = pTQT(i).Substring(pTQT(i).LastIndexOf(" ")).Trim.Split(",")
+                        Dim pSeg() As String
+                        If i < pTQT.GetUpperBound(0) AndAlso pTQT(i + 1).Length > 2 AndAlso pTQT(i + 1).Substring(1, 1) = " " Then
+                            pTQT(i) &= pTQT(i + 1).Trim
+                            pSeg = pTQT(i).Substring(pTQT(i).LastIndexOf(" ")).Trim.Split(",")
+                        Else
+                            pSeg = pTQT(i).Substring(pTQT(i).LastIndexOf(" ")).Trim.Split(",")
+                        End If
                         For i1 As Integer = 0 To pSeg.GetUpperBound(0)
                             Dim pSeg1() As String = pSeg(i1).Split("-")
                             If IsNumeric(pSeg1(0)) Then

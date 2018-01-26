@@ -45,11 +45,11 @@
                 ' We link our application to the active session of the FOS '
                 mobjSession = Sessions.UIActiveSession
                 mobjSession.Send("JGD/C")
-                Dim pLines() As String = mstrResponse.Split({Chr(10), Chr(13)})
+                Dim pLines() As String = mstrResponse.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
                 For i As Integer = 0 To pLines.GetUpperBound(0)
                     If pLines(i).Trim.StartsWith("OFFICE") Then
                         mstrPCC = pLines(i).Substring(pLines(i).IndexOf("-") + 1).Trim
-                    ElseIf pLines(i).Trim.StartsWith("SIGN") Then
+                    ElseIf pLines(i).Trim.StartsWith("SIGN ") Then
                         mstrUser = pLines(i).Substring(pLines(i).IndexOf("-") + 1).Trim
                     End If
                 Next
