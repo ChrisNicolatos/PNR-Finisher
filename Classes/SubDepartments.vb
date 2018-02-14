@@ -1,4 +1,6 @@
-﻿Namespace SubDepartments
+﻿Option Strict Off
+Option Explicit On
+Namespace SubDepartments
     Public Class Item
         Private Structure ClassProps
             Dim ID As Long
@@ -35,33 +37,36 @@
         End Sub
 
         Public Sub Load(ByVal pSubID As Long)
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
-            Dim pobjComm As New SqlClient.SqlCommand
-            Dim pobjReader As SqlClient.SqlDataReader
+            If MySettings.PCCBackOffice = 1 Then
 
-            pobjConn.Open()
-            pobjComm = pobjConn.CreateCommand
+                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjComm As New SqlClient.SqlCommand
+                Dim pobjReader As SqlClient.SqlDataReader
 
-            With pobjComm
-                .CommandType = CommandType.Text
-                .CommandText = " SELECT [Id] " & _
-                               " ,[Code] " & _
-                               " ,[Name] " & _
-                               " FROM [TravelForceCosmos].[dbo].[TFEntitySubdepartments] " & _
-                               " WHERE ID = " & pSubID & "  " & _
+                pobjConn.Open()
+                pobjComm = pobjConn.CreateCommand
+
+                With pobjComm
+                    .CommandType = CommandType.Text
+                    .CommandText = " SELECT [Id] " &
+                               " ,[Code] " &
+                               " ,[Name] " &
+                               " FROM [TravelForceCosmos].[dbo].[TFEntitySubdepartments] " &
+                               " WHERE ID = " & pSubID & "  " &
                                " ORDER BY Name "
 
 
-                pobjReader = .ExecuteReader
-            End With
+                    pobjReader = .ExecuteReader
+                End With
 
-            With pobjReader
-                Do While .Read
-                    SetValues(.Item("Id"), .Item("Code"), .Item("Name"))
-                Loop
-                .Close()
-            End With
-            pobjConn.Close()
+                With pobjReader
+                    Do While .Read
+                        SetValues(.Item("Id"), .Item("Code"), .Item("Name"))
+                    Loop
+                    .Close()
+                End With
+                pobjConn.Close()
+            End If
         End Sub
     End Class
     Public Class Collection
@@ -69,45 +74,42 @@
         Private mlngEntityID As Long
 
         Public Sub Load(ByVal pEntityID As Long)
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
-            Dim pobjComm As New SqlClient.SqlCommand
-            Dim pobjReader As SqlClient.SqlDataReader
-            Dim pobjClass As Item
+            If MySettings.PCCBackOffice = 1 Then
 
-            mlngEntityID = pEntityID
+                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjComm As New SqlClient.SqlCommand
+                Dim pobjReader As SqlClient.SqlDataReader
+                Dim pobjClass As Item
 
-            pobjConn.Open()
-            pobjComm = pobjConn.CreateCommand
+                mlngEntityID = pEntityID
 
-            With pobjComm
-                .CommandType = CommandType.Text
-                .CommandText = " SELECT [Id] " & _
-                               " ,[Code] " & _
-                               " ,[Name] " & _
-                               " FROM [TravelForceCosmos].[dbo].[TFEntitySubdepartments] " & _
-                               " WHERE EntityID = " & mlngEntityID & "  AND InUse = 1 " & _
+                pobjConn.Open()
+                pobjComm = pobjConn.CreateCommand
+
+                With pobjComm
+                    .CommandType = CommandType.Text
+                    .CommandText = " SELECT [Id] " &
+                               " ,[Code] " &
+                               " ,[Name] " &
+                               " FROM [TravelForceCosmos].[dbo].[TFEntitySubdepartments] " &
+                               " WHERE EntityID = " & mlngEntityID & "  AND InUse = 1 " &
                                " ORDER BY Name "
 
 
-                pobjReader = .ExecuteReader
-            End With
+                    pobjReader = .ExecuteReader
+                End With
 
-            With pobjReader
-                Do While .Read
-                    pobjClass = New Item
-                    pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"))
-                    MyBase.Add(pobjClass.ID, pobjClass)
-                Loop
-                .Close()
-            End With
-            pobjConn.Close()
+                With pobjReader
+                    Do While .Read
+                        pobjClass = New Item
+                        pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"))
+                        MyBase.Add(pobjClass.ID, pobjClass)
+                    Loop
+                    .Close()
+                End With
+                pobjConn.Close()
+            End If
         End Sub
-
-        'Private ReadOnly Property EntityID() As Long
-        '    Get
-        '        EntityID = mlngEntityID
-        '    End Get
-        'End Property
 
     End Class
 End Namespace

@@ -1,6 +1,6 @@
 Option Strict Off
 Option Explicit On
-Friend Class gtmAirlines
+Friend Class Airlines
 
     Public ReadOnly Property AirlineName(ByVal AirlineCode As String) As String
         Get

@@ -1,4 +1,6 @@
-﻿Public Class ReadPNR
+﻿Option Strict Off
+Option Explicit On
+Public Class ReadPNR
 
     Private WithEvents mobjSession As k1aHostToolKit.HostSession
 
@@ -13,16 +15,11 @@
     Private mdteCreationDate As Date
     Private mflgQRSegment As Boolean = False
     Private mdteDepartureDate As Date
-    'Private mflgExistsPassengers As Boolean
     Private mflgExistsSegments As Boolean
-
-    'Private mstrVesselNameOSI As String
-
+    Private mflgExistsSSRDocs As Boolean
     Private mobjExistingAmadeusElements As New AmadeusExisting.Collection
     Private mobjNewAmadeusElements As AmadeusNew.Collection
     Private mobjTicketElements As AmadeusTickets.Collection
-
-    'Private mflgAmadeusPNR As Boolean
 
     Public ReadOnly Property PNR As s1aPNR.PNR
         Get
@@ -89,19 +86,11 @@
             SegmentsExist = mflgExistsSegments
         End Get
     End Property
-    'Public Sub NoPNR()
-
-    '    mstrPNRNumber = "NOPNR"
-    '    mstrOfficeOfResponsibility = MySettings.AmadeusPCC
-    '    mdteCreationDate = Today
-    '    mstrPaxNames = ""
-    '    mdteDepartureDate = Date.MinValue
-    '    mstrItinerary = ""
-    '    mobjPNR = New s1aPNR.PNR
-    '    mobjNewAmadeusElements = New AmadeusNew.Collection(OfficeOfResponsibility, CreationDate, DepartureDate, NumberOfPax)
-
-    'End Sub
-
+    Public ReadOnly Property SSRDocsExists As Boolean
+        Get
+            SSRDocsExists = mflgExistsSSRDocs
+        End Get
+    End Property
     Public Function Read() As String
 
         Dim Sessions As k1aHostToolKit.HostSessions
@@ -139,12 +128,15 @@
                     GetTicketElement()
                     GetOptionQueueElement()
                     GetVesselOSI()
+                    GetSSR()
                     GetRM()
 
                     GetTickets()
-                    Read = CheckDMI()
-
-
+                    If mobjPNR.RawResponse.IndexOf("***  NHP  ***") >= 0 Then
+                        Read = "               ***  NHP  ***"
+                    Else
+                        Read = CheckDMI()
+                    End If
                 Else
                     Throw New Exception("There is no active PNR" & vbCrLf & mstrPNRResponse)
                 End If
@@ -190,7 +182,6 @@
         ClearExistingItems(mobjExistingAmadeusElements.OpenSegment, mobjNewAmadeusElements.OpenSegment)
         ClearExistingItems(mobjExistingAmadeusElements.OptionQueueElement, mobjNewAmadeusElements.OptionQueueElement)
         ClearExistingItems(mobjExistingAmadeusElements.TicketElement, mobjNewAmadeusElements.TicketElement)
-        ClearExistingItems(mobjExistingAmadeusElements.AmadeusReward, mobjNewAmadeusElements.AmadeusReward)
         ClearExistingItems(mobjExistingAmadeusElements.AgentID, mobjNewAmadeusElements.AgentID)
 
         ' the following elements are removed and replaced if they exist in the PNR
@@ -262,7 +253,6 @@
                 SendAmadeusElement(mobjNewAmadeusElements.OpenSegment)
                 SendAmadeusElement(mobjNewAmadeusElements.TicketElement)
                 SendAmadeusElement(mobjNewAmadeusElements.OptionQueueElement)
-                SendAmadeusElement(mobjNewAmadeusElements.AmadeusReward)
 
                 If mflgNewPNR Then
                     SendAmadeusElement(mobjNewAmadeusElements.SavingsElement)
@@ -284,10 +274,12 @@
                 SendAmadeusElement(mobjNewAmadeusElements.ReasonForTravel)
                 SendAmadeusElement(mobjNewAmadeusElements.CostCentre)
 
-                Dim pAirlineEntries() As String = AirlineEntries.Text.Split(vbCrLf)
+                Dim pAirlineEntries() As String = AirlineEntries.Text.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
+
                 For i As Integer = 0 To pAirlineEntries.GetUpperBound(0)
+                    pAirlineEntries(i) = pAirlineEntries(i).Replace(">", "").Trim
                     If pAirlineEntries(i).Trim <> "" Then
-                        SendAmadeusAirlineItems(pAirlineEntries(i))
+                        SendAmadeusAirlineItems(pAirlineEntries(i).Replace("> ", ""))
                     End If
                 Next
             End If
@@ -309,25 +301,26 @@
     Private Sub APISUpdate(ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView)
 
         Dim pstrCommand As String
-        'Dim pflgFreqFlyer As Boolean = False
-
         Try
             For i = 0 To dgvApis.RowCount - 1
                 With dgvApis.Rows(i)
-                    Dim pobjItem As New PaxApisDB.Item(.Cells(0).Value, .Cells(1).Value, .Cells(2).Value, _
-                                                       APISDateFromIATA(.Cells(6).Value), .Cells(7).Value, .Cells(3).Value, _
+                    If .ErrorText = "" Then
+                        Dim pobjItem As New PaxApisDB.Item(.Cells(0).Value, .Cells(1).Value, .Cells(2).Value,
+                                                       APISDateFromIATA(.Cells(6).Value), .Cells(7).Value, .Cells(3).Value,
                                                      .Cells(4).Value, APISDateFromIATA(.Cells(8).Value), .Cells(5).Value)
 
-                    pobjItem.Update(mflgExpiryDateOK)
-                    pstrCommand = "SR DOCS YY HK1-P-" & pobjItem.IssuingCountry & "-" & pobjItem.PassportNumber & "-" & pobjItem.Nationality & _
+                        pobjItem.Update(mflgExpiryDateOK)
+                        pstrCommand = "SR DOCS YY HK1-P-" & pobjItem.IssuingCountry & "-" & pobjItem.PassportNumber & "-" & pobjItem.Nationality &
                     "-" & APISDateToIATA(pobjItem.BirthDate) & "-" & pobjItem.Gender & "-"
-                    If mflgExpiryDateOK Then
-                        pstrCommand &= APISDateToIATA(pobjItem.ExpiryDate)
-                    Else
-                        pstrCommand &= ""
+                        If mflgExpiryDateOK Then
+                            pstrCommand &= APISDateToIATA(pobjItem.ExpiryDate)
+                        Else
+                            pstrCommand &= ""
+                        End If
+                        pstrCommand &= "-" & pobjItem.Surname & "-" & pobjItem.FirstName & "/P" & pobjItem.Id
+                        SendNewAmadeusEntries(pstrCommand)
                     End If
-                    pstrCommand &= "-" & pobjItem.Surname & "-" & pobjItem.FirstName & "/P" & pobjItem.Id
-                    SendNewAmadeusEntries(pstrCommand)
+
                 End With
 
             Next
@@ -340,30 +333,13 @@
 
     Private Sub CloseOffPNR()
 
-        Dim pQCommand As String
+        Dim pCloseOffEntries As New CloseOffEntries.Collection
 
-        If mstrOfficeOfResponsibility = MySettings.AmadeusPCC Then
-            pQCommand = "QE" & MySettings.AgentQueue & "-RT"
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE.ATHNB-RT"
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE/AMSVP3102/92C0-RT"
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE/ATH1A098A/77-RT"
-            mobjSession.Send(pQCommand)
-        Else
-            pQCommand = "RF ATPI ATHENS " & MySettings.AgentName
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE/" & MySettings.AmadeusPCC & "/" & MySettings.AgentQueue & "-RT"
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE/" & MySettings.AmadeusPCC & "/28C0-RT"
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE/AMSVP3102/92C0-RT"
-            mobjSession.Send(pQCommand)
-            pQCommand = "QE/ATH1A098A/77-RT"
-            mobjSession.Send(pQCommand)
-        End If
+        pCloseOffEntries.Load(MySettings.AmadeusPCC, mstrOfficeOfResponsibility = MySettings.AmadeusPCC)
 
+        For Each pCommand As CloseOffEntries.Item In pCloseOffEntries.Values
+            mobjSession.Send(pCommand.CloseOffEntry)
+        Next
         If mstrPNRResponse.Contains("WARNING: SECURE FLT PASSENGER DATA REQUIRED") Then
             MessageBox.Show(mstrPNRResponse)
         End If
@@ -447,41 +423,6 @@
         Return pEntries
 
     End Function
-
-    Public Sub UpdatePrices()
-
-        Dim pFlag As Boolean = False
-
-        For i As Integer = 1 To mobjTicketElements.GetUpperBound
-            With mobjTicketElements.Tickets(i)
-                If .DocType = AmadeusTickets.Item.TicketDocType.ETKT Then
-                    If .SellingPrice <> 0 And .SegsElementNo.StartsWith("S") And .PaxID <> "" Then
-                        Dim pCommand As String = MySettings.AmadeusValue("TextSLP") & .SellingPrice.ToString
-                        pCommand &= "/SG" & .SegsElementNo.Substring(1)
-                        Dim i1 As Integer = .PaxID.IndexOf(".")
-                        If i1 > 0 Then
-                            pCommand &= "/P" & .PaxID.Substring(0, i1)
-                            mobjSession.Send(pCommand)
-                            pFlag = True
-                        End If
-                    End If
-                ElseIf .DocType = AmadeusTickets.Item.TicketDocType.VCHR Then
-                    If .SellingPrice <> 0 And .SegsElementNo.StartsWith("S") Then
-                        Dim pCommand As String = MySettings.AmadeusValue("TextSLP") & .SellingPrice.ToString
-                        pCommand &= "/SG" & .SegsElementNo.Substring(1)
-                        mobjSession.Send(pCommand)
-                        pFlag = True
-                    End If
-                End If
-            End With
-        Next
-
-        If pFlag Then
-            mobjSession.Send("ER")
-            mobjSession.Send("TTP/BTK/O")
-        End If
-
-    End Sub
 
     Private Sub GetPnrNumber()
 
@@ -609,7 +550,7 @@
     Private Sub GetPhoneElement()
 
         For Each pField As s1aPNR.PhoneElement In mobjPNR.PhoneElements
-            If pField.Text.Contains("AP ATH") Then
+            If pField.Text.Replace(" ", "").Contains(MySettings.AmadeusValue("TextAP").Replace(" ", "")) Then
                 mobjExistingAmadeusElements.PhoneElement.SetValues(True, pField.Text.Substring(0, pField.Text.IndexOf(pField.ElementID) - 1), "", "")
                 Exit For
             End If
@@ -619,7 +560,7 @@
     Private Sub GetEmailElement()
 
         For Each pField As s1aPNR.PhoneElement In mobjPNR.PhoneElements
-            If pField.Text.Contains("APE ") Then
+            If pField.Text.Contains(MySettings.AmadeusValue("TextAPE_ToFind")) Then
                 mobjExistingAmadeusElements.EmailElement.SetValues(True, pField.Text.Substring(0, pField.Text.IndexOf(pField.ElementID) - 1), "", "")
             End If
         Next
@@ -668,15 +609,21 @@
         Next
 
     End Sub
+    Private Sub GetSSR()
 
+        mflgExistsSSRDocs = False
+        For Each pSSR As s1aPNR.SSRElement In mobjPNR.SSRElements
+            If pSSR.Text.Contains("SSR DOCS") Then
+                mflgExistsSSRDocs = True
+            End If
+        Next
+
+    End Sub
     Private Sub GetRM()
 
         For Each pRemark As s1aPNR.RemarkElement In mobjPNR.RemarkElements
             If pRemark.Text.Contains(MySettings.AmadeusValue("TextAGT")) Then
                 mobjExistingAmadeusElements.AgentID.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), pRemark.Text, "")
-            End If
-            If pRemark.Text.Contains(MySettings.AmadeusValue("TextAMR")) Then
-                mobjExistingAmadeusElements.AmadeusReward.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), pRemark.Text, "")
             End If
             If pRemark.Text.Contains(MySettings.AmadeusValue("TextCLN")) Then
                 If mobjExistingAmadeusElements.CustomerCode.Exists Then
@@ -729,21 +676,21 @@
             ElseIf pRemark.Text.Contains(MySettings.AmadeusValue("TextCC")) Then
                 Dim pCostCentre As String = pRemark.Text.Substring(pRemark.Text.IndexOf(MySettings.AmadeusValue("TextCC")) + MySettings.AmadeusValue("TextCC").Length)
                 mobjExistingAmadeusElements.CostCentre.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), "", pCostCentre)
-            ElseIf pRemark.Text.Contains("*GRACE/CLA") Then
+            ElseIf pRemark.Text.Contains(MySettings.AmadeusValue("TextCLA")) Then
                 If mobjExistingAmadeusElements.CustomerName.Exists Then
                     Throw New Exception("Please check PNR. Duplicate customer name defined" & vbCrLf & mobjExistingAmadeusElements.CustomerName.LineNumber & vbCrLf & pRemark.Text)
                 Else
                     mobjExistingAmadeusElements.CustomerName.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), "", "")
                 End If
-            ElseIf pRemark.Text.Contains("*GRACE/SBA/") Then
+            ElseIf pRemark.Text.Contains(MySettings.AmadeusValue("TextSBA")) Then
                 mobjExistingAmadeusElements.SubDepartmentName.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), "", "")
-            ElseIf pRemark.Text.Contains("*GRACE/CRA/") Then
+            ElseIf pRemark.Text.Contains(MySettings.AmadeusValue("TextCRA")) Then
                 mobjExistingAmadeusElements.CRMName.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), "", "")
             End If
         Next
 
     End Sub
-   
+
     Private Sub GetTickets()
 
         mobjTicketElements = New AmadeusTickets.Collection(mobjPNR)

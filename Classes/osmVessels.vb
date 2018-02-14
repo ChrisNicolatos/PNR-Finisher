@@ -1,20 +1,25 @@
-﻿Namespace osmVessels
+﻿Option Strict Off
+Option Explicit On
+Namespace osmVessels
     Public Class VesselItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim VesselName As String
-            Dim VesselGroup As String
+            Dim VesselGroup() As Integer
+            Dim VesselgroupCount As Integer
             Dim InUse As Boolean
             Dim isNew As Boolean
             Dim isValid As Boolean
         End Structure
         Dim mudtProps As ClassProps
+        Dim mobjVessel_VesselGroup As New Vessel_VesselGroupCollection
 
         Public Sub New()
             With mudtProps
                 .Id = 0
                 .VesselName = ""
-                .VesselGroup = ""
+                .VesselgroupCount = 0
+                ReDim .VesselGroup(0)
                 .InUse = True
                 .isNew = True
                 CheckValid()
@@ -39,13 +44,26 @@
                 CheckValid()
             End Set
         End Property
-        Public Property VesselGroup As String
+        Public ReadOnly Property VesselGroupCount As Integer
             Get
-                VesselGroup = mudtProps.VesselGroup
+                VesselGroupCount = mudtProps.VesselgroupCount
             End Get
-            Set(value As String)
-                mudtProps.VesselGroup = value
-                CheckValid()
+        End Property
+        Public ReadOnly Property VesselGroup(ByVal Index As Integer) As Integer
+            Get
+                If Index >= 0 And Index < mudtProps.VesselgroupCount Then
+                    VesselGroup = mudtProps.VesselGroup(Index)
+                Else
+                    VesselGroup = 0
+                End If
+            End Get
+        End Property
+        Public Property Vessel_VesselGroup As Vessel_VesselGroupCollection
+            Get
+                Vessel_VesselGroup = mobjVessel_VesselGroup
+            End Get
+            Set(value As Vessel_VesselGroupCollection)
+                mobjVessel_VesselGroup = value
             End Set
         End Property
         Public Property InUse As Boolean
@@ -61,14 +79,13 @@
                 isValid = mudtProps.isValid
             End Get
         End Property
-
-        Public Sub SetValues(ByVal pId As Integer, ByVal pVesselName As String, ByVal pVesselGroup As String, ByVal pInUse As Boolean)
+        Public Sub SetValues(ByVal pId As Integer, ByVal pVesselName As String, ByVal pInUse As Boolean)
             With mudtProps
                 .Id = pId
                 .VesselName = pVesselName
-                .VesselGroup = pVesselGroup
                 .InUse = pInUse
                 .isNew = False
+                mobjVessel_VesselGroup.Load(Id)
             End With
             CheckValid()
         End Sub
@@ -93,11 +110,11 @@
                     With pobjComm
                         .CommandType = CommandType.Text
                         If mudtProps.isNew Then
-                            .CommandText = "IF (SELECT COUNT(*) FROM [AmadeusReports].[dbo].[osmVessels] WHERE osmvVesselName = '" & mudtProps.VesselName & "') = 0 " & _
-                                           " INSERT INTO AmadeusReports.dbo.osmVessels " & _
-                                           " (osmvVesselName, osmvVesselGroup, osmvInUse) " & _
-                                           " VALUES " & _
-                                           " ( '" & mudtProps.VesselName & "', '" & mudtProps.VesselGroup & "', " & If(mudtProps.InUse, 1, 0) & ") " & _
+                            .CommandText = "IF (SELECT COUNT(*) FROM [AmadeusReports].[dbo].[osmVessels] WHERE osmvVesselName = '" & mudtProps.VesselName & "') = 0 " &
+                                           " INSERT INTO AmadeusReports.dbo.osmVessels " &
+                                           " (osmvVesselName, osmvVesselGroup, osmvInUse) " &
+                                           " VALUES " &
+                                           " ( '" & mudtProps.VesselName & "', '', " & If(mudtProps.InUse, 1, 0) & ") " &
                                            " select scope_identity() as Id"
                             Dim pTemp As Object = .ExecuteScalar
                             If IsDBNull(pTemp) Then
@@ -107,14 +124,15 @@
                                 mudtProps.isNew = False
                             End If
                         Else
-                            .CommandText = "UPDATE AmadeusReports.dbo.osmVessels " & _
-                                           " SET osmvVesselName = '" & mudtProps.VesselName & "', " & _
-                                           "     osmvVesselGroup = '" & mudtProps.VesselGroup & "', " & _
-                                           "     osmvInUse = " & If(mudtProps.InUse, 1, 0) & " " & _
+                            .CommandText = "UPDATE AmadeusReports.dbo.osmVessels " &
+                                           " SET osmvVesselName = '" & mudtProps.VesselName & "', " &
+                                           "     osmvVesselGroup = '', " &
+                                           "     osmvInUse = " & If(mudtProps.InUse, 1, 0) & " " &
                                            " WHERE osmvId = " & mudtProps.Id
                             .ExecuteNonQuery()
                         End If
                     End With
+                    mobjVessel_VesselGroup.Update()
                 Else
                     Throw New Exception("Vessel name invalid")
                 End If
@@ -124,12 +142,38 @@
 
 
         End Sub
+
     End Class
 
     Public Class VesselCollection
         Inherits Collections.Generic.Dictionary(Of String, VesselItem)
 
         Public Sub Load()
+
+            Dim pText As String
+
+            pText = "SELECT osmvID " &
+                    " ,osmvVesselName " &
+                    " , ISNULL(osmvInUse, 0) AS osmvInUse " &
+                    " FROM AmadeusReports.dbo.osmVessels " &
+                    " ORDER BY osmvVesselName"
+            ExecuteLoad(pText)
+
+        End Sub
+        Public Sub Load(ByVal pVesselGroup As Integer)
+
+            Dim pText As String
+
+            pText = "SELECT osmvID " &
+                    " ,osmvVesselName " &
+                    " , ISNULL(osmvInUse, 0) AS osmvInUse " &
+                    " FROM AmadeusReports.dbo.osmVessels " &
+                    " WHERE osmvID IN (SELECT osmVesselGroup_Vessels.osmvId_fkey FROM osmVesselGroup_Vessels WHERE osmVesselGroup_Vessels.osmvrId_fkey=" & pVesselGroup & ")" &
+                    " ORDER BY osmvVesselName"
+            ExecuteLoad(pText)
+
+        End Sub
+        Private Sub ExecuteLoad(ByVal pText As String)
 
             Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
@@ -141,14 +185,313 @@
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = "SELECT osmvID, osmvVesselName, ISNULL(osmvVesselGroup, '') AS osmvVesselGroup, ISNULL(osmvInUse, 0) AS osmvInUse FROM AmadeusReports.dbo.osmVessels ORDER BY osmvVesselName"
+                .CommandText = pText
                 pobjReader = .ExecuteReader
             End With
 
             With pobjReader
                 Do While .Read
                     pobjClass = New VesselItem
-                    pobjClass.SetValues(.Item("osmvId"), .Item("osmvVesselName"), .Item("osmvVesselGroup"), .Item("osmvInUse"))
+                    pobjClass.SetValues(.Item("osmvId"), .Item("osmvVesselName"), .Item("osmvInUse"))
+                    MyBase.Add(pobjClass.Id, pobjClass)
+                Loop
+                .Close()
+            End With
+            pobjConn.Close()
+        End Sub
+    End Class
+    Public Class Vessel_VesselGroupItem
+        Private Structure ClassProps
+            Dim Id As Integer
+            Dim VesselId As Integer
+            Dim VesselGroupId As Integer
+            Dim VesselName As String
+            Dim VesselGroupName As String
+            Dim Exists As Boolean
+        End Structure
+        Dim mudtProps As ClassProps
+        Public Sub New()
+            With mudtProps
+                .Id = 0
+                .VesselId = 0
+                .VesselGroupId = 0
+                .VesselName = ""
+                .VesselGroupName = ""
+                .Exists = False
+            End With
+        End Sub
+        Public Overrides Function ToString() As String
+            ToString = mudtProps.VesselName & "-" & mudtProps.VesselGroupName
+        End Function
+        Public ReadOnly Property Id As Integer
+            Get
+                Id = mudtProps.Id
+            End Get
+        End Property
+        Public ReadOnly Property VesselName As String
+            Get
+                VesselName = mudtProps.VesselName
+            End Get
+        End Property
+        Public ReadOnly Property VesselGroupName As String
+            Get
+                VesselGroupName = mudtProps.VesselGroupName
+            End Get
+        End Property
+        Public Property VesselId As Integer
+            Get
+                VesselId = mudtProps.VesselId
+            End Get
+            Set(value As Integer)
+                mudtProps.VesselId = value
+            End Set
+        End Property
+        Public Property VesselGroupId As Integer
+            Get
+                VesselGroupId = mudtProps.VesselGroupId
+            End Get
+            Set(value As Integer)
+                mudtProps.VesselGroupId = value
+            End Set
+        End Property
+        Public Property Exists As Boolean
+            Get
+                Exists = mudtProps.Exists
+            End Get
+            Set(value As Boolean)
+                mudtProps.Exists = value
+            End Set
+        End Property
+        Friend Sub SetValues(ByVal pId As Integer, ByVal pVesselId As Integer, ByVal pVesselGroupId As Integer, ByVal pVesselName As String, ByVal pVesselGroupName As String, ByVal pVesselId_fkey As Integer)
+            With mudtProps
+                .Id = pId
+                .VesselId = pVesselId
+                .VesselGroupId = pVesselGroupId
+                .VesselName = pVesselName
+                .VesselGroupName = pVesselGroupName
+                .Exists = (pVesselId_fkey <> 0)
+            End With
+        End Sub
+    End Class
+    Public Class Vessel_VesselGroupCollection
+        Inherits Collections.Generic.Dictionary(Of String, Vessel_VesselGroupItem)
+
+        Public Sub Load(ByVal pVesselId As Integer)
+
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjComm As New SqlClient.SqlCommand
+            Dim pobjReader As SqlClient.SqlDataReader
+            Dim pobjClass As Vessel_VesselGroupItem
+
+            pobjConn.Open()
+            pobjComm = pobjConn.CreateCommand
+
+            With pobjComm
+                .CommandType = CommandType.Text
+                .CommandText = " SELECT [osmvrId] " &
+                               "       ,[osmvrGroupName] " &
+                               " 	  ,ISNULL(osmvVesselName, '') AS osmvVesselName " &
+                               " 	  ," & pVesselId & " AS osmvId " &
+                               " 	  ,ISNULL((SELECT osmvId_fkey FROM osmVesselGroup_Vessels WHERE osmvrId = osmvrId_fkey AND osmvId_fkey=" & pVesselId & "),0) AS osmvId_fkey " &
+                               "   FROM [AmadeusReports].[dbo].[osmVesselGroup] " &
+                               "   LEFT JOIN osmVessels " &
+                               "   ON osmvID = " & pVesselId
+
+                pobjReader = .ExecuteReader
+            End With
+
+            MyBase.Clear()
+            Dim pId As Integer = 0
+            With pobjReader
+                Do While .Read
+                    pobjClass = New Vessel_VesselGroupItem
+                    pId += 1
+                    pobjClass.SetValues(pId, .Item("osmvId"), .Item("osmvrId"), .Item("osmvVesselName"), .Item("osmvrGroupName"), .Item("osmvId_fkey"))
+                    MyBase.Add(pobjClass.Id, pobjClass)
+                Loop
+                .Close()
+            End With
+            pobjConn.Close()
+
+        End Sub
+        Public Sub Update()
+
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjComm As New SqlClient.SqlCommand
+            Dim pobjClass As Vessel_VesselGroupItem
+
+            pobjConn.Open()
+            pobjComm = pobjConn.CreateCommand
+
+            For Each pobjClass In MyBase.Values
+                pobjComm.CommandType = CommandType.Text
+                If pobjClass.Exists Then
+                    pobjComm.CommandText = "IF (SELECT COUNT(*) FROM AmadeusReports.dbo.osmVesselGroup_Vessels WHERE osmvrId_fkey = " & pobjClass.VesselGroupId & " AND osmvId_fkey = " & pobjClass.VesselId & ")=0" &
+                        "INSERT INTO AmadeusReports.dbo.osmVesselGroup_Vessels (osmvrId_fkey ,osmvId_fkey) VALUES (" & pobjClass.VesselGroupId & "," & pobjClass.VesselId & ")"
+                Else
+                    pobjComm.CommandText = "DELETE FROM AmadeusReports.dbo.osmVesselGroup_Vessels WHERE osmvrId_fkey = " & pobjClass.VesselGroupId & " AND osmvId_fkey = " & pobjClass.VesselId
+                End If
+                pobjComm.ExecuteNonQuery()
+            Next
+        End Sub
+    End Class
+    Public Class VesselGroupItem
+        Private Structure ClassProps
+            Dim Id As Integer
+            Dim GroupName As String
+            Dim isNew As Boolean
+            Dim isValid As Boolean
+        End Structure
+        Dim mudtProps As ClassProps
+        Public Sub New()
+            With mudtProps
+                .Id = 0
+                .GroupName = ""
+                .isNew = True
+                CheckValid()
+            End With
+        End Sub
+        Public Sub New(pId As Integer, pGroupName As String)
+            With mudtProps
+                .Id = pId
+                .GroupName = pGroupName
+                .isNew = True
+                CheckValid()
+            End With
+        End Sub
+        Private Sub CheckValid()
+            mudtProps.isValid = (GroupName <> "")
+        End Sub
+        Public Overrides Function ToString() As String
+            ToString = mudtProps.GroupName
+        End Function
+        Public ReadOnly Property Id As Integer
+            Get
+                Id = mudtProps.Id
+            End Get
+        End Property
+        Public Property GroupName As String
+            Get
+                GroupName = mudtProps.GroupName
+            End Get
+            Set(value As String)
+                mudtProps.GroupName = value
+                CheckValid()
+            End Set
+        End Property
+        Public ReadOnly Property isValid As Boolean
+            Get
+                isValid = mudtProps.isValid
+            End Get
+        End Property
+        Public ReadOnly Property isNew As Boolean
+            Get
+                isNew = mudtProps.isNew
+            End Get
+        End Property
+        Public Sub SetValues(ByVal pId As Integer, ByVal pGroupName As String)
+            With mudtProps
+                .Id = pId
+                .GroupName = pGroupName
+                .isNew = False
+                CheckValid()
+            End With
+        End Sub
+        Public Sub Update()
+
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjComm As New SqlClient.SqlCommand
+
+            pobjConn.Open()
+            pobjComm = pobjConn.CreateCommand
+
+            With pobjComm
+                .CommandType = CommandType.Text
+                .CommandText = "INSERT INTO [AmadeusReports].[dbo].[osmVesselGroup] " &
+                               " (osmvrGroupName) " &
+                               " VALUES " &
+                               " ( '" & GroupName & ", ') " &
+                               " select scope_identity() as Id"
+                mudtProps.Id = .ExecuteScalar
+                mudtProps.isNew = False
+            End With
+        End Sub
+        Public Sub Delete()
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjComm As New SqlClient.SqlCommand
+
+            pobjConn.Open()
+            pobjComm = pobjConn.CreateCommand
+
+            With pobjComm
+                .CommandType = CommandType.Text
+                If Not mudtProps.isNew Then
+                    .CommandText = "DELETE FROM AmadeusReports.dbo.osmVesselGroup " &
+                                   " WHERE osmvrId = " & mudtProps.Id
+                    .ExecuteNonQuery()
+                End If
+            End With
+        End Sub
+    End Class
+    Public Class VesselGroupCollection
+        Inherits Collections.Generic.Dictionary(Of String, VesselGroupItem)
+
+        Public Sub Load(ByVal pVesselGroupID As Integer)
+
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjComm As New SqlClient.SqlCommand
+            Dim pobjReader As SqlClient.SqlDataReader
+            Dim pobjClass As VesselGroupItem
+
+            pobjConn.Open()
+            pobjComm = pobjConn.CreateCommand
+
+            With pobjComm
+                .CommandType = CommandType.Text
+                .CommandText = "SELECT osmvrId " &
+                               "      ,osmvrGroupName " &
+                               "  FROM AmadeusReports.dbo.osmVesselGroup " &
+                               "  WHERE osmvrId = " & pVesselGroupID & " " &
+                               "  ORDER BY osmvrGroupName"
+                pobjReader = .ExecuteReader
+            End With
+
+            MyBase.Clear()
+            With pobjReader
+                Do While .Read
+                    pobjClass = New VesselGroupItem
+                    pobjClass.SetValues(.Item("osmvrId"), .Item("osmvrGroupName"))
+                    MyBase.Add(pobjClass.Id, pobjClass)
+                Loop
+                .Close()
+            End With
+            pobjConn.Close()
+
+        End Sub
+        Public Sub Load()
+
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjComm As New SqlClient.SqlCommand
+            Dim pobjReader As SqlClient.SqlDataReader
+            Dim pobjClass As VesselGroupItem
+
+            pobjConn.Open()
+            pobjComm = pobjConn.CreateCommand
+
+            With pobjComm
+                .CommandType = CommandType.Text
+                .CommandText = "SELECT osmvrId " &
+                               "      ,osmvrGroupName " &
+                               "  FROM AmadeusReports.dbo.osmVesselGroup " &
+                               "  ORDER BY osmvrGroupName"
+                pobjReader = .ExecuteReader
+            End With
+
+            MyBase.Clear()
+            With pobjReader
+                Do While .Read
+                    pobjClass = New VesselGroupItem
+                    pobjClass.SetValues(.Item("osmvrId"), .Item("osmvrGroupName"))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()
@@ -157,7 +500,6 @@
 
         End Sub
     End Class
-
     Public Class emailItem
 
         Private Structure Classprops
@@ -312,27 +654,27 @@
                 .CommandType = CommandType.Text
                 If mudtprops.isNew Then
                     If mudtprops.EmailType = "AGENT" Then
-                        .CommandText = "INSERT INTO [AmadeusReports].[dbo].[osmEmailDetails] " & _
-                                       " (osmeName, osmeDetails, osmeType, osmeEmail) " & _
-                                       " VALUES " & _
-                                       " ( '" & mudtprops.Name & "', '" & mudtprops.Details & "', '" & mudtprops.EmailType & "', '" & mudtprops.Email & "') " & _
+                        .CommandText = "INSERT INTO [AmadeusReports].[dbo].[osmEmailDetails] " &
+                                       " (osmeName, osmeDetails, osmeType, osmeEmail) " &
+                                       " VALUES " &
+                                       " ( '" & mudtprops.Name & "', '" & mudtprops.Details & "', '" & mudtprops.EmailType & "', '" & mudtprops.Email & "') " &
                                        " select scope_identity() as Id"
                     Else
-                        .CommandText = "INSERT INTO [AmadeusReports].[dbo].[osmEmailDetails] " & _
-                                       " (osmeVessel_FK, osmeName, osmeDetails, osmeType, osmeEmail) " & _
-                                       " VALUES " & _
-                                       " ( " & mudtprops.Vessel_FK & ", '" & mudtprops.Name & "', '" & mudtprops.Details & "', '" & mudtprops.EmailType & "', '" & mudtprops.Email & "') " & _
+                        .CommandText = "INSERT INTO [AmadeusReports].[dbo].[osmEmailDetails] " &
+                                       " (osmeVessel_FK, osmeName, osmeDetails, osmeType, osmeEmail) " &
+                                       " VALUES " &
+                                       " ( " & mudtprops.Vessel_FK & ", '" & mudtprops.Name & "', '" & mudtprops.Details & "', '" & mudtprops.EmailType & "', '" & mudtprops.Email & "') " &
                                        " select scope_identity() as Id"
 
                     End If
                     mudtprops.Id = .ExecuteScalar
                     mudtprops.isNew = False
                 Else
-                    .CommandText = "UPDATE AmadeusReports.dbo.osmEmailDetails " & _
-                                   " SET osmeName = '" & mudtprops.Name & "', " & _
-                                   "     osmeDetails = '" & mudtprops.Details & "', " & _
-                                   "     osmeType    = '" & mudtprops.EmailType & "' ," & _
-                                   "     osmeEmail   = '" & mudtprops.Email & "' " & _
+                    .CommandText = "UPDATE AmadeusReports.dbo.osmEmailDetails " &
+                                   " SET osmeName = '" & mudtprops.Name & "', " &
+                                   "     osmeDetails = '" & mudtprops.Details & "', " &
+                                   "     osmeType    = '" & mudtprops.EmailType & "' ," &
+                                   "     osmeEmail   = '" & mudtprops.Email & "' " &
                                    " WHERE osmeId = " & mudtprops.Id
                     .ExecuteNonQuery()
                 End If
@@ -348,14 +690,14 @@
             With pobjComm
                 .CommandType = CommandType.Text
                 If Not mudtprops.isNew Then
-                    .CommandText = "DELETE FROM AmadeusReports.dbo.osmEmailDetails " & _
+                    .CommandText = "DELETE FROM AmadeusReports.dbo.osmEmailDetails " &
                                    " WHERE osmeId = " & mudtprops.Id
                     .ExecuteNonQuery()
                 End If
             End With
         End Sub
     End Class
-    Public Class emailCollection
+    Public Class EmailCollection
         Inherits Collections.Generic.Dictionary(Of String, emailItem)
 
         Public Sub Load(ByVal pVesselID As Integer)
@@ -370,17 +712,17 @@
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = "SELECT osmeId " & _
-                               "      ,ISNULL(osmeVessel_FK,0) AS osmeVessel_FK " & _
-                               "      ,ISNULL(osmeName, '') AS osmeName " & _
-                               "      ,ISNULL(osmeDetails, '') AS osmeDetails " & _
-                               "      ,ISNULL(osmeType, '') AS osmeType " & _
-                               "      ,ISNULL(osmeEmail, '') AS osmeEmail " & _
-                               "      ,ISNULL(osmvVesselName, '') AS osmvVesselName " & _
-                               "  FROM AmadeusReports.dbo.osmEmailDetails " & _
-                               " LEFT JOIN AmadeusReports.dbo.osmVessels " & _
-                               "   ON osmeVessel_FK = osmVessels.osmvID " & _
-                               "  WHERE ISNULL(osmeVessel_FK, " & pVesselID & ") = " & pVesselID & " " & _
+                .CommandText = "SELECT osmeId " &
+                               "      ,ISNULL(osmeVessel_FK,0) AS osmeVessel_FK " &
+                               "      ,ISNULL(osmeName, '') AS osmeName " &
+                               "      ,ISNULL(osmeDetails, '') AS osmeDetails " &
+                               "      ,ISNULL(osmeType, '') AS osmeType " &
+                               "      ,ISNULL(osmeEmail, '') AS osmeEmail " &
+                               "      ,ISNULL(osmvVesselName, '') AS osmvVesselName " &
+                               "  FROM AmadeusReports.dbo.osmEmailDetails " &
+                               " LEFT JOIN AmadeusReports.dbo.osmVessels " &
+                               "   ON osmeVessel_FK = osmVessels.osmvID " &
+                               "  WHERE ISNULL(osmeVessel_FK, " & pVesselID & ") = " & pVesselID & " " &
                                "  ORDER BY osmeType, osmeName"
                 pobjReader = .ExecuteReader
             End With
@@ -409,17 +751,17 @@
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = "SELECT osmeId " & _
-                               "      ,ISNULL(osmeVessel_FK,0) AS osmeVessel_FK " & _
-                               "      ,ISNULL(osmeName, '') AS osmeName " & _
-                               "      ,ISNULL(osmeDetails, '') AS osmeDetails " & _
-                               "      ,ISNULL(osmeType, '') AS osmeType " & _
-                               "      ,ISNULL(osmeEmail, '') AS osmeEmail " & _
-                               "      ,ISNULL(osmvVesselName, '') AS osmvVesselName " & _
-                               "  FROM AmadeusReports.dbo.osmEmailDetails " & _
-                               " LEFT JOIN AmadeusReports.dbo.osmVessels " & _
-                               "   ON osmeVessel_FK = osmVessels.osmvID " & _
-                               "  WHERE osmeType = 'AGENT' " & _
+                .CommandText = "SELECT osmeId " &
+                               "      ,ISNULL(osmeVessel_FK,0) AS osmeVessel_FK " &
+                               "      ,ISNULL(osmeName, '') AS osmeName " &
+                               "      ,ISNULL(osmeDetails, '') AS osmeDetails " &
+                               "      ,ISNULL(osmeType, '') AS osmeType " &
+                               "      ,ISNULL(osmeEmail, '') AS osmeEmail " &
+                               "      ,ISNULL(osmvVesselName, '') AS osmvVesselName " &
+                               "  FROM AmadeusReports.dbo.osmEmailDetails " &
+                               " LEFT JOIN AmadeusReports.dbo.osmVessels " &
+                               "   ON osmeVessel_FK = osmVessels.osmvID " &
+                               "  WHERE osmeType = 'AGENT' " &
                                "  ORDER BY  osmeName"
                 pobjReader = .ExecuteReader
             End With

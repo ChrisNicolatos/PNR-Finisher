@@ -165,7 +165,6 @@
         End If
 
     End Sub
-
     Private Sub LoadCustomerGroups()
 
         mobjCustomerGroups = New Customers.CustomerGroupCollection

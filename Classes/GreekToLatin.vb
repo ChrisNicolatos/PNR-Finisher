@@ -1,4 +1,6 @@
-﻿Public Class GreekToLatin
+﻿Option Strict Off
+Option Explicit On
+Public Class GreekToLatin
 
     Private Const Greek As String = "αβγδεζηθικλμνξοπρστυφχψωάέήίόύώϊϋΐΰΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩΆΈΉΊΌΎΏΪΫ"
     Private Const GreekAccents As String = "άέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ"

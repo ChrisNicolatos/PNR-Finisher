@@ -1,7 +1,7 @@
-﻿Namespace osmPax
-
+﻿Option Strict Off
+Option Explicit On
+Namespace osmPax
     Public Class Pax
-
         Private Structure ClassProps
             Dim Id As Integer
             Dim LastName As String

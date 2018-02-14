@@ -1,5 +1,6 @@
-﻿Namespace AmadeusExisting
-
+﻿Option Strict Off
+Option Explicit On
+Namespace AmadeusExisting
     Public Class Item
         Private Structure ExistingItemClass
 
@@ -58,7 +59,6 @@
         Private mobjAgentElement As New Item
         Private mobjEmailElement As New Item
         Private mobjTicketElement As New Item
-        Private mobjAmadeusReward As New Item
         Private mobjOptionQueueElement As New Item
         Private mobjAOH As New Item
         Private mobjAgentID As New Item
@@ -103,11 +103,6 @@
         Public ReadOnly Property TicketElement As Item
             Get
                 TicketElement = mobjTicketElement
-            End Get
-        End Property
-        Public ReadOnly Property AmadeusReward As Item
-            Get
-                AmadeusReward = mobjAmadeusReward
             End Get
         End Property
         Public ReadOnly Property OptionQueueElement As Item
@@ -212,7 +207,6 @@
             mobjAgentElement.Clear()
             mobjEmailElement.Clear()
             mobjTicketElement.Clear()
-            mobjAmadeusReward.Clear()
             mobjOptionQueueElement.Clear()
             mobjAOH.Clear()
             mobjAgentID.Clear()

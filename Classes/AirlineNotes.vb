@@ -1,5 +1,6 @@
-﻿Namespace AirlineNotes
-
+﻿Option Strict Off
+Option Explicit On
+Namespace AirlineNotes
     Public Class Item
         Private Structure ClassProps
             Dim ID As Integer
@@ -48,7 +49,7 @@
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Integer, ByVal pAirlineCode As String, ByVal pFlightType As String, ByVal pSeaman As Boolean, _
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pAirlineCode As String, ByVal pFlightType As String, ByVal pSeaman As Boolean,
                              ByVal pSeqNo As Integer, ByVal pAmadeusElement As String, ByVal pAmadeusText As String)
             With mudtProps
                 .ID = pID
@@ -68,15 +69,15 @@
         Public Sub Load(ByVal pIATACode As String)
 
             Dim pCommandText As String
-            pCommandText = "SELECT anID, " & _
-                            " anAirlineCode, " & _
-                            " anFlightType, " & _
-                            " ISNULL(anSeaman, 0) AS anSeaman, " & _
-                            " anSeqNo, " & _
-                            " anAmadeusElement, " & _
-                            " anAmadeusText " & _
-                            " FROM AmadeusReports.dbo.AirlineNotes " & _
-                            " WHERE anAirlineCode = '" & pIATACode & "' " & _
+            pCommandText = "SELECT anID, " &
+                            " anAirlineCode, " &
+                            " anFlightType, " &
+                            " ISNULL(anSeaman, 0) AS anSeaman, " &
+                            " anSeqNo, " &
+                            " anAmadeusElement, " &
+                            " anAmadeusText " &
+                            " FROM AmadeusReports.dbo.AirlineNotes " &
+                            " WHERE anAirlineCode = '" & pIATACode & "' " &
                             " ORDER BY anSeqNo"
             ReadFromDB(pCommandText)
 
@@ -85,23 +86,22 @@
         Public Sub Load()
 
             Dim pCommandText As String
-            pCommandText = "SELECT anID, " & _
-                            " anAirlineCode, " & _
-                            " anFlightType, " & _
-                            " ISNULL(anSeaman, 0) AS anSeaman, " & _
-                            " anSeqNo, " & _
-                            " anAmadeusElement, " & _
-                            " anAmadeusText " & _
-                            " FROM AmadeusReports.dbo.AirlineNotes " & _
+            pCommandText = "SELECT anID, " &
+                            " anAirlineCode, " &
+                            " anFlightType, " &
+                            " ISNULL(anSeaman, 0) AS anSeaman, " &
+                            " anSeqNo, " &
+                            " anAmadeusElement, " &
+                            " anAmadeusText " &
+                            " FROM AmadeusReports.dbo.AirlineNotes " &
                             " ORDER BY anAirlineCode, anSeqNo"
 
             ReadFromDB(pCommandText)
 
         End Sub
-
         Private Sub ReadFromDB(ByVal CommandText As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As Item
@@ -120,7 +120,7 @@
                 Do While .Read
                     pID += 1
                     pobjClass = New Item
-                    pobjClass.SetValues(.Item("anID"), .Item("anAirlineCode"), .Item("anFlightType"), .Item("anSeaman"), _
+                    pobjClass.SetValues(.Item("anID"), .Item("anAirlineCode"), .Item("anFlightType"), .Item("anSeaman"),
                                         .Item("anSeqNo"), .Item("anAmadeusElement"), .Item("anAmadeusText"))
                     MyBase.Add(pID, pobjClass)
                 Loop

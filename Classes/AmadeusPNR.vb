@@ -1,20 +1,17 @@
 Option Strict Off
 Option Explicit On
-Friend Class gtmAmadeusPNR
-	
-    Private Const IATANumber As String = ""
-	Public Event ReadStatus(ByRef Status As Short, ByRef StatusDescription As String)
-	
-	Private Structure ClassProps
-		Dim RequestedPNR As String
-		Dim UserSignIn As String
+Friend Class AmadeusPNR
+    Public Event ReadStatus(ByRef Status As Short, ByRef StatusDescription As String)
+    Private Structure ClassProps
+        Dim RequestedPNR As String
+        Dim UserSignIn As String
         Dim PNRCreationdate As Date
         Dim Seats As String
 
         Dim isDirty As Boolean
-		Dim isValid As Boolean
-		Dim isNew As Boolean
-	End Structure
+        Dim isValid As Boolean
+        Dim isNew As Boolean
+    End Structure
 
     Private Structure TQTProps
         Dim TQTElement As Integer
@@ -23,74 +20,42 @@ Friend Class gtmAmadeusPNR
         Dim Allowance As String
         Dim Pax As String
         Dim Status As String
-
     End Structure
 
-	Private mudtProps As ClassProps
+    Private mudtProps As ClassProps
     Private mudtTQT() As TQTProps
     Private mudtAllowance() As TQTProps
 
     Private WithEvents mobjHostSession As k1aHostToolKit.HostSession
     Private mobjPNR As s1aPNR.PNR
-	Private mobjPax As gtmAmadeusPaxColl
-    Private mobjSegs As gtmAmadeusSegColl
+    Private mobjPax As AmadeusPax.AmadeusPaxColl
+    Private mobjSegs As AmadeusSeg.AmadeusSegColl
     Private mSegsLastElement As Integer
-	Private mobjNumberParser As gtmAmadeusNumberParser
-    'Private mintPaxCount As Short
-    'Private mintPax() As Short
+    Private mobjNumberParser As AmadeusNumberParser
     Private mstrVesselName As String
-	Private mobjTickets As gtmTicketColl
-    Private mobjFrequentFlyer As FrequentFlyerColl
+    Private mobjTickets As Ticket.TicketColl
+    Private mobjFrequentFlyer As FrequentFlyer.FrequentFlyerColl
     Private mstrCC As String
-    Private mstrOPT1 As String
-    Private mstrOPT2 As String
-    Private mstrOPT3 As String
+    Private mstrCLN As String
+    Private mstrCLA As string
 
     Private mflgCancelError As Boolean
-    'Private mflgOriginalIssue As Boolean
 
     Private mintStatus As Short
-	Private mstrStatus As String
-	
+    Private mstrStatus As String
     Private Sub Class_Initialize_Renamed()
-
-        mobjPax = New gtmAmadeusPaxColl
-        mobjSegs = New gtmAmadeusSegColl
-        mobjNumberParser = New gtmAmadeusNumberParser
-        mobjFrequentFlyer = New FrequentFlyerColl
-
+        mobjPax = New AmadeusPax.AmadeusPaxColl
+        mobjSegs = New AmadeusSeg.AmadeusSegColl
+        mobjNumberParser = New AmadeusNumberParser
+        mobjFrequentFlyer = New FrequentFlyer.FrequentFlyerColl
     End Sub
-	Public Sub New()
-		MyBase.New()
-		Class_Initialize_Renamed()
-	End Sub
-	
+    Public Sub New()
+        MyBase.New()
+        Class_Initialize_Renamed()
+    End Sub
     Protected Overrides Sub Finalize()
         MyBase.Finalize()
     End Sub
-    'Public ReadOnly Property AllowanceUpperBound As Integer
-    '    Get
-    '        AllowanceUpperBound = mudtAllowance.GetUpperBound(0)
-    '    End Get
-    'End Property
-    'Public ReadOnly Property AllowanceSegs(ByVal Index As Integer) As String
-    '    Get
-    '        If Index >= 1 And Index <= mudtAllowance.GetUpperBound(0) Then
-    '            AllowanceSegs = mudtAllowance(Index).Itin
-    '        Else
-    '            AllowanceSegs = ""
-    '        End If
-    '    End Get
-    'End Property
-    'Public ReadOnly Property Allowance(ByVal Index As Integer) As String
-    '    Get
-    '        If Index >= 1 And Index <= mudtAllowance.GetUpperBound(0) Then
-    '            Allowance = mudtAllowance(Index).Allowance
-    '        Else
-    '            Allowance = ""
-    '        End If
-    '    End Get
-    'End Property
     Public ReadOnly Property AllowanceForSegment(ByVal Origin As String, ByVal Destination As String, ByVal Airline As String) As String ', ByVal Pax As String) As String
         Get
             AllowanceForSegment = ""
@@ -101,20 +66,10 @@ Friend Class gtmAmadeusPNR
             Next
         End Get
     End Property
-    'Public ReadOnly Property StatusForSegment(ByVal Origin As String, ByVal Destination As String, ByVal Airline As String, ByVal Pax As String) As String
-    '    Get
-    '        StatusForSegment = ""
-    '        For i As Integer = 1 To mudtAllowance.GetUpperBound(0)
-    '            If mudtAllowance(i).Itin = Origin & " " & Airline & " " & Destination Then
-    '                StatusForSegment = mudtAllowance(i).Status
-    '            End If
-    '        Next
-    '    End Get
-    'End Property
     Public ReadOnly Property FrequentFlyerNumber(ByVal Airline As String, ByVal PaxName As String) As String
         Get
             FrequentFlyerNumber = ""
-            For Each pItem As FrequentFlyer In mobjFrequentFlyer.Values
+            For Each pItem As FrequentFlyer.FrequentFlyerItem In mobjFrequentFlyer.Values
                 If pItem.Airline = Airline And pItem.PaxName = PaxName Then
                     FrequentFlyerNumber = pItem.Airline & " " & pItem.FrequentTravelerNo
                     Exit For
@@ -122,42 +77,28 @@ Friend Class gtmAmadeusPNR
             Next
         End Get
     End Property
-	Public ReadOnly Property VesselName() As String
-		Get
+    Public ReadOnly Property VesselName() As String
+        Get
             VesselName = mstrVesselName
         End Get
-	End Property
+    End Property
+    Public ReadOnly Property ClientName As String
+        Get
+            ClientName = mstrCLA
+        End Get
+    End Property
+    Public ReadOnly Property ClientCode As String
+        Get
+            ClientCode = mstrCLN
+        End Get
+    End Property
     Public ReadOnly Property CostCentre As String
         Get
             CostCentre = mstrCC
         End Get
     End Property
-    Public ReadOnly Property Opt1
-        Get
-            Opt1 = mstrOPT1
-        End Get
-    End Property
-    Public ReadOnly Property Opt2
-        Get
-            Opt2 = mstrOPT2
-        End Get
-    End Property
-    Public ReadOnly Property Opt3
-        Get
-            Opt3 = mstrOPT3
-        End Get
-    End Property
-    Public ReadOnly Property Opt4
-        Get
-            Try
-                Opt4 = Opt1 * mobjPax.Count
-            Catch ex As Exception
-                Opt4 = 0
-            End Try
-        End Get
-    End Property
     Public ReadOnly Property RequestedPNR() As String
-		Get
+        Get
             RequestedPNR = mudtProps.RequestedPNR
         End Get
     End Property
@@ -168,26 +109,20 @@ Friend Class gtmAmadeusPNR
     End Property
     Public Property CancelError() As Boolean
         Get
-
             CancelError = mflgCancelError
-
         End Get
         Set(ByVal Value As Boolean)
-
             mflgCancelError = Value
-
         End Set
     End Property
 
-    Public ReadOnly Property Tickets() As gtmTicketColl
-		Get
-			
-			Tickets = mobjTickets
-			
-		End Get
-	End Property
+    Public ReadOnly Property Tickets() As Ticket.TicketColl
+        Get
+            Tickets = mobjTickets
+        End Get
+    End Property
 
-    Public ReadOnly Property Segments() As gtmAmadeusSegColl
+    Public ReadOnly Property Segments() As AmadeusSeg.AmadeusSegColl
         Get
             Segments = mobjSegs
         End Get
@@ -197,10 +132,10 @@ Friend Class gtmAmadeusPNR
             HasSegments = (mSegsLastElement > -1)
         End Get
     End Property
-    Public ReadOnly Property LastSegment As gtmAmadeusSeg
+    Public ReadOnly Property LastSegment As AmadeusSeg.AmadeusSegItem
         Get
             If mSegsLastElement = -1 Then
-                LastSegment = New gtmAmadeusSeg
+                LastSegment = New AmadeusSeg.AmadeusSegItem
             Else
                 LastSegment = mobjSegs(Format(mSegsLastElement))
             End If
@@ -221,7 +156,7 @@ Friend Class gtmAmadeusPNR
             MaxAirportShortNameLength = mobjSegs.MaxAirportShortNameLength
         End Get
     End Property
-    Public ReadOnly Property Passengers() As gtmAmadeusPaxColl
+    Public ReadOnly Property Passengers() As AmadeusPax.AmadeusPaxColl
         Get
             Passengers = mobjPax
         End Get
@@ -266,7 +201,7 @@ Friend Class gtmAmadeusPNR
             mstrStatus = Err.Description
             RaiseEvent ReadStatus(mintStatus, mstrStatus)
 
-            If mflgCancelError Then
+            If CancelError Then
                 Throw New Exception("RetrivePNRsFromQueue()" & vbCrLf & mstrStatus)
             End If
         End Try
@@ -308,24 +243,23 @@ Friend Class gtmAmadeusPNR
             mstrStatus = Err.Description
             RaiseEvent ReadStatus(mintStatus, mstrStatus)
 
-            If mflgCancelError Then
+            If CancelError Then
                 Throw New Exception("ReadPNR()" & vbCrLf & mstrStatus)
             End If
         End Try
 
     End Function
-	
+
     Private Function RetrievePNR(ByVal ForReportOnly As Boolean) As Boolean
 
         Dim pintPNRStatus As Integer
 
         mobjPNR = New s1aPNR.PNR
-        mobjTickets = New gtmTicketColl
+        mobjTickets = New Ticket.TicketColl
         mstrVesselName = ""
         mstrCC = ""
-        mstrOPT1 = ""
-        mstrOPT2 = ""
-        mstrOPT3 = ""
+        mstrCLA = ""
+        mstrCLN = ""
 
         With mudtProps
 
@@ -359,51 +293,35 @@ Friend Class gtmAmadeusPNR
         End With
 
     End Function
-	
-	Private Function setRecordLocator() As String
-		
+    Private Function setRecordLocator() As String
         Try
             setRecordLocator = mobjPNR.Header.RecordLocator
         Catch ex As Exception
             setRecordLocator = UCase(mudtProps.RequestedPNR)
         End Try
-
-	End Function
-    'Private Function setOfficeOfResponsibility() As String
-
-    '       Try
-    '           setOfficeOfResponsibility = mobjPNR.Header.OfficeOfResponsability
-    '       Catch ex As Exception
-    '           setOfficeOfResponsibility = ""
-    '       End Try
-
-    'End Function
-
+    End Function
     Private Sub getAutoTickets()
-		
-		Dim pobjFareAutoTktElement As s1aPNR.FareAutoTktElement
-		Dim pobjFareOriginalIssueElement As s1aPNR.FareOriginalIssueElement
 
-        'mflgOriginalIssue = False
-        For	Each pobjFareOriginalIssueElement In mobjPNR.FareOriginalIssueElements
-			parseFareOriginal(pobjFareOriginalIssueElement)
-		Next pobjFareOriginalIssueElement
-		
-        'If Not mflgOriginalIssue Then
+        Dim pobjFareAutoTktElement As s1aPNR.FareAutoTktElement
+        Dim pobjFareOriginalIssueElement As s1aPNR.FareOriginalIssueElement
+
+        For Each pobjFareOriginalIssueElement In mobjPNR.FareOriginalIssueElements
+            parseFareOriginal(pobjFareOriginalIssueElement)
+        Next pobjFareOriginalIssueElement
+
         For Each pobjFareAutoTktElement In mobjPNR.FareAutoTktElements
             parseFareAutoTktElement(pobjFareAutoTktElement)
         Next pobjFareAutoTktElement
-        'End If
 
-	End Sub
-	
-	Private Sub parseFareOriginal(ByVal Element As s1aPNR.FareOriginalIssueElement)
-		
-		Dim i As Short
-		Dim pflgIATAFound As Boolean
-		Dim pstrText As String
-		Dim pstrSplit1() As String
-		Dim pstrSplit2() As String
+    End Sub
+
+    Private Sub parseFareOriginal(ByVal Element As s1aPNR.FareOriginalIssueElement)
+
+        Dim i As Short
+        Dim pflgIATAFound As Boolean
+        Dim pstrText As String
+        Dim pstrSplit1() As String
+        Dim pstrSplit2() As String
 
         Try
 
@@ -418,7 +336,7 @@ Friend Class gtmAmadeusPNR
                     SegAssociations &= mobjSegs(objSeg.ElementNo).BoardPoint & " " & mobjSegs(objSeg.ElementNo).Airline & " " & mobjSegs(objSeg.ElementNo).OffPoint & vbCrLf
                 Next
             Else
-                For Each pSeg As gtmAmadeusSeg In mobjSegs.Values
+                For Each pSeg As AmadeusSeg.AmadeusSegItem In mobjSegs.Values
                     SegAssociations &= pSeg.BoardPoint & " " & pSeg.Airline & " " & pSeg.OffPoint & vbCrLf
                 Next
             End If
@@ -428,7 +346,7 @@ Friend Class gtmAmadeusPNR
                     PaxAssociations &= mobjPax(objPax.ElementNo).PaxName & vbCrLf
                 Next
             Else
-                For Each pPax As gtmAmadeusPax In mobjPax.Values
+                For Each pPax As AmadeusPax.AmadeusPaxitem In mobjPax.Values
                     PaxAssociations &= pPax.PaxName & vbCrLf
                 Next
             End If
@@ -441,7 +359,7 @@ Friend Class gtmAmadeusPNR
             pflgIATAFound = False
             If IsArray(pstrSplit2) Then
                 For i = LBound(pstrSplit2) To UBound(pstrSplit2)
-                    If InStr(pstrSplit2(i), IATANumber) > 0 Then
+                    If InStr(pstrSplit2(i), MySettings.IATANumber) > 0 Then
                         pflgIATAFound = True
                         Exit For
                     End If
@@ -458,7 +376,6 @@ Friend Class gtmAmadeusPNR
                             With mobjNumberParser
                                 If .TicketNumberText(pstrSplit1(i)) Then
                                     mobjTickets.addTicket("FO", .StockType, .DocumentNumber, .Books, .AirlineNumber, .AirlineNumber, False, SegAssociations, PaxAssociations, pstrSplit2(2))
-                                    'mflgOriginalIssue = True
                                 End If
                             End With
                         End If
@@ -468,7 +385,7 @@ Friend Class gtmAmadeusPNR
         Catch ex As Exception
 
         End Try
-		
+
     End Sub
     ''' <summary>
     ''' This is the new version which does not check the issuing office of the ticket
@@ -491,7 +408,7 @@ Friend Class gtmAmadeusPNR
                     SegAssociations &= mobjSegs(objSeg.ElementNo).BoardPoint & " " & mobjSegs(objSeg.ElementNo).Airline & " " & mobjSegs(objSeg.ElementNo).OffPoint & vbCrLf
                 Next
             Else
-                For Each pSeg As gtmAmadeusSeg In mobjSegs.Values
+                For Each pSeg As AmadeusSeg.AmadeusSegItem In mobjSegs.Values
                     SegAssociations &= pSeg.BoardPoint & " " & pSeg.Airline & " " & pSeg.OffPoint & vbCrLf
                 Next
             End If
@@ -501,7 +418,7 @@ Friend Class gtmAmadeusPNR
                     PaxAssociations &= mobjPax(objPax.ElementNo).PaxName & vbCrLf
                 Next
             Else
-                For Each pPax As gtmAmadeusPax In mobjPax.Values
+                For Each pPax As AmadeusPax.AmadeusPaxitem In mobjPax.Values
                     PaxAssociations &= pPax.PaxName & vbCrLf
                 Next
             End If
@@ -535,57 +452,6 @@ Friend Class gtmAmadeusPNR
         End Try
 
     End Sub
-    '
-    ' This is the previous version of Sub parseFareAutoTktElement which checked that the ticket had been issued by a Griffin office
-    '
-    'Private Sub parseFareAutoTktElementOLD(ByVal Element As s1aPNR.FareAutoTktElement)
-
-    '    Dim pstrText As String
-    '    Dim pstrSplit1() As String
-    '    Dim pstrSplit2() As String
-    '    Dim i As Short
-    '    Dim pflgOK As Boolean
-    '    Dim pflgETicket As Boolean
-
-    '    Try
-    '        pstrText = Element.Text
-
-    '        pstrSplit1 = Split(pstrText, "/")
-    '        pflgETicket = False
-
-    '        If IsArray(pstrSplit1) Then
-    '            pflgOK = False
-    '            For i = LBound(pstrSplit1) To UBound(pstrSplit1)
-    '                If Mid(pstrSplit1(i), 4) = My.Settings.AmadeusPCCAllOffices Then ' "ATHG42100" Then ' mudtProps.OfficeOfResponsibility Then
-    '                    pflgOK = True
-    '                    Exit For
-    '                End If
-    '            Next i
-
-    '            If pflgOK Then
-    '                pstrSplit2 = Split(pstrSplit1(0), " ")
-    '                If UBound(pstrSplit1) > 0 Then
-    '                    If Len(pstrSplit1(1)) = 4 And Left(pstrSplit1(1), 2) = "ET" Then
-    '                        pflgETicket = True
-    '                    End If
-    '                End If
-    '                If IsArray(pstrSplit2) Then
-    '                    If UBound(pstrSplit2) >= 3 Then
-    '                        With mobjNumberParser
-    '                            If .TicketNumberText(pstrSplit2(3)) Then
-    '                                mobjTickets.addTicket("FA", .StockType, .DocumentNumber, .Books, .AirlineNumber, pflgETicket)
-    '                            End If
-    '                        End With
-    '                    End If
-    '                End If
-    '            End If
-    '        End If
-    '    Catch ex As Exception
-
-    '    End Try
-
-    'End Sub
-
     Private Sub getPax()
 
         Dim i As Short
@@ -613,7 +479,7 @@ Friend Class gtmAmadeusPNR
         Next pobjPax
 
     End Sub
-	
+
     Private Sub getSegs(ByVal ForReportOnly As Boolean)
 
         Dim pobjSeg As Object
@@ -624,10 +490,10 @@ Friend Class gtmAmadeusPNR
         For Each pobjSeg In mobjPNR.AllAirSegments
             Dim pElementNo As Short = airElementNo(pobjSeg)
             If ForReportOnly Then
-                mobjSegs.AddItem(airAirline(pobjSeg), airBoardPoint(pobjSeg), airClass(pobjSeg), airDepartureDate(pobjSeg), airArrivalDate(pobjSeg), pElementNo, airFlightNo(pobjSeg), airOffPoint(pobjSeg), airStatus(pobjSeg), airFareBase(pobjSeg), airDepartTime(pobjSeg), airArriveTime(pobjSeg), airText(pobjSeg), "")
+                mobjSegs.AddItem(airAirline(pobjSeg), airBoardPoint(pobjSeg), airClass(pobjSeg), airDepartureDate(pobjSeg), airArrivalDate(pobjSeg), pElementNo, airFlightNo(pobjSeg), airOffPoint(pobjSeg), airStatus(pobjSeg), airDepartTime(pobjSeg), airArriveTime(pobjSeg), airText(pobjSeg), "")
             Else
                 Dim pSegDo As k1aHostToolKit.CHostResponse = mobjHostSession.Send("DO" & pobjSeg.ElementNo)
-                mobjSegs.AddItem(airAirline(pobjSeg), airBoardPoint(pobjSeg), airClass(pobjSeg), airDepartureDate(pobjSeg), airArrivalDate(pobjSeg), pElementNo, airFlightNo(pobjSeg), airOffPoint(pobjSeg), airStatus(pobjSeg), airFareBase(pobjSeg), airDepartTime(pobjSeg), airArriveTime(pobjSeg), airText(pobjSeg), pSegDo.Text)
+                mobjSegs.AddItem(airAirline(pobjSeg), airBoardPoint(pobjSeg), airClass(pobjSeg), airDepartureDate(pobjSeg), airArrivalDate(pobjSeg), pElementNo, airFlightNo(pobjSeg), airOffPoint(pobjSeg), airStatus(pobjSeg), airDepartTime(pobjSeg), airArriveTime(pobjSeg), airText(pobjSeg), pSegDo.Text)
             End If
             If pElementNo > mSegsLastElement Then
                 mSegsLastElement = pElementNo
@@ -645,8 +511,8 @@ Friend Class gtmAmadeusPNR
 
     End Function
 
-	Private Function airAirline(ByRef pSegment As Object) As String
-		
+    Private Function airAirline(ByRef pSegment As Object) As String
+
         Try
             airAirline = pSegment.Airline
         Catch ex As Exception
@@ -654,31 +520,31 @@ Friend Class gtmAmadeusPNR
         End Try
 
     End Function
-	
-	Private Function airBoardPoint(ByRef pSegment As Object) As String
-		
+
+    Private Function airBoardPoint(ByRef pSegment As Object) As String
+
         Try
             airBoardPoint = pSegment.BoardPoint
         Catch ex As Exception
             airBoardPoint = ""
         End Try
 
-	End Function
-	
-	Private Function airClass(ByRef pSegment As Object) As String
-		
+    End Function
+
+    Private Function airClass(ByRef pSegment As Object) As String
+
         Try
             airClass = pSegment.Class
         Catch ex As Exception
             airClass = ""
         End Try
-		
-	End Function
-	
-	Private Function airDepartureDate(ByRef pSegment As Object) As Date
-		
-		Dim pdteDate As Date
-		
+
+    End Function
+
+    Private Function airDepartureDate(ByRef pSegment As Object) As Date
+
+        Dim pdteDate As Date
+
         Try
             pdteDate = pSegment.DepartureDate
             Do While pdteDate > DateAdd(Microsoft.VisualBasic.DateInterval.Year, 1, mudtProps.PNRCreationdate) Or pdteDate < System.DateTime.FromOADate(2)
@@ -692,7 +558,7 @@ Friend Class gtmAmadeusPNR
         Catch ex As Exception
             airDepartureDate = System.DateTime.FromOADate(0)
         End Try
-		
+
     End Function
 
     Private Function airArrivalDate(ByRef pSegment As Object) As Date
@@ -714,110 +580,99 @@ Friend Class gtmAmadeusPNR
         End Try
 
     End Function
-	Private Function airElementNo(ByRef pSegment As Object) As Short
-		
+    Private Function airElementNo(ByRef pSegment As Object) As Short
+
         Try
             airElementNo = pSegment.ElementNo
         Catch ex As Exception
             airElementNo = CShort("")
         End Try
-		
-	End Function
-	
-	Private Function airFlightNo(ByRef pSegment As Object) As String
-		
+
+    End Function
+
+    Private Function airFlightNo(ByRef pSegment As Object) As String
+
         Try
             airFlightNo = pSegment.FlightNo
         Catch ex As Exception
             airFlightNo = ""
         End Try
 
-	End Function
-	
-	Private Function airOffPoint(ByRef pSegment As Object) As String
-		
+    End Function
+
+    Private Function airOffPoint(ByRef pSegment As Object) As String
+
         Try
             airOffPoint = pSegment.OffPoint
         Catch ex As Exception
             airOffPoint = ""
         End Try
-		
-	End Function
-	
-	Private Function airFareBase(ByRef pSegment As Object) As String
-		
-        Try
-            airFareBase = "" 'TODO find where the fare base is in the PNR
-        Catch ex As Exception
-            airFareBase = ""
-        End Try
 
-	End Function
-	
-	Private Function airDepartTime(ByRef pSegment As Object) As Date
-		
+    End Function
+    Private Function airDepartTime(ByRef pSegment As Object) As Date
+
         Try
             airDepartTime = pSegment.DepartureTime
         Catch ex As Exception
             airDepartTime = System.DateTime.FromOADate(0)
         End Try
-		
-	End Function
-	
-	Private Function airArriveTime(ByRef pSegment As Object) As Date
-		
+
+    End Function
+
+    Private Function airArriveTime(ByRef pSegment As Object) As Date
+
         Try
             airArriveTime = pSegment.ArrivalTime
         Catch ex As Exception
             airArriveTime = System.DateTime.FromOADate(0)
         End Try
 
-	End Function
-	
-	Private Function airText(ByRef pSegment As Object) As String
-		
+    End Function
+
+    Private Function airText(ByRef pSegment As Object) As String
+
         Try
             airText = pSegment.Text
         Catch ex As Exception
             airText = ""
         End Try
-		
+
     End Function
-	
-	Private Sub getOtherServiceElements()
-		
-		Dim pobjOtherServiceElement As s1aPNR.OtherServiceElement
-		
-		For	Each pobjOtherServiceElement In mobjPNR.OtherServiceElements
-			parseOtherServiceElements(pobjOtherServiceElement)
-		Next pobjOtherServiceElement
-		
-	End Sub
-	
-	Private Sub parseOtherServiceElements(ByVal Element As s1aPNR.OtherServiceElement)
-		
-		Dim i As Short
-		Dim j As Short
-		
-		Dim pintLen As Short
-		Dim pstrText As String
+
+    Private Sub getOtherServiceElements()
+
+        Dim pobjOtherServiceElement As s1aPNR.OtherServiceElement
+
+        For Each pobjOtherServiceElement In mobjPNR.OtherServiceElements
+            parseOtherServiceElements(pobjOtherServiceElement)
+        Next pobjOtherServiceElement
+
+    End Sub
+
+    Private Sub parseOtherServiceElements(ByVal Element As s1aPNR.OtherServiceElement)
+
+        Dim i As Short
+        Dim j As Short
+
+        Dim pintLen As Short
+        Dim pstrText As String
         Dim pstrSplit() As String
-		
-		pstrText = ConcatenateText(Element.Text)
-		pintLen = Len(pstrText)
-		
-		i = InStr(pstrText, "/SG")
-		j = InStr(pstrText, "/P")
-		If i > 0 And i - 1 < pintLen Then
-			pintLen = i - 1
-		End If
-		If j > 0 And j - 1 < pintLen Then
-			pintLen = j - 1
-		End If
-		
-		pstrSplit = Split(Left(pstrText, pintLen), " ")
-		
-		If IsArray(pstrSplit) Then
+
+        pstrText = ConcatenateText(Element.Text)
+        pintLen = Len(pstrText)
+
+        i = InStr(pstrText, "/SG")
+        j = InStr(pstrText, "/P")
+        If i > 0 And i - 1 < pintLen Then
+            pintLen = i - 1
+        End If
+        If j > 0 And j - 1 < pintLen Then
+            pintLen = j - 1
+        End If
+
+        pstrSplit = Split(Left(pstrText, pintLen), " ")
+
+        If IsArray(pstrSplit) Then
             For i = LBound(pstrSplit) To UBound(pstrSplit)
                 If pstrSplit(i) = "MV" Then
                     mstrVesselName = ""
@@ -836,8 +691,8 @@ Friend Class gtmAmadeusPNR
                 End If
             Next i
         End If
-		
-	End Sub
+
+    End Sub
 
     Private Sub getSSRElements()
 
@@ -850,7 +705,7 @@ Friend Class gtmAmadeusPNR
                     mobjFrequentFlyer.AddItem(mobjPax(objPax.ElementNo).PaxName, pobjSSR.Airline, pobjSSR.FrequentTravelerNo)
                 Next
             Else
-                For Each pPax As gtmAmadeusPax In mobjPax.Values
+                For Each pPax As AmadeusPax.AmadeusPaxitem In mobjPax.Values
                     mobjFrequentFlyer.AddItem(pPax.PaxName, pobjSSR.Airline, pobjSSR.FrequentTravelerNo)
                 Next
             End If
@@ -881,12 +736,6 @@ Friend Class gtmAmadeusPNR
                 Next
             End If
             mudtProps.Seats = pTemp2
-            'If pTQTtext.Text.IndexOf(vbCrLf & ">") > 2 Then
-            '    mudtProps.Seats = pTQTtext.Text.Substring(0, pTQTtext.Text.IndexOf(vbCrLf & ">") - 1)
-            'Else
-            '    mudtProps.Seats = pTQTtext.Text
-            'End If
-
         End If
 
     End Sub
@@ -913,18 +762,13 @@ Friend Class gtmAmadeusPNR
         If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
             If pstrSplit(1) = "CC" Then
                 mstrCC = pstrSplit(2)
-            ElseIf pstrSplit(1) = "OPT" Then
-                If pstrSplit.Length >= 3 Then
-                    mstrOPT1 = pstrSplit(2).Replace(".", ",")
-                    If pstrSplit.Length >= 4 Then
-                        mstrOPT2 = pstrSplit(3).Replace(".", ",")
-                        If pstrSplit.Length >= 5 Then
-                            mstrOPT3 = pstrSplit(4).Replace(".", ",")
-                        End If
-                    End If
-                End If
+            ElseIf pstrSplit(1) = "CLN" Then
+                mstrCLN = pstrSplit(2)
+            ElseIf pstrSplit(1) = "CLA" Then
+                mstrCLA = pstrSplit(2)
             End If
         End If
+
     End Sub
     Private Sub getTQT()
 
@@ -1004,24 +848,13 @@ Friend Class gtmAmadeusPNR
         End If
 
     End Sub
-    'Private Function StripPriceFromTag(ByVal Tag As String) As Decimal
-
-    '    Try
-    '        If Tag.Trim.StartsWith("EUR/:") Then
-    '            StripPriceFromTag = Tag.Trim.Substring(5).Replace(".", ",")
-    '        End If
-    '    Catch ex As Exception
-    '        StripPriceFromTag = 0
-    '    End Try
-
-    'End Function
     Private Function ConcatenateText(ByVal Text As String) As String
-		
-		Dim i As Short
-		Dim j As Short
-		Dim pintLen As Short
-		Dim pstrTemp As String
-		
+
+        Dim i As Short
+        Dim j As Short
+        Dim pintLen As Short
+        Dim pstrTemp As String
+
         Try
             j = -1
             pintLen = Len(Text)
@@ -1039,7 +872,6 @@ Friend Class gtmAmadeusPNR
                 pstrTemp = Mid(Text, j, 60)
                 j = j + 60
                 Do While j <= pintLen
-                    'UPGRADE_WARNING: Couldn't resolve default property of object myMin(). Click for more: 'ms-help://MS.VSCC.v90/dv_commoner/local/redirect.htm?keyword="6A50421D-15FE-4896-8A1B-2EC21E9037B2"'
                     If Mid(Text, j, Math.Min(23, pintLen - j + 1)) & " " = " " & Mid(Text, j, Math.Min(23, pintLen - j + 1)) Then
                         j = j + 23
                         If j <= pintLen Then
@@ -1053,6 +885,6 @@ Friend Class gtmAmadeusPNR
         Catch ex As Exception
             ConcatenateText = Text
         End Try
-		
-	End Function
+
+    End Function
 End Class

@@ -1,29 +1,6 @@
-﻿Public Class AmadeusUser
-
-    Private Structure UserProps
-        Dim ID As Integer
-        Dim PCC As String
-        Dim User As String
-        Dim AgentQueue As String
-        Dim AgentOPQueue As String
-        Dim AgentName As String
-        Dim AgentEmail As String
-        Dim AirportName As Integer
-        Dim AirlineLocator As Boolean
-        Dim ClassOfService As Boolean
-        Dim BanElectricalEquipment As Boolean
-        Dim BrazilText As Boolean
-        Dim USAText As Boolean
-        Dim Tickets As Boolean
-        Dim PaxSegPerTkt As Boolean
-        Dim ShowStopovers As Boolean
-        Dim ShowTerminal As Boolean
-        Dim FlyingTime As Boolean
-        Dim CostCentre As Boolean
-        Dim Seating As Boolean
-        Dim Vessel As Boolean
-        Dim PlainFormat As Boolean
-    End Structure
+﻿Option Strict Off
+Option Explicit On
+Public Class AmadeusUser
 
     Private WithEvents mobjSession As k1aHostToolKit.HostSession
     Private mstrResponse As String
@@ -65,12 +42,12 @@
 
     Public ReadOnly Property PCC As String
         Get
-            PCC = mstrPCC
+            PCC = mstrPCC.ToUpper
         End Get
     End Property
     Public ReadOnly Property User As String
         Get
-            User = mstrUser
+            User = mstrUser.ToUpper
         End Get
     End Property
     Private Sub mobjSession_ReceivedResponse(ByRef newResponse As k1aHostToolKit.CHostResponse) Handles mobjSession.ReceivedResponse

@@ -1,4 +1,6 @@
-﻿Namespace AmadeusNew
+﻿Option Strict Off
+Option Explicit On
+Namespace AmadeusNew
 
 
     Public Class Item
@@ -12,7 +14,6 @@
 
         End Structure
         Private mudtProps As NewItemClass
-
         Public ReadOnly Property AmadeusCommand As String
             Get
                 AmadeusCommand = mudtProps.AmadeusCommand
@@ -43,7 +44,6 @@
         Private mobjPhoneElement As New Item
         Private mobjEmailElement As New Item
         Private mobjTicketElement As New Item
-        Private mobjAmadeusReward As New Item
 
         Private mobjOptionQueueElement As New Item
         Private mobjAOH As New Item
@@ -76,8 +76,6 @@
         Private mdteDepartureDate As Date
         Private mintNumberOfPax As Integer
 
-        'Private MySettings As New References
-
         Public Sub New(ByVal pOfficeOfResponsibility As String, ByVal pCreationDate As Date, ByVal pDepartureDate As Date, ByVal pNumberOfPax As Integer)
             mstrOfficeOfResponsibility = pOfficeOfResponsibility
             mdteCreationDate = pCreationDate
@@ -104,11 +102,6 @@
         Public ReadOnly Property TicketElement As Item
             Get
                 TicketElement = mobjTicketElement
-            End Get
-        End Property
-        Public ReadOnly Property AmadeusReward As Item
-            Get
-                AmadeusReward = mobjAmadeusReward
             End Get
         End Property
         Public ReadOnly Property OptionQueueElement As Item
@@ -345,16 +338,14 @@
             Catch ex As Exception
                 Throw New Exception("PreparePNRCommands()" & vbCrLf & ex.Message)
             End Try
-            mobjOpenSegment.SetText("", _
-                                    MySettings.AmadeusValue("TextMISSegmentCommand") & _
-                                    IIf(mintNumberOfPax = 0, 1, mintNumberOfPax) & " " & _
-                                    MySettings.OfficeCityCode & " " & _
+            mobjOpenSegment.SetText("",
+                                    MySettings.AmadeusValue("TextMISSegmentCommand") &
+                                    IIf(mintNumberOfPax = 0, 1, mintNumberOfPax) & " " &
+                                    MySettings.OfficeCityCode & " " &
                                     pDate.IATA & "-" & MySettings.AmadeusValue("TextMISSegmentText"))
             mobjPhoneElement.SetText("", (MySettings.AmadeusValue("TextAP").Replace("  ", " ")))
             mobjEmailElement.SetText("", MySettings.AmadeusValue("TextAPE"))
             mobjAgentID.SetText("", MySettings.AmadeusValue("TextAGT"))
-            'mobjSavingsElement.SetText("", MySettings.AmadeusValue("TextSAV"))
-            'mobjLossElement.SetText("", MySettings.AmadeusValue("TextLOS"))
 
             If mdteDepartureDate > DateAdd(DateInterval.Day, 3, Today) Then ' Date.MinValue Then
                 pDate.VBDate = DateAdd(DateInterval.Day, -3, mdteDepartureDate)
@@ -368,7 +359,6 @@
                 pTTLAmadeus = MySettings.AmadeusValue("TextTTL") & pDate.IATA
             End If
             mobjTicketElement.SetText("", pTTLAmadeus)
-            mobjAmadeusReward.SetText("", MySettings.AmadeusValue("TextAMR"))
 
             If mdteDepartureDate > Today Then
                 pDate.VBDate = DateAdd(DateInterval.Day, 1, mdteDepartureDate)
@@ -386,7 +376,6 @@
             mobjPhoneElement.Clear()
             mobjEmailElement.Clear()
             mobjTicketElement.Clear()
-            mobjAmadeusReward.Clear()
 
             mobjOptionQueueElement.Clear()
             mobjAOH.Clear()

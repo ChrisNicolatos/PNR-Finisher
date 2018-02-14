@@ -29,7 +29,7 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkProfile />
-    <PublishUrl>\\ath2-svrdc1\PNRFinisher\</PublishUrl>
+    <PublishUrl>C:\Users\Chris.Nicolatos\Documents\Click-Once Applications\PNR Finisher ATH\</PublishUrl>
     <Install>false</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -39,11 +39,11 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
+    <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>70</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -82,6 +82,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -107,37 +108,37 @@
   <ItemGroup>
     <Compile Include="Classes\AirlineNotes.vb" />
     <Compile Include="Classes\AirlinePoints.vb" />
+    <Compile Include="Classes\Alerts.vb" />
     <Compile Include="Classes\AmadeusExisting.vb" />
     <Compile Include="Classes\AmadeusNew.vb" />
     <Compile Include="Classes\AmadeusTickets.vb" />
     <Compile Include="Classes\AmadeusUser.vb" />
+    <Compile Include="Classes\BackOffice.vb" />
+    <Compile Include="Classes\CloseOffEntries.vb" />
     <Compile Include="Classes\Config.vb" />
     <Compile Include="Classes\CRM.vb" />
     <Compile Include="Classes\Customers.vb" />
     <Compile Include="Classes\CustomProperties.vb" />
     <Compile Include="Classes\ExportDataGrid.vb" />
     <Compile Include="Classes\FrequentFlyer.vb" />
-    <Compile Include="Classes\FrequentFlyerColl.vb" />
+    <Compile Include="Classes\GDS.vb" />
     <Compile Include="Classes\GreekToLatin.vb" />
-    <Compile Include="Classes\gtmAirlines.vb" />
-    <Compile Include="Classes\gtmAirports.vb" />
-    <Compile Include="Classes\gtmAmadeusNumberParser.vb" />
-    <Compile Include="Classes\gtmAmadeusPax.vb" />
-    <Compile Include="Classes\gtmAmadeusPaxColl.vb" />
-    <Compile Include="Classes\gtmAmadeusPNR.vb" />
-    <Compile Include="Classes\gtmAmadeusSeg.vb" />
-    <Compile Include="Classes\gtmAmadeusSegColl.vb" />
-    <Compile Include="Classes\gtmTicket.vb" />
-    <Compile Include="Classes\gtmTicketColl.vb" />
+    <Compile Include="Classes\Airlines.vb" />
+    <Compile Include="Classes\Airports.vb" />
+    <Compile Include="Classes\AmadeusNumberParser.vb" />
+    <Compile Include="Classes\AmadeusPax.vb" />
+    <Compile Include="Classes\AmadeusPNR.vb" />
+    <Compile Include="Classes\AmadeusSeg.vb" />
+    <Compile Include="Classes\Ticket.vb" />
     <Compile Include="Classes\osmVessels.vb" />
     <Compile Include="Classes\PriceLookup.vb" />
     <Compile Include="Classes\ReadPNR.vb" />
     <Compile Include="Classes\SubDepartments.vb" />
     <Compile Include="Classes\Vessels.vb" />
-    <Compile Include="Forms\frmApis.designer.vb">
-      <DependentUpon>frmApis.vb</DependentUpon>
+    <Compile Include="Forms\frmAdmin.Designer.vb">
+      <DependentUpon>frmAdmin.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmApis.vb">
+    <Compile Include="Forms\frmAdmin.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmCostCentre.Designer.vb">
@@ -152,10 +153,10 @@
     <Compile Include="Forms\frmItnMSReportDates.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\frmOptions.Designer.vb">
-      <DependentUpon>frmOptions.vb</DependentUpon>
+    <Compile Include="Forms\frmShowOptions.Designer.vb">
+      <DependentUpon>frmShowOptions.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmOptions.vb">
+    <Compile Include="Forms\frmShowOptions.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmOSMAddVessel.Designer.vb">
@@ -180,13 +181,6 @@
       <DependentUpon>frmPNR.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmPNR.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmTables.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmTables.Designer.vb">
-      <DependentUpon>frmTables.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmVesselForPNR.Designer.vb">
@@ -216,8 +210,8 @@
     <Compile Include="Classes\osmPax.vb" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\frmApis.resx">
-      <DependentUpon>frmApis.vb</DependentUpon>
+    <EmbeddedResource Include="Forms\frmAdmin.resx">
+      <DependentUpon>frmAdmin.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmCostCentre.resx">
       <DependentUpon>frmCostCentre.vb</DependentUpon>
@@ -225,8 +219,8 @@
     <EmbeddedResource Include="Forms\frmItnMSReportDates.resx">
       <DependentUpon>frmItnMSReportDates.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmOptions.resx">
-      <DependentUpon>frmOptions.vb</DependentUpon>
+    <EmbeddedResource Include="Forms\frmShowOptions.resx">
+      <DependentUpon>frmShowOptions.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmOSMAddVessel.resx">
@@ -240,10 +234,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmPNR.resx">
       <DependentUpon>frmPNR.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmTables.resx">
-      <DependentUpon>frmTables.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmVesselForPNR.resx">
@@ -308,7 +298,7 @@
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
+      <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
@@ -360,6 +350,78 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="Notes\Airline Points Commands.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="Notes\GDS Commands.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="Notes\My Notes.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="Notes\PARTIAL PNR DISPLAY ELEMENT CODES.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="Notes\PNR History Display Codes.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="Notes\PNRFinisher.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="Notes\SSR Docs.txt">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Exclude</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

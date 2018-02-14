@@ -1,5 +1,6 @@
-﻿Public Class ExportDataGrid
-
+﻿Option Strict Off
+Option Explicit On
+Public Class ExportDataGrid
     Public Sub Export(ByVal dGrid As DataGridView)
 
         Try

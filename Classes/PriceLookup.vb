@@ -1,5 +1,6 @@
-﻿Namespace PriceLookup
-
+﻿Option Strict Off
+Option Explicit On
+Namespace PriceLookup
     Public Class Item
         Private Structure ClassProps
             Dim Id As Integer
@@ -132,90 +133,94 @@
 
         Private Sub Load(ByVal FromDate As Date, ByVal Origin As String, ByVal Destination As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
-            Dim pobjComm As New SqlClient.SqlCommand
-            Dim pobjReader As SqlClient.SqlDataReader
-            Dim pobjClass As Item
+            If MySettings.PCCBackOffice = 1 Then
 
-            pobjConn.Open()
-            pobjComm = pobjConn.CreateCommand
+                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjComm As New SqlClient.SqlCommand
+                Dim pobjReader As SqlClient.SqlDataReader
+                Dim pobjClass As Item
 
-            With pobjComm
-                .CommandType = CommandType.Text
-                .CommandText = " SELECT TFEntities.Code + '/' + TFEntities.Name AS ClientName  " & _
-                                " 	  ,Airlines.IATACode AS Airline  " & _
-                                "       ,AirSegFrom.ActualClass AS Class  " & _
-                                "   	  ,COUNT(*) AS CountOfTkts  " & _
-                                " 	  ,AVG(-(  CTCost.FaceValue          + CTCost.FVVatAmount        + CTCost.FaceValueExtra  " & _
-                                "                + CTCost.FVXVatAmount       + CTCost.Taxes              + CTCost.TAXVatAmount  " & _
-                                " 			   + CTCost.TaxesExtra         + CTCost.TAXXVatAmount      + CTCost.DiscountAmount  " & _
-                                " 			   + CTCost.DISCVatAmount      + CTCost.CommissionAmount   + CTCost.COMVatAmount    " & _
-                                " 			   + CTCost.ServiceFeeAmount   + CTCost.SFVatAmount        + CTCost.ExtraChargeAmount1  " & _
-                                " 			   + CTCost.ExtraChargeAmount2 + CTCost.ExtraChargeAmount3 + CTCost.CancellationFeeAmount  " & _
-                                " 			   + CTCost.CFVatAmount   " & _
-                                " 		)) AS AverageCostPrice  " & _
-                                "   FROM CommercialTransactions  " & _
-                                "   LEFT JOIN CommercialTransactionValues CTV  " & _
-                                " 	LEFT JOIN TFEntities  " & _
-                                " 		ON CTV.CommercialEntityID = TFEntities.Id  " & _
-                                " 	ON CommercialTransactions.Id = CTV.CommercialTransactionID   " & _
-                                " 	   AND IsCost = 0  " & _
-                                "   LEFT JOIN AirTicketTransactions  " & _
-                                " 	LEFT JOIN AirSegments AirSegFrom  " & _
-                                " 		ON AirSegFrom.AirTicketTransactionID = AirTicketTransactions.Id   " & _
-                                " 		   AND OriginalPosition = (SELECT MIN(OriginalPosition) FROM AirSegments WHERE AirSegments.AirTicketTransactionID = AirTicketTransactions.Id)  " & _
-                                " 	LEFT JOIN AirSegments AirSegTo  " & _
-                                " 		On AirSegTo.AirTicketTransactionID = AirTicketTransactions.Id  " & _
-                                " 			AND AirSegTo.OriginalPosition = (SELECT MAX(OriginalPosition) FROM AirSegments WHERE AirSegments.AirTicketTransactionID = AirTicketTransactions.Id)  " & _
-                                " 	LEFT JOIN AirTickets  " & _
-                                " 		ON AirTicketTransactions.AirTicketID = AirTickets.Id  " & _
-                                " 	ON AirTicketTransactions.CommercialTransactionID = CommercialTransactions.Id  " & _
-                                "   LEFT JOIN Airports AirportFrom  " & _
-                                " 	ON AirSegFrom.FromAirportID = AirportFrom.Id  " & _
-                                "   LEFT JOIN Airports AirportTo  " & _
-                                " 	ON AirSegTo.ToAirportID = AirportTo.Id  " & _
-                                "   LEFT JOIN Airlines  " & _
-                                " 	ON AirSegFrom.CarrierAirlineID = Airlines.Id  " & _
-                                "   LEFT JOIN CommercialTransactionValues CTCost  " & _
-                                " 	ON CTCost.CommercialTransactionID = CTV.CommercialTransactionID   " & _
-                                " 			  AND CTCost.IsCost=1  " & _
-                                "   WHERE ComTransactionTypeID = 1                   " & _
-                                "         AND ActionTypeID = 335                     " & _
-                                " 		AND AirTickets.IssueDate  >= '" & Format(FromDate, "yyyy-MM-dd") & "'     " & _
-                                " 		AND AirportFrom.Abbreviation = '" & Origin & "'  " & _
-                                " 		AND AirportTo.Abbreviation   = '" & Destination & "'  " & _
-                                "  GROUP BY GROUPING SETS ( " & _
-                                " 						 (TFEntities.Code + '/' + TFEntities.Name) " & _
-                                " 						,(TFEntities.Code + '/' + TFEntities.Name, Airlines.IATACode) " & _
-                                " 						,(Airlines.IATACode ,AirSegFrom.ActualClass) " & _
-                                " 						,(Airlines.IATACode) " & _
-                                " 						,() " & _
-                                " 						)" & _
-                                "   ORDER BY TFEntities.Code + '/' + TFEntities.Name  " & _
-                                " 		   ,Airlines.IATACode  " & _
+                pobjConn.Open()
+                pobjComm = pobjConn.CreateCommand
+
+                With pobjComm
+                    .CommandType = CommandType.Text
+                    .CommandText = " SELECT TFEntities.Code + '/' + TFEntities.Name AS ClientName  " &
+                                " 	  ,Airlines.IATACode AS Airline  " &
+                                "       ,AirSegFrom.ActualClass AS Class  " &
+                                "   	  ,COUNT(*) AS CountOfTkts  " &
+                                " 	  ,AVG(-(  CTCost.FaceValue          + CTCost.FVVatAmount        + CTCost.FaceValueExtra  " &
+                                "                + CTCost.FVXVatAmount       + CTCost.Taxes              + CTCost.TAXVatAmount  " &
+                                " 			   + CTCost.TaxesExtra         + CTCost.TAXXVatAmount      + CTCost.DiscountAmount  " &
+                                " 			   + CTCost.DISCVatAmount      + CTCost.CommissionAmount   + CTCost.COMVatAmount    " &
+                                " 			   + CTCost.ServiceFeeAmount   + CTCost.SFVatAmount        + CTCost.ExtraChargeAmount1  " &
+                                " 			   + CTCost.ExtraChargeAmount2 + CTCost.ExtraChargeAmount3 + CTCost.CancellationFeeAmount  " &
+                                " 			   + CTCost.CFVatAmount   " &
+                                " 		)) AS AverageCostPrice  " &
+                                "   FROM CommercialTransactions  " &
+                                "   LEFT JOIN CommercialTransactionValues CTV  " &
+                                " 	LEFT JOIN TFEntities  " &
+                                " 		ON CTV.CommercialEntityID = TFEntities.Id  " &
+                                " 	ON CommercialTransactions.Id = CTV.CommercialTransactionID   " &
+                                " 	   AND IsCost = 0  " &
+                                "   LEFT JOIN AirTicketTransactions  " &
+                                " 	LEFT JOIN AirSegments AirSegFrom  " &
+                                " 		ON AirSegFrom.AirTicketTransactionID = AirTicketTransactions.Id   " &
+                                " 		   AND OriginalPosition = (SELECT MIN(OriginalPosition) FROM AirSegments WHERE AirSegments.AirTicketTransactionID = AirTicketTransactions.Id)  " &
+                                " 	LEFT JOIN AirSegments AirSegTo  " &
+                                " 		On AirSegTo.AirTicketTransactionID = AirTicketTransactions.Id  " &
+                                " 			AND AirSegTo.OriginalPosition = (SELECT MAX(OriginalPosition) FROM AirSegments WHERE AirSegments.AirTicketTransactionID = AirTicketTransactions.Id)  " &
+                                " 	LEFT JOIN AirTickets  " &
+                                " 		ON AirTicketTransactions.AirTicketID = AirTickets.Id  " &
+                                " 	ON AirTicketTransactions.CommercialTransactionID = CommercialTransactions.Id  " &
+                                "   LEFT JOIN Airports AirportFrom  " &
+                                " 	ON AirSegFrom.FromAirportID = AirportFrom.Id  " &
+                                "   LEFT JOIN Airports AirportTo  " &
+                                " 	ON AirSegTo.ToAirportID = AirportTo.Id  " &
+                                "   LEFT JOIN Airlines  " &
+                                " 	ON AirSegFrom.CarrierAirlineID = Airlines.Id  " &
+                                "   LEFT JOIN CommercialTransactionValues CTCost  " &
+                                " 	ON CTCost.CommercialTransactionID = CTV.CommercialTransactionID   " &
+                                " 			  AND CTCost.IsCost=1  " &
+                                "   WHERE ComTransactionTypeID = 1                   " &
+                                "         AND ActionTypeID = 335                     " &
+                                " 		AND AirTickets.IssueDate  >= '" & Format(FromDate, "yyyy-MM-dd") & "'     " &
+                                " 		AND AirportFrom.Abbreviation = '" & Origin & "'  " &
+                                " 		AND AirportTo.Abbreviation   = '" & Destination & "'  " &
+                                "  GROUP BY GROUPING SETS ( " &
+                                " 						 (TFEntities.Code + '/' + TFEntities.Name) " &
+                                " 						,(TFEntities.Code + '/' + TFEntities.Name, Airlines.IATACode) " &
+                                " 						,(Airlines.IATACode ,AirSegFrom.ActualClass) " &
+                                " 						,(Airlines.IATACode) " &
+                                " 						,() " &
+                                " 						)" &
+                                "   ORDER BY TFEntities.Code + '/' + TFEntities.Name  " &
+                                " 		   ,Airlines.IATACode  " &
                                 " 		   ,AirSegFrom.ActualClass  "
-                pobjReader = .ExecuteReader
-            End With
+                    pobjReader = .ExecuteReader
+                End With
 
-            Dim pId As Integer = 0
-            mTicketCount = 0
-            mAveragePrice = 0
-            MyBase.Clear()
+                Dim pId As Integer = 0
+                mTicketCount = 0
+                mAveragePrice = 0
+                MyBase.Clear()
 
-            With pobjReader
-                Do While .Read
-                    pId = pId + 1
-                    pobjClass = New Item
-                    pobjClass.SetValues(pId, .Item("ClientName"), .Item("Airline"), .Item("Class"), .Item("CountOfTkts"), .Item("AverageCostPrice"))
-                    MyBase.Add(pobjClass.Id, pobjClass)
-                    If pobjClass.CustomerNameNull And pobjClass.AirlineNull And pobjClass.ClassOfServiceNull Then
-                        mTicketCount = pobjClass.TicketCount
-                        mAveragePrice = pobjClass.AveragePrice
-                    End If
-                Loop
-                .Close()
-            End With
-            pobjConn.Close()
+                With pobjReader
+                    Do While .Read
+                        pId = pId + 1
+                        pobjClass = New Item
+                        pobjClass.SetValues(pId, .Item("ClientName"), .Item("Airline"), .Item("Class"), .Item("CountOfTkts"), .Item("AverageCostPrice"))
+                        MyBase.Add(pobjClass.Id, pobjClass)
+                        If pobjClass.CustomerNameNull And pobjClass.AirlineNull And pobjClass.ClassOfServiceNull Then
+                            mTicketCount = pobjClass.TicketCount
+                            mAveragePrice = pobjClass.AveragePrice
+                        End If
+                    Loop
+                    .Close()
+                End With
+                pobjConn.Close()
+
+            End If
 
         End Sub
         Public ReadOnly Property TicketCount As Integer

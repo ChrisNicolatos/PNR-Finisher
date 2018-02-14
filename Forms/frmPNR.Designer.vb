@@ -27,7 +27,6 @@ Partial Class frmPNR
         Me.cmdExit = New System.Windows.Forms.Button()
         Me.cmdReadPNR = New System.Windows.Forms.Button()
         Me.llbOptions = New System.Windows.Forms.LinkLabel()
-        Me.llbTables = New System.Windows.Forms.LinkLabel()
         Me.lblPNR = New System.Windows.Forms.Label()
         Me.lblPax = New System.Windows.Forms.Label()
         Me.lblSegs = New System.Windows.Forms.Label()
@@ -58,6 +57,7 @@ Partial Class frmPNR
         Me.lblCostCentreHighlight = New System.Windows.Forms.Label()
         Me.tabPNR = New System.Windows.Forms.TabControl()
         Me.tabPageFinisher = New System.Windows.Forms.TabPage()
+        Me.cmdAdmin = New System.Windows.Forms.Button()
         Me.cmdPNROnlyDocs = New System.Windows.Forms.Button()
         Me.cmdPNRWriteWithDocs = New System.Windows.Forms.Button()
         Me.txtAirlineEntries = New System.Windows.Forms.TextBox()
@@ -68,11 +68,12 @@ Partial Class frmPNR
         Me.lblAvPriceDetails = New System.Windows.Forms.Label()
         Me.cmdCostCentre = New System.Windows.Forms.Button()
         Me.tabPageItinerary = New System.Windows.Forms.TabPage()
+        Me.webItnDoc = New System.Windows.Forms.WebBrowser()
         Me.lblItnPNRCounter = New System.Windows.Forms.Label()
         Me.cmdItnRefresh = New System.Windows.Forms.Button()
         Me.cmdItnReadQueue = New System.Windows.Forms.Button()
         Me.fraItnFormat = New System.Windows.Forms.GroupBox()
-        Me.optItnFormatOPTReport = New System.Windows.Forms.RadioButton()
+        Me.optItnFormatEuronav = New System.Windows.Forms.RadioButton()
         Me.optItnFormatMSReport = New System.Windows.Forms.RadioButton()
         Me.chkItnSeaChefsWithCode = New System.Windows.Forms.CheckBox()
         Me.optItnFormatSeaChefs = New System.Windows.Forms.RadioButton()
@@ -110,6 +111,7 @@ Partial Class frmPNR
         Me.txtItnPNR = New System.Windows.Forms.TextBox()
         Me.lblItnPNR = New System.Windows.Forms.Label()
         Me.tabOSM = New System.Windows.Forms.TabPage()
+        Me.cmbOSMVesselGroup = New System.Windows.Forms.ComboBox()
         Me.chkOSMVesselInUse = New System.Windows.Forms.CheckBox()
         Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
         Me.txtOSMAgentsFilter = New System.Windows.Forms.TextBox()
@@ -142,6 +144,7 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -181,16 +184,6 @@ Partial Class frmPNR
         Me.llbOptions.TabIndex = 38
         Me.llbOptions.TabStop = True
         Me.llbOptions.Text = "Options"
-        '
-        'llbTables
-        '
-        Me.llbTables.AutoSize = True
-        Me.llbTables.Location = New System.Drawing.Point(1217, 32)
-        Me.llbTables.Name = "llbTables"
-        Me.llbTables.Size = New System.Drawing.Size(39, 13)
-        Me.llbTables.TabIndex = 39
-        Me.llbTables.TabStop = True
-        Me.llbTables.Text = "Tables"
         '
         'lblPNR
         '
@@ -477,6 +470,7 @@ Partial Class frmPNR
         '
         'tabPageFinisher
         '
+        Me.tabPageFinisher.Controls.Add(Me.cmdAdmin)
         Me.tabPageFinisher.Controls.Add(Me.cmdPNROnlyDocs)
         Me.tabPageFinisher.Controls.Add(Me.cmdPNRWriteWithDocs)
         Me.tabPageFinisher.Controls.Add(Me.txtAirlineEntries)
@@ -491,7 +485,6 @@ Partial Class frmPNR
         Me.tabPageFinisher.Controls.Add(Me.cmdOneTimeVessel)
         Me.tabPageFinisher.Controls.Add(Me.txtSubdepartment)
         Me.tabPageFinisher.Controls.Add(Me.txtCustomer)
-        Me.tabPageFinisher.Controls.Add(Me.llbTables)
         Me.tabPageFinisher.Controls.Add(Me.lblCostCentreHighlight)
         Me.tabPageFinisher.Controls.Add(Me.llbOptions)
         Me.tabPageFinisher.Controls.Add(Me.cmbCostCentre)
@@ -526,6 +519,15 @@ Partial Class frmPNR
         Me.tabPageFinisher.TabIndex = 0
         Me.tabPageFinisher.Text = "PNR Finisher"
         Me.tabPageFinisher.UseVisualStyleBackColor = True
+        '
+        'cmdAdmin
+        '
+        Me.cmdAdmin.Location = New System.Drawing.Point(1207, 27)
+        Me.cmdAdmin.Name = "cmdAdmin"
+        Me.cmdAdmin.Size = New System.Drawing.Size(63, 19)
+        Me.cmdAdmin.TabIndex = 45
+        Me.cmdAdmin.Text = "Admin"
+        Me.cmdAdmin.UseVisualStyleBackColor = True
         '
         'cmdPNROnlyDocs
         '
@@ -622,6 +624,7 @@ Partial Class frmPNR
         '
         'tabPageItinerary
         '
+        Me.tabPageItinerary.Controls.Add(Me.webItnDoc)
         Me.tabPageItinerary.Controls.Add(Me.lblItnPNRCounter)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnRefresh)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnReadQueue)
@@ -644,8 +647,21 @@ Partial Class frmPNR
         Me.tabPageItinerary.Text = "PNR Itinerary"
         Me.tabPageItinerary.UseVisualStyleBackColor = True
         '
+        'webItnDoc
+        '
+        Me.webItnDoc.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.webItnDoc.Location = New System.Drawing.Point(315, 176)
+        Me.webItnDoc.MinimumSize = New System.Drawing.Size(20, 20)
+        Me.webItnDoc.Name = "webItnDoc"
+        Me.webItnDoc.Size = New System.Drawing.Size(20, 20)
+        Me.webItnDoc.TabIndex = 16
+        Me.webItnDoc.Visible = False
+        '
         'lblItnPNRCounter
         '
+        Me.lblItnPNRCounter.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lblItnPNRCounter.BackColor = System.Drawing.Color.Aqua
         Me.lblItnPNRCounter.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblItnPNRCounter.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
@@ -679,7 +695,7 @@ Partial Class frmPNR
         '
         'fraItnFormat
         '
-        Me.fraItnFormat.Controls.Add(Me.optItnFormatOPTReport)
+        Me.fraItnFormat.Controls.Add(Me.optItnFormatEuronav)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatMSReport)
         Me.fraItnFormat.Controls.Add(Me.chkItnSeaChefsWithCode)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatSeaChefs)
@@ -693,22 +709,22 @@ Partial Class frmPNR
         Me.fraItnFormat.TabStop = False
         Me.fraItnFormat.Text = "Custom Format"
         '
-        'optItnFormatOPTReport
+        'optItnFormatEuronav
         '
-        Me.optItnFormatOPTReport.AutoSize = True
-        Me.optItnFormatOPTReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatOPTReport.Location = New System.Drawing.Point(17, 88)
-        Me.optItnFormatOPTReport.Name = "optItnFormatOPTReport"
-        Me.optItnFormatOPTReport.Size = New System.Drawing.Size(82, 17)
-        Me.optItnFormatOPTReport.TabIndex = 6
-        Me.optItnFormatOPTReport.Text = "OPT Report"
-        Me.optItnFormatOPTReport.UseVisualStyleBackColor = True
+        Me.optItnFormatEuronav.AutoSize = True
+        Me.optItnFormatEuronav.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.optItnFormatEuronav.Location = New System.Drawing.Point(17, 71)
+        Me.optItnFormatEuronav.Name = "optItnFormatEuronav"
+        Me.optItnFormatEuronav.Size = New System.Drawing.Size(65, 17)
+        Me.optItnFormatEuronav.TabIndex = 6
+        Me.optItnFormatEuronav.Text = "Euronav"
+        Me.optItnFormatEuronav.UseVisualStyleBackColor = True
         '
         'optItnFormatMSReport
         '
         Me.optItnFormatMSReport.AutoSize = True
         Me.optItnFormatMSReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 71)
+        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 88)
         Me.optItnFormatMSReport.Name = "optItnFormatMSReport"
         Me.optItnFormatMSReport.Size = New System.Drawing.Size(76, 17)
         Me.optItnFormatMSReport.TabIndex = 5
@@ -719,7 +735,7 @@ Partial Class frmPNR
         '
         Me.chkItnSeaChefsWithCode.AutoSize = True
         Me.chkItnSeaChefsWithCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnSeaChefsWithCode.Location = New System.Drawing.Point(108, 54)
+        Me.chkItnSeaChefsWithCode.Location = New System.Drawing.Point(110, 54)
         Me.chkItnSeaChefsWithCode.Name = "chkItnSeaChefsWithCode"
         Me.chkItnSeaChefsWithCode.Size = New System.Drawing.Size(107, 17)
         Me.chkItnSeaChefsWithCode.TabIndex = 4
@@ -1136,6 +1152,8 @@ Partial Class frmPNR
         '
         'tabOSM
         '
+        Me.tabOSM.Controls.Add(Me.Label2)
+        Me.tabOSM.Controls.Add(Me.cmbOSMVesselGroup)
         Me.tabOSM.Controls.Add(Me.chkOSMVesselInUse)
         Me.tabOSM.Controls.Add(Me.lblOSMMultipleSearchSeparator)
         Me.tabOSM.Controls.Add(Me.txtOSMAgentsFilter)
@@ -1169,12 +1187,21 @@ Partial Class frmPNR
         Me.tabOSM.Text = "OSM"
         Me.tabOSM.UseVisualStyleBackColor = True
         '
+        'cmbOSMVesselGroup
+        '
+        Me.cmbOSMVesselGroup.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cmbOSMVesselGroup.FormattingEnabled = True
+        Me.cmbOSMVesselGroup.Location = New System.Drawing.Point(18, 67)
+        Me.cmbOSMVesselGroup.Name = "cmbOSMVesselGroup"
+        Me.cmbOSMVesselGroup.Size = New System.Drawing.Size(193, 21)
+        Me.cmbOSMVesselGroup.TabIndex = 26
+        '
         'chkOSMVesselInUse
         '
         Me.chkOSMVesselInUse.AutoSize = True
         Me.chkOSMVesselInUse.Checked = True
         Me.chkOSMVesselInUse.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.chkOSMVesselInUse.Location = New System.Drawing.Point(18, 70)
+        Me.chkOSMVesselInUse.Location = New System.Drawing.Point(18, 121)
         Me.chkOSMVesselInUse.Name = "chkOSMVesselInUse"
         Me.chkOSMVesselInUse.Size = New System.Drawing.Size(81, 17)
         Me.chkOSMVesselInUse.TabIndex = 24
@@ -1236,10 +1263,10 @@ Partial Class frmPNR
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.lstOSMVessels.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed
         Me.lstOSMVessels.FormattingEnabled = True
-        Me.lstOSMVessels.Location = New System.Drawing.Point(18, 94)
+        Me.lstOSMVessels.Location = New System.Drawing.Point(18, 146)
         Me.lstOSMVessels.Name = "lstOSMVessels"
         Me.lstOSMVessels.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
-        Me.lstOSMVessels.Size = New System.Drawing.Size(193, 420)
+        Me.lstOSMVessels.Size = New System.Drawing.Size(193, 368)
         Me.lstOSMVessels.TabIndex = 3
         '
         'cmdOSMCopyDocument
@@ -1342,7 +1369,7 @@ Partial Class frmPNR
         '
         'cmdOSMVesselsEdit
         '
-        Me.cmdOSMVesselsEdit.Location = New System.Drawing.Point(113, 67)
+        Me.cmdOSMVesselsEdit.Location = New System.Drawing.Point(113, 118)
         Me.cmdOSMVesselsEdit.Name = "cmdOSMVesselsEdit"
         Me.cmdOSMVesselsEdit.Size = New System.Drawing.Size(98, 21)
         Me.cmdOSMVesselsEdit.TabIndex = 2
@@ -1353,7 +1380,7 @@ Partial Class frmPNR
         '
         Me.lblOSMVessels.BackColor = System.Drawing.Color.Yellow
         Me.lblOSMVessels.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblOSMVessels.Location = New System.Drawing.Point(18, 46)
+        Me.lblOSMVessels.Location = New System.Drawing.Point(18, 97)
         Me.lblOSMVessels.Name = "lblOSMVessels"
         Me.lblOSMVessels.Size = New System.Drawing.Size(193, 13)
         Me.lblOSMVessels.TabIndex = 1
@@ -1456,6 +1483,17 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
         '
+        'Label2
+        '
+        Me.Label2.BackColor = System.Drawing.Color.Yellow
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.Label2.Location = New System.Drawing.Point(18, 46)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(193, 13)
+        Me.Label2.TabIndex = 27
+        Me.Label2.Text = "Vessel Group"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'frmPNR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1487,7 +1525,6 @@ Partial Class frmPNR
     Friend WithEvents cmdExit As System.Windows.Forms.Button
     Friend WithEvents cmdReadPNR As System.Windows.Forms.Button
     Friend WithEvents llbOptions As System.Windows.Forms.LinkLabel
-    Friend WithEvents llbTables As System.Windows.Forms.LinkLabel
     Friend WithEvents lblPNR As System.Windows.Forms.Label
     Friend WithEvents lblPax As System.Windows.Forms.Label
     Friend WithEvents lblSegs As System.Windows.Forms.Label
@@ -1598,8 +1635,12 @@ Partial Class frmPNR
     Friend WithEvents txtAirlineEntries As System.Windows.Forms.TextBox
     Friend WithEvents cmdPNROnlyDocs As System.Windows.Forms.Button
     Friend WithEvents cmdPNRWriteWithDocs As System.Windows.Forms.Button
-    Friend WithEvents optItnFormatOPTReport As RadioButton
     Friend WithEvents menuITNSelectCopy As ContextMenuStrip
     Friend WithEvents MenuCopyItn As ToolStripMenuItem
     Public WithEvents lblItnPNRCounter As Label
+    Friend WithEvents cmdAdmin As Button
+    Friend WithEvents webItnDoc As WebBrowser
+    Friend WithEvents optItnFormatEuronav As RadioButton
+    Friend WithEvents cmbOSMVesselGroup As ComboBox
+    Friend WithEvents Label2 As Label
 End Class

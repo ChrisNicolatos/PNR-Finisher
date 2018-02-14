@@ -11,15 +11,15 @@ Module modPNR
     ' 
 
     Private Const MONTH_NAMES As String = "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC"
-    Private Const mstrDBConnectionsFileGT As String = "\\192.168.102.223\Common\Click-Once Applications\PNR Finisher ATH\Config\PNRFinisher.txt"
+    Private Const mstrDBConnectionsFileGT As String = "\\192.168.102.223\Common\Click-Once Applications\PNR Finisher ATH V2\Config\PNRFinisher.txt"
     Private Const mstrDBConnectionsFile As String = "\\ath2-svrdc1\PNR Finisher ATH Config\PNRFinisher.txt"
     Private mstrDBConnectionFileActual As String
 
     Private mMySettings As Config
-    Private mAccDataSource As String = ""
-    Private mAccDataCatalog As String = ""
-    Private mAccUserName As String = ""
-    Private mAccPassword As String = ""
+    Private mHomeSettings As Config
+    Private mHomeSettingsExist As Boolean
+    Private mstrRequestedPCC As String = ""
+    Private mstrRequestedUser As String = ""
 
     Private mPnrDataSource As String = ""
     Private mPnrDataCatalog As String = ""
@@ -27,13 +27,59 @@ Module modPNR
     Private mPnrPassword As String = ""
 
     Public Sub InitSettings(ByVal mAmadeusUser As AmadeusUser)
-        mMySettings = New Config(mAmadeusUser)
+        Try
+            mstrRequestedPCC = mAmadeusUser.PCC
+            mstrRequestedUser = mAmadeusUser.User
+
+            mMySettings = New Config(mAmadeusUser)
+            If Not mHomeSettingsExist Then
+                mHomeSettings = mMySettings
+                mHomeSettingsExist = True
+            End If
+        Catch ex As Exception
+            If mHomeSettingsExist Then
+                mMySettings = mHomeSettings
+            Else
+                Throw New Exception(ex.Message)
+            End If
+        End Try
+
     End Sub
     Public ReadOnly Property MySettings As Config
         Get
             MySettings = mMySettings
         End Get
 
+    End Property
+    Public ReadOnly Property MyHomeSettings As Config
+        Get
+            MyHomeSettings = mHomeSettings
+        End Get
+    End Property
+    Public ReadOnly Property RequestedPCC As String
+        Get
+            RequestedPCC = mstrRequestedPCC
+        End Get
+    End Property
+    Public ReadOnly Property RequestedUser As String
+        Get
+            RequestedUser = mstrRequestedUser
+        End Get
+    End Property
+    Public ReadOnly Property PNRDataSource As String
+        Get
+            PNRDataSource = mPnrDataSource
+        End Get
+    End Property
+    Public ReadOnly Property PNRDataCatalog As String
+        Get
+            PNRDataCatalog = mPnrDataCatalog
+        End Get
+    End Property
+    Public ReadOnly Property PNRUserName As String
+        Get
+            PNRUserName = mPnrUserName
+        End Get
     End Property
     Public ReadOnly Property DBConnectionsFile As String
         Get
@@ -61,14 +107,6 @@ Module modPNR
                 For i As Integer = xLine.GetLowerBound(0) To xLine.GetUpperBound(0)
                     Dim pValues() As String = xLine(i).Split("=")
                     Select Case pValues(0).Trim.ToUpper
-                        Case "DATASOURCEACC"
-                            mAccDataSource = pValues(1).Trim
-                        Case "DATACATALOGACC"
-                            mAccDataCatalog = pValues(1).Trim
-                        Case "DATAUSERNAMEACC"
-                            mAccUserName = pValues(1).Trim
-                        Case "DATAUSERPASSWORDACC"
-                            mAccPassword = pValues(1).Trim
                         Case "DATASOURCEPNR"
                             mPnrDataSource = pValues(1).Trim
                         Case "DATACATALOGPNR"
@@ -90,13 +128,14 @@ Module modPNR
 
     Public ReadOnly Property ConnectionStringACC() As String
         Get
-            If mAccDataSource = "" Then
+            If MySettings.PCCDBDataSource = "" Then
                 ReadDBConnections()
             End If
-            ConnectionStringACC = "Data Source=" & mAccDataSource & _
-                                  ";Initial Catalog=" & mAccDataCatalog & _
-                                  ";User ID=" & mAccUserName & _
-                                  ";Password=" & mAccPassword
+            ConnectionStringACC = "Data Source=" & MySettings.PCCDBDataSource &
+                                  ";Initial Catalog=" & MySettings.PCCDBInitialCatalog &
+                                  ";User ID=" & MySettings.PCCDBUserId &
+                                  ";Password=" & MySettings.PCCDBUserPassword
+
         End Get
     End Property
 
@@ -117,7 +156,6 @@ Module modPNR
                                   ";Password=" & mPnrPassword
         End Get
     End Property
-
     Public Function myCurr(ByVal StringToParse As String) As Decimal
 
         Dim i As Integer
@@ -155,12 +193,15 @@ Module modPNR
         End If
 
     End Function
-
     Public Sub OSMRefreshVessels(ByRef lstListBox As ListBox, ByVal InUseOnly As Boolean)
 
         Dim pOSMVessels As New osmVessels.VesselCollection
 
-        pOSMVessels.Load()
+        If Not MySettings Is Nothing Then
+            pOSMVessels.Load(MySettings.OSMVesselGroup)
+        Else
+            pOSMVessels.Load()
+        End If
         lstListBox.Items.Clear()
 
         For Each pVessels As osmVessels.VesselItem In pOSMVessels.Values
@@ -170,35 +211,46 @@ Module modPNR
         Next
 
     End Sub
+    Public Sub OSMRefreshVessels(ByRef lstListBox As ListBox)
 
-    <CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")>
-    Public Sub OSMDisplayEmails(ByVal VesselId As Integer, ByRef lstToEmail As ListBox, ByRef lstCCEmail As ListBox, ByRef lstAgentsEmail As ListBox)
+        Dim pOSMVessels As New osmVessels.VesselCollection
 
-        Dim pobjEmails As New osmVessels.emailCollection
+        pOSMVessels.Load()
+        lstListBox.Items.Clear()
 
-        pobjEmails.Load(VesselId)
+        For Each pVessels As osmVessels.VesselItem In pOSMVessels.Values
+            lstListBox.Items.Add(pVessels)
+        Next
 
-        lstToEmail.Items.Clear()
-        lstCCEmail.Items.Clear()
-        lstAgentsEmail.Items.Clear()
-        lstAgentsEmail.Items.Add("")
+    End Sub
+    Public Sub OSMRefreshVesselGroup(ByRef cmbComboBox As ComboBox)
 
-        For Each pEmail As osmVessels.emailItem In pobjEmails.Values
-            With pEmail
-                If .EmailType = "TO" Then
-                    lstToEmail.Items.Add(pEmail)
-                ElseIf .EmailType = "CC" Then
-                    lstCCEmail.Items.Add(pEmail)
-                ElseIf .EmailType = "AGENT" Then
-                    lstAgentsEmail.Items.Add(pEmail)
+        Dim pOSMVesselGroup As New osmVessels.VesselGroupCollection
+
+        pOSMVesselGroup.Load()
+        cmbComboBox.Items.Clear()
+
+        For Each PVesselGroup As osmVessels.VesselGroupItem In pOSMVesselGroup.Values
+            cmbComboBox.Items.Add(PVesselGroup)
+            If Not MySettings Is Nothing Then
+                If PVesselGroup.Id = MySettings.OSMVesselGroup Then
+                    cmbComboBox.SelectedItem = PVesselGroup
                 End If
-            End With
+            End If
+        Next
+
+    End Sub
+    Public Sub OSMDisplayVesselGroups(ByRef lstListBox As CheckedListBox, ByVal pobjGroups As osmVessels.Vessel_VesselGroupCollection)
+
+        lstListBox.Items.Clear()
+        For Each Vessel_VesselGroup As osmVessels.Vessel_VesselGroupItem In pobjGroups.Values
+            lstListBox.Items.Add(Vessel_VesselGroup, Vessel_VesselGroup.Exists)
         Next
 
     End Sub
     Public Sub OSMDisplayEmails(ByVal VesselList As ListBox, ByRef lstToEmail As ListBox, ByRef lstCCEmail As ListBox, ByRef lstAgentsEmail As ListBox)
 
-        Dim pobjEmails As New osmVessels.emailCollection
+        Dim pobjEmails As New osmVessels.EmailCollection
 
         lstToEmail.Items.Clear()
         lstCCEmail.Items.Clear()
@@ -242,11 +294,9 @@ Module modPNR
         Next
 
     End Sub
-
-
     Public Sub OSMDisplayEmails(ByVal VesselId As Integer, ByRef lstToEmail As ListBox, ByRef lstCCEmail As ListBox)
 
-        Dim pobjEmails As New osmVessels.emailCollection
+        Dim pobjEmails As New osmVessels.EmailCollection
 
         pobjEmails.Load(VesselId)
 
@@ -265,7 +315,7 @@ Module modPNR
     End Sub
     Public Sub OSMDisplayEmails(ByRef lstAgents As ListBox)
 
-        Dim pobjEmails As New osmVessels.emailCollection
+        Dim pobjEmails As New osmVessels.EmailCollection
 
         pobjEmails.Load()
 
@@ -282,18 +332,20 @@ Module modPNR
 
     Public Sub ListBox_DrawItem(sender As Object, e As DrawItemEventArgs)
 
-        Dim stringToDraw As String = sender.Items(e.Index).ToString
-        Dim VesselToDraw As osmVessels.VesselItem = sender.Items(e.Index)
-        Dim C As Color
-        If Not VesselToDraw.InUse Then
-            C = Color.Red
-        Else
-            C = sender.ForeColor
-        End If
+        If e.Index >= 0 And e.Index < sender.Items.Count Then
+            Dim stringToDraw As String = sender.Items(e.Index).ToString
+            Dim VesselToDraw As osmVessels.VesselItem = sender.Items(e.Index)
+            Dim C As Color
+            If Not VesselToDraw.InUse Then
+                C = Color.Red
+            Else
+                C = sender.ForeColor
+            End If
 
-        e.DrawBackground()
-        e.DrawFocusRectangle()
-        e.Graphics.DrawString(stringToDraw, e.Font, New SolidBrush(C), e.Bounds)
+            e.DrawBackground()
+            e.DrawFocusRectangle()
+            e.Graphics.DrawString(stringToDraw, e.Font, New SolidBrush(C), e.Bounds)
+        End If
 
     End Sub
 

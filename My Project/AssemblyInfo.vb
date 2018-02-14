@@ -12,13 +12,13 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("ATPI Griffinstone")> 
 <Assembly: AssemblyProduct("PNR Finisher")>
-<Assembly: AssemblyCopyright("Copyright ©  2016-2017")>
+<Assembly: AssemblyCopyright("Copyright ©  2016-2018")>
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("2fd2b693-a52a-4f14-b0c8-04ad7c812cee")> 
+<Assembly: Guid("2fd2b693-a52a-4f14-b0c8-04ad7c812cee")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.43.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("2.0.0.0")>
+<Assembly: AssemblyFileVersion("2.0.0.0")>

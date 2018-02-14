@@ -1,5 +1,6 @@
-﻿Namespace AmadeusTickets
-
+﻿Option Strict Off
+Option Explicit On
+Namespace AmadeusTickets
     Public Class Item
         Public Enum TicketDocType
             NONE = 0

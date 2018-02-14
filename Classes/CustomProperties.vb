@@ -1,6 +1,7 @@
-﻿Imports System.Xml
+﻿Option Strict Off
+Option Explicit On
+Imports System.Xml
 Namespace CustomProperties
-
     Public Enum CustomPropertyIDValue As Integer
         BookedBy = 1
         Department = 2
@@ -74,7 +75,6 @@ Namespace CustomProperties
         Friend Sub SetValues(ByVal pID As Long, ByVal pCustomPropertyID As CustomPropertyIDValue, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pLabel As String, ByVal pTFEntityID As Long)
             With mudtProps
                 .ID = pID
-                'Debug.Assert(pID <> 113)
                 .CustomPropertyID = pCustomPropertyID
                 .LookUpValues = pLookUpValues
                 .LimitToLookup = pLimitToLookup
@@ -147,29 +147,60 @@ Namespace CustomProperties
             MyBase.Clear()
             mstrID = ""
 
-            Do While pTfEntityID <> 0 And mstrID.IndexOf("," & pTfEntityID & ",") < 0
-                With pobjComm
-                    .CommandType = CommandType.Text
-                    .CommandText = "SELECT LookUpValues, ISNULL(RelatedEntityID, 0) AS RelatedEntityID " & _
-                                   " FROM [TravelForceCosmos].[dbo].[ClientCustomProperties] " & _
+            If MySettings.PCCBackOffice = 1 Then
+
+                Do While pTfEntityID <> 0 And mstrID.IndexOf("," & pTfEntityID & ",") < 0
+                    With pobjComm
+                        .CommandType = CommandType.Text
+                        .CommandText = "SELECT LookUpValues, ISNULL(RelatedEntityID, 0) AS RelatedEntityID " &
+                                   " FROM [TravelForceCosmos].[dbo].[ClientCustomProperties] " &
                                    " LEFT JOIN TravelForceCosmos.dbo.TFEntities " &
                                    " 	ON TFEntityID=TFEntities.Id " &
                                    " WHERE CustomPropertyID = " & pCustomPropertyID & " And TFEntityID = " & pTfEntityID
+                        pobjReader = .ExecuteReader
+                    End With
+                    With pobjReader
+                        Do While .Read
+                            ParseXML(.Item("LookUpValues"))
+                            mstrID &= "," & pTfEntityID & ","
+                            pTfEntityID = .Item("RelatedEntityID")
+                        Loop
+                    End With
+                    pobjReader.Close()
+                Loop
+                MyBase.Sort()
+            ElseIf MySettings.PCCBackOffice = 2 Then
+                With pobjComm
+                    .CommandType = CommandType.Text
+                    Select Case pCustomPropertyID
+                        Case 1 ' booked by
+                            .CommandText = "SELECT [Child_Value] AS Name " &
+                                           " From [Disco_Instone_EU].[dbo].[Costcen] " &
+                                           "  LEFT JOIN Company " &
+                                           "  ON Costcen.Account_Id=Company.Account_Id " &
+                                           "  WHERE CostCen.Account_id = " & pTfEntityID & " AND Child_Name = 'BBY' " &
+                                           " ORDER BY Child_Value"
+                        Case 4 ' reason for travel
+                            .CommandText = "SELECT [Child_Value] AS Name " &
+                                          " From [Disco_Instone_EU].[dbo].[Costcen] " &
+                                          "  LEFT JOIN Company " &
+                                          "  ON Costcen.Account_Id=Company.Account_Id " &
+                                          "  WHERE CostCen.Account_id = " & pTfEntityID & " AND Child_Name = 'REF2' " &
+                                          " ORDER BY Child_Value"
+                    End Select
+
                     pobjReader = .ExecuteReader
                 End With
                 With pobjReader
                     Do While .Read
-                        ParseXML(.Item("LookUpValues"))
-                        mstrID &= "," & pTfEntityID & ","
-                        pTfEntityID = .Item("RelatedEntityID")
+                        If Not MyBase.Contains(.Item("Name")) Then
+                            MyBase.Add(.Item("Name"))
+                        End If
                     Loop
                 End With
-                pobjReader.Close()
-            Loop
-            MyBase.Sort()
+            End If
 
         End Sub
-
         Private Sub ParseXML(ByVal pXMLString As String)
 
             Try
@@ -208,42 +239,6 @@ Namespace CustomProperties
         End Sub
 
     End Class
-
-    Public Class Values
-        Private Structure ClassProps
-            Dim Description As String
-            Dim Value As String
-            Dim IsDefault As Boolean
-        End Structure
-        Private mudtProps As ClassProps
-
-        Public ReadOnly Property Description() As String
-            Get
-                Description = mudtProps.Description
-            End Get
-        End Property
-
-        Public ReadOnly Property Value() As String
-            Get
-                Value = mudtProps.Value
-            End Get
-        End Property
-
-        Public ReadOnly Property IsDefault() As Boolean
-            Get
-                IsDefault = mudtProps.IsDefault
-            End Get
-        End Property
-
-        'Friend Sub SetValues(ByVal pDescription As String, ByVal pValue As String, ByVal pIsDefault As Boolean)
-        '    With mudtProps
-        '        .Description = pDescription
-        '        .Value = pValue
-        '        .IsDefault = pIsDefault
-        '    End With
-        'End Sub
-    End Class
-
     Public Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
 
@@ -255,52 +250,76 @@ Namespace CustomProperties
 
         Public Sub Load(ByVal pEntityID As Long)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
-            Dim pobjComm As New SqlClient.SqlCommand
-            Dim pobjReader As SqlClient.SqlDataReader
-            Dim pobjClass As Item
+            If MySettings.PCCBackOffice = 1 Then
+                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjComm As New SqlClient.SqlCommand
+                Dim pobjReader As SqlClient.SqlDataReader
+                Dim pobjClass As Item
 
-            pobjConn.Open()
-            pobjComm = pobjConn.CreateCommand
+                pobjConn.Open()
+                pobjComm = pobjConn.CreateCommand
 
-            With pobjComm
-                .CommandType = CommandType.Text
-                .CommandText = " SELECT [Id] " & _
-                               "       ,[CustomPropertyID] " & _
-                               "       ,[LookUpValues] " & _
-                               "       ,[LimitToLookUp] " & _
-                               "       ,[Label] " & _
-                               "       ,[TFEntityID] " & _
-                               "   FROM [TravelForceCosmos].[dbo].[ClientCustomProperties] " & _
-                               "   WHERE TFEntityID = '" & pEntityID & "'   " & _
+                With pobjComm
+                    .CommandType = CommandType.Text
+                    .CommandText = " SELECT [Id] " &
+                               "       ,[CustomPropertyID] " &
+                               "       ,[LookUpValues] " &
+                               "       ,[LimitToLookUp] " &
+                               "       ,[Label] " &
+                               "       ,[TFEntityID] " &
+                               "   FROM [TravelForceCosmos].[dbo].[ClientCustomProperties] " &
+                               "   WHERE TFEntityID = '" & pEntityID & "'   " &
                                "   AND IsDisabled = 0"
 
-                pobjReader = .ExecuteReader
-            End With
+                    pobjReader = .ExecuteReader
+                End With
 
-            mflgBookedBy = False
-            mflgDepartment = False
-            mflgReasonForTravel = False
-            mflgCostCentre = False
+                mflgBookedBy = False
+                mflgDepartment = False
+                mflgReasonForTravel = False
+                mflgCostCentre = False
 
-            With pobjReader
-                Do While .Read
-                    pobjClass = New Item
-                    pobjClass.SetValues(.Item("Id"), .Item("CustomPropertyID"), .Item("LookUpValues"), .Item("LimitToLookUp"), .Item("Label"), .Item("TFEntityID"))
+                With pobjReader
+                    Do While .Read
+                        pobjClass = New Item
+                        pobjClass.SetValues(.Item("Id"), .Item("CustomPropertyID"), .Item("LookUpValues"), .Item("LimitToLookUp"), .Item("Label"), .Item("TFEntityID"))
+                        MyBase.Add(pobjClass.ID, pobjClass)
+                        If pobjClass.CustomPropertyID = CustomPropertyIDValue.BookedBy Then
+                            mflgBookedBy = True
+                        ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.Department Then
+                            mflgDepartment = True
+                        ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.ReasonFortravel Then
+                            mflgReasonForTravel = True
+                        ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.CostCentre Then
+                            mflgCostCentre = True
+                        End If
+                    Loop
+                    .Close()
+                End With
+                pobjConn.Close()
+            Else
+                Dim pobjClass As Item
+                pobjClass = New Item
+                pobjClass.SetValues(1, CustomPropertyIDValue.BookedBy, "", True, "BookedBy", pEntityID)
+                If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
-                    If pobjClass.CustomPropertyID = CustomPropertyIDValue.BookedBy Then
-                        mflgBookedBy = True
-                    ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.Department Then
-                        mflgDepartment = True
-                    ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.ReasonFortravel Then
-                        mflgReasonForTravel = True
-                    ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.CostCentre Then
-                        mflgCostCentre = True
-                    End If
-                Loop
-                .Close()
-            End With
-            pobjConn.Close()
+                    mflgBookedBy = True
+                Else
+                    mflgBookedBy = False
+                End If
+                pobjClass = New Item
+                pobjClass.SetValues(2, CustomPropertyIDValue.ReasonFortravel, "", True, "ReasonFortravel", pEntityID)
+                If pobjClass.ValuesCount > 0 Then
+                    MyBase.Add(pobjClass.ID, pobjClass)
+                    mflgReasonForTravel = True
+                Else
+                    mflgReasonForTravel = False
+                End If
+
+                mflgDepartment = False
+                mflgCostCentre = False
+            End If
+
         End Sub
         Public ReadOnly Property BookedBy As Boolean
             Get
@@ -397,180 +416,110 @@ Namespace CustomProperties
         End Sub
 
         Private Sub Load(ByVal byGroup As Boolean, ByVal Id As Integer)
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
-            Dim pobjComm As New SqlClient.SqlCommand
-            Dim pobjReader As SqlClient.SqlDataReader
-            Dim pobjClass As CostCentreLookupItem
-            Dim pCommandText As String = ""
 
-            pobjConn.Open()
-            pobjComm = pobjConn.CreateCommand
+            If MySettings.PCCBackOffice = 1 Then
 
-            With pobjComm
-                .CommandType = CommandType.Text
-                'pCommandText = " USE TravelForceCosmos " & _
-                '            " DECLARE @TagSeaChefsMarine INT = 154 " & _
-                '            " DECLARE @TagSeaChefsCorporate INT = 155 " & _
-                '            " If(OBJECT_ID('tempdb..#TempTable') Is Not Null) " & _
-                '            " Begin " & _
-                '            "     Drop Table #TempTable " & _
-                '            " End " & _
-                '            " SELECT ClientCustomProperties.TFEntityID " & _
-                '            " ,  CAST(REPLACE(REPLACE(ClientCustomProperties.LookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS LookUpValues " & _
-                '            " ,  CAST(REPLACE(REPLACE(ClientCustomProperties.DependsOnLookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS DependsOnLookUpValues " & _
-                '            " INTO #TempTable " & _
-                '            " FROM ClientCustomProperties " & _
-                '            "   WHERE CustomPropertyID=5 "
-                'If byGroup Then
-                '    pCommandText &= " 		AND TFEntityID IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
-                'Else
-                '    pCommandText &= " 		AND TFEntityID =" & Id & " "
-                'End If
+                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjComm As New SqlClient.SqlCommand
+                Dim pobjReader As SqlClient.SqlDataReader
+                Dim pobjClass As CostCentreLookupItem
+                Dim pCommandText As String = ""
 
-                'pCommandText &= " If(OBJECT_ID('tempdb..#TempTable1') Is Not Null) " & _
-                '        " Begin " & _
-                '        "     Drop Table #TempTable1 " & _
-                '        " End " & _
-                '        " SELECT DISTINCT " & _
-                '        " 	TFEntityID " & _
-                '        " 	,CustomProperties.CustProps.value('../@MasterLookupValue[1]','VARCHAR(1000)') AS Vessel " & _
-                '        " 	,CustomProperties.CustProps.value('.','VARCHAR(1000)') AS CostCentre " & _
-                '        " INTO #TempTable1	 " & _
-                '        " FROM #TempTable  " & _
-                '        "    CROSS APPLY DependsOnLookUpValues.nodes('/DependsOnValues/CustomPropertyDependsOnValue/DependentLookupValues')  CustomProperties(CustProps) " & _
-                '        " LEFT JOIN TFEntities " & _
-                '        " 	ON TFEntities.Id = TFEntityID " & _
-                '        " ORDER BY  Vessel,CostCentre, TFEntityID    " & _
-                '        " SELECT DISTINCT " & _
-                '        " 	#TempTable.TFEntityID " & _
-                '        " 	, Code " & _
-                '        " 	,Remarks " & _
-                '        " 	, Name " & _
-                '        " 	, Logo " & _
-                '        " 	,CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') AS CostCentre " & _
-                '        " 	,#TempTable1.Vessel AS ActualVessel " & _
-                '        " FROM #TempTable  " & _
-                '        "    CROSS APPLY LookUpValues.nodes('/LookUpValues/CustomPropertyLookupValue')  CustomProperties(CustProps) " & _
-                '        " LEFT JOIN TFEntities " & _
-                '        " 	ON TFEntities.Id = #TempTable.TFEntityID " & _
-                '        " LEFT JOIN #TempTable1 " & _
-                '        " 	ON #TempTable.TFEntityID=#TempTable1.TFEntityID " & _
-                '        " 		AND CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') = #TempTable1.CostCentre " & _
-                '        " WHERE #TempTable1.Vessel IS NOT NULL		 " & _
-                '        " UNION " & _
-                '        " SELECT DISTINCT TFEntities.Id " & _
-                '        " 				, TFEntities.Code " & _
-                '        " 				, '' AS Remarks " & _
-                '        " 				, TFEntities.Name " & _
-                '        " 				, TFEntities.Logo " & _
-                '        " 				, '' AS CostCentre " & _
-                '        " 				, TFEntityDepartments.Name AS ActualVessel " & _
-                '        " FROM TFEntities " & _
-                '        " LEFT JOIN TFEntityDepartments ON TFEntityDepartments.EntityID=TFEntities.Id  " & _
-                '        " 		  AND TFEntityDepartments.InUse=1 " & _
-                '        " 		  AND (SELECT COUNT(*) FROM #TempTable1 WHERE TFEntityDepartments.Name = #TempTable1.Vessel) = 0 "
-                'If byGroup Then
-                '    pCommandText &= " 		WHERE TFEntities.Id IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
-                'Else
-                '    pCommandText &= " 		WHERE TFEntities.Id =" & Id & " "
-                'End If
-                'pCommandText &= " ORDER BY  CostCentre, ActualVessel, Code    " & _
-                '        " If(OBJECT_ID('tempdb..#TempTable') Is Not Null) " & _
-                '        " Begin " & _
-                '        "     Drop Table #TempTable " & _
-                '        " End " & _
-                '        " If(OBJECT_ID('tempdb..#TempTable1') Is Not Null) " & _
-                '        " Begin " & _
-                '        "     Drop Table #TempTable1 " & _
-                '        " End "
-                pCommandText = "USE TravelForceCosmos   " & _
-                " If(OBJECT_ID('tempdb..#TempTable') Is Not Null)   " & _
-                " Begin       " & _
-                " Drop Table #TempTable   " & _
-                " End   " & _
-                " SELECT ClientCustomProperties.TFEntityID   " & _
-                " 		, CAST(REPLACE(REPLACE(ClientCustomProperties.LookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS LookUpValues   " & _
-                " 		, CAST(REPLACE(REPLACE(ClientCustomProperties.DependsOnLookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS DependsOnLookUpValues   " & _
-                " 		INTO #TempTable   " & _
-                " FROM ClientCustomProperties     " & _
+                pobjConn.Open()
+                pobjComm = pobjConn.CreateCommand
+
+                With pobjComm
+                    .CommandType = CommandType.Text
+
+                    pCommandText = "USE TravelForceCosmos   " &
+                " If(OBJECT_ID('tempdb..#TempTable') Is Not Null)   " &
+                " Begin       " &
+                " Drop Table #TempTable   " &
+                " End   " &
+                " SELECT ClientCustomProperties.TFEntityID   " &
+                " 		, CAST(REPLACE(REPLACE(ClientCustomProperties.LookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS LookUpValues   " &
+                " 		, CAST(REPLACE(REPLACE(ClientCustomProperties.DependsOnLookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS DependsOnLookUpValues   " &
+                " 		INTO #TempTable   " &
+                " FROM ClientCustomProperties     " &
                 " WHERE CustomPropertyID=5     "
-                If byGroup Then
-                    pCommandText &= " 		AND TFEntityID IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
-                Else
-                    pCommandText &= " 		AND TFEntityID =" & Id & " "
-                End If
-                pCommandText &= " If(OBJECT_ID('tempdb..#TempTable1') Is Not Null)   " & _
-                " Begin " & _
-                " Drop Table #TempTable1 " & _
-                " End " & _
-                " SELECT DISTINCT   #TempTable.TFEntityID " & _
-                " 				  ,CustomProperties.CustProps.value('../@MasterLookupValue[1]','VARCHAR(1000)') AS Vessel    " & _
-                " 				  ,CustomProperties.CustProps.value('.','VARCHAR(1000)') AS CostCentre   " & _
-                " 				  INTO #TempTable1    " & _
-                " FROM #TempTable       " & _
-                " CROSS APPLY DependsOnLookUpValues.nodes('/DependsOnValues/CustomPropertyDependsOnValue/DependentLookupValues')  CustomProperties(CustProps)   " & _
-                " LEFT JOIN TFEntities   ON TFEntities.Id = #TempTable.TFEntityID   " & _
-                " LEFT JOIN TFEntityDepartments ON TFEntityDepartments.EntityID = TFEntities.Id  " & _
-                " 								 AND CustomProperties.CustProps.value('../@MasterLookupValue[1]','VARCHAR(1000)') = TFEntityDepartments.Name  " & _
-                " 								 AND TFEntityDepartments.InUse=1 " & _
-                " ORDER BY  Vessel,CostCentre, TFEntityID      " & _
-                " SELECT DISTINCT   #TempTable.TFEntityID    " & _
-                " 				  , Code    " & _
-                " 				  , '' AS Remarks    " & _
-                " 				  , Name    " & _
-                " 				  , Logo    " & _
-                " 				  ,CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') AS CostCentre    " & _
-                " 				  ,#TempTable1.Vessel AS ActualVessel   " & _
-                " FROM #TempTable       " & _
-                " CROSS APPLY LookUpValues.nodes('/LookUpValues/CustomPropertyLookupValue')  CustomProperties(CustProps)   " & _
-                " LEFT JOIN TFEntities   ON TFEntities.Id = #TempTable.TFEntityID   " & _
-                " LEFT JOIN #TempTable1  ON #TempTable.TFEntityID=#TempTable1.TFEntityID     " & _
-                "                           AND CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') = #TempTable1.CostCentre   " & _
-                " WHERE #TempTable1.Vessel IS NOT NULL     " & _
-                " UNION " & _
-                " SELECT DISTINCT TFEntities.Id " & _
-                " 				, TFEntities.Code " & _
-                " 				, '' AS Remarks " & _
-                " 				, TFEntities.Name " & _
-                " 				, TFEntities.Logo " & _
-                " 				, '' AS CostCentre " & _
-                " 				, TFEntityDepartments.Name AS ActualVessel " & _
-                " FROM TFEntities " & _
-                " LEFT JOIN TFEntityDepartments ON TFEntityDepartments.EntityID=TFEntities.Id  " & _
-                " 		  AND TFEntityDepartments.InUse=1 " & _
-                " 		  AND (SELECT COUNT(*) FROM #TempTable1 WHERE TFEntityDepartments.Name = #TempTable1.Vessel) = 0 " & _
+                    If byGroup Then
+                        pCommandText &= " 		AND TFEntityID IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
+                    Else
+                        pCommandText &= " 		AND TFEntityID =" & Id & " "
+                    End If
+                    pCommandText &= " If(OBJECT_ID('tempdb..#TempTable1') Is Not Null)   " &
+                " Begin " &
+                " Drop Table #TempTable1 " &
+                " End " &
+                " SELECT DISTINCT   #TempTable.TFEntityID " &
+                " 				  ,CustomProperties.CustProps.value('../@MasterLookupValue[1]','VARCHAR(1000)') AS Vessel    " &
+                " 				  ,CustomProperties.CustProps.value('.','VARCHAR(1000)') AS CostCentre   " &
+                " 				  INTO #TempTable1    " &
+                " FROM #TempTable       " &
+                " CROSS APPLY DependsOnLookUpValues.nodes('/DependsOnValues/CustomPropertyDependsOnValue/DependentLookupValues')  CustomProperties(CustProps)   " &
+                " LEFT JOIN TFEntities   ON TFEntities.Id = #TempTable.TFEntityID   " &
+                " LEFT JOIN TFEntityDepartments ON TFEntityDepartments.EntityID = TFEntities.Id  " &
+                " 								 AND CustomProperties.CustProps.value('../@MasterLookupValue[1]','VARCHAR(1000)') = TFEntityDepartments.Name  " &
+                " 								 AND TFEntityDepartments.InUse=1 " &
+                " ORDER BY  Vessel,CostCentre, TFEntityID      " &
+                " SELECT DISTINCT   #TempTable.TFEntityID    " &
+                " 				  , Code    " &
+                " 				  , '' AS Remarks    " &
+                " 				  , Name    " &
+                " 				  , Logo    " &
+                " 				  ,CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') AS CostCentre    " &
+                " 				  ,#TempTable1.Vessel AS ActualVessel   " &
+                " FROM #TempTable       " &
+                " CROSS APPLY LookUpValues.nodes('/LookUpValues/CustomPropertyLookupValue')  CustomProperties(CustProps)   " &
+                " LEFT JOIN TFEntities   ON TFEntities.Id = #TempTable.TFEntityID   " &
+                " LEFT JOIN #TempTable1  ON #TempTable.TFEntityID=#TempTable1.TFEntityID     " &
+                "                           AND CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') = #TempTable1.CostCentre   " &
+                " WHERE #TempTable1.Vessel IS NOT NULL     " &
+                " UNION " &
+                " SELECT DISTINCT TFEntities.Id " &
+                " 				, TFEntities.Code " &
+                " 				, '' AS Remarks " &
+                " 				, TFEntities.Name " &
+                " 				, TFEntities.Logo " &
+                " 				, '' AS CostCentre " &
+                " 				, TFEntityDepartments.Name AS ActualVessel " &
+                " FROM TFEntities " &
+                " LEFT JOIN TFEntityDepartments ON TFEntityDepartments.EntityID=TFEntities.Id  " &
+                " 		  AND TFEntityDepartments.InUse=1 " &
+                " 		  AND (SELECT COUNT(*) FROM #TempTable1 WHERE TFEntityDepartments.Name = #TempTable1.Vessel) = 0 " &
                 " WHERE TFEntityDepartments.Name IS NOT NULL "
-                If byGroup Then
-                    pCommandText &= " 		AND TFEntities.Id IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
-                Else
-                    pCommandText &= " 		AND TFEntities.Id =" & Id & " "
-                End If
-                pCommandText &= " ORDER BY   ActualVessel,CostCentre, Code    " & _
-                " If(OBJECT_ID('tempdb..#TempTable') Is Not Null)   " & _
-                " Begin       " & _
-                " Drop Table #TempTable   " & _
-                " End   " & _
-                " If(OBJECT_ID('tempdb..#TempTable1') Is Not Null)   " & _
-                " Begin       " & _
-                " Drop Table #TempTable1   " & _
+                    If byGroup Then
+                        pCommandText &= " 		AND TFEntities.Id IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
+                    Else
+                        pCommandText &= " 		AND TFEntities.Id =" & Id & " "
+                    End If
+                    pCommandText &= " ORDER BY   ActualVessel,CostCentre, Code    " &
+                " If(OBJECT_ID('tempdb..#TempTable') Is Not Null)   " &
+                " Begin       " &
+                " Drop Table #TempTable   " &
+                " End   " &
+                " If(OBJECT_ID('tempdb..#TempTable1') Is Not Null)   " &
+                " Begin       " &
+                " Drop Table #TempTable1   " &
                 " End  "
 
 
-                .CommandText = pCommandText
-                pobjReader = .ExecuteReader
-            End With
+                    .CommandText = pCommandText
+                    pobjReader = .ExecuteReader
+                End With
 
-            Dim pId As Integer = 0
-            MyBase.Clear()
-            With pobjReader
-                Do While .Read
-                    pId = pId + 1
-                    pobjClass = New CostCentreLookupItem(pId, .Item("Code"), .Item("Remarks"), .Item("Name"), .Item("Logo"), .Item("ActualVessel"), .Item("CostCentre"))
-                    MyBase.Add(pobjClass.Id, pobjClass)
-                Loop
-                .Close()
-            End With
-            pobjConn.Close()
+                Dim pId As Integer = 0
+                MyBase.Clear()
+                With pobjReader
+                    Do While .Read
+                        pId = pId + 1
+                        pobjClass = New CostCentreLookupItem(pId, .Item("Code"), .Item("Remarks"), .Item("Name"), .Item("Logo"), .Item("ActualVessel"), .Item("CostCentre"))
+                        MyBase.Add(pobjClass.Id, pobjClass)
+                    Loop
+                    .Close()
+                End With
+                pobjConn.Close()
+            End If
 
         End Sub
     End Class

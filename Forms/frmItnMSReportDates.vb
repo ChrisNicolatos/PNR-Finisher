@@ -16,15 +16,12 @@
             ToDate = dtpToDate.Value
         End Get
     End Property
-
-    
     Private Sub cmdRun_Click(sender As Object, e As EventArgs) Handles cmdRun.Click
 
         Me.DialogResult = Windows.Forms.DialogResult.OK
         Me.Close()
 
     End Sub
-
     Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
 
         Me.DialogResult = Windows.Forms.DialogResult.Cancel

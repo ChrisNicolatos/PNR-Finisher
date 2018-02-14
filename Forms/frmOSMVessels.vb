@@ -5,7 +5,7 @@
 
     Private Sub frmOSMVessels_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        OSMRefreshVessels(lstOSMEditVessels, False)
+        OSMRefreshVessels(lstOSMEditVessels)
         CheckValid()
 
     End Sub
@@ -45,6 +45,7 @@
             mOSMSelectedVessel = lstOSMEditVessels.SelectedItem
             txtOSMEditVessel.Text = mOSMSelectedVessel.ToString
             chkOSMVesselInUse.Checked = mOSMSelectedVessel.InUse
+            OSMDisplayVesselGroups(lstVesselGroup, mOSMSelectedVessel.Vessel_VesselGroup)
             OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
         End If
 
@@ -145,7 +146,7 @@
         Try
             mOSMSelectedVessel.Update()
 
-            OSMRefreshVessels(lstOSMEditVessels, False)
+            OSMRefreshVessels(lstOSMEditVessels)
             CheckValid()
 
         Catch ex As Exception
@@ -166,7 +167,7 @@
         Dim pFrm As New frmOSMAddVessel
 
         If pFrm.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-            OSMRefreshVessels(lstOSMEditVessels, False)
+            OSMRefreshVessels(lstOSMEditVessels)
             CheckValid()
         End If
 
@@ -178,6 +179,13 @@
 
         mOSMSelectedVessel.InUse = chkOSMVesselInUse.Checked
         CheckValid()
+
+    End Sub
+
+    Private Sub lstVesselGroup_ItemCheck(sender As Object, e As ItemCheckEventArgs) Handles lstVesselGroup.ItemCheck
+
+        Dim pItem As osmVessels.Vessel_VesselGroupItem = lstVesselGroup.Items(e.Index)
+        pItem.Exists = e.NewValue
 
     End Sub
 End Class

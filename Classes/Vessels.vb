@@ -1,7 +1,8 @@
-﻿Namespace Vessels
+﻿Option Strict Off
+Option Explicit On
+Namespace Vessels
 
     Public Class Item
-        Private Const TEXTREG As String = " REG "
         Private Structure ClassProps
             Dim Name As String
             Dim Flag As String
@@ -9,7 +10,7 @@
         Private mudtProps As ClassProps
         Public Overrides Function ToString() As String
             With mudtProps
-                Return .Name + IIf(.Flag = "", "", TEXTREG & .Flag)
+                Return .Name + IIf(.Flag = "", "", MySettings.AmadeusValue("TextREG") & .Flag)
             End With
         End Function
 
@@ -27,12 +28,12 @@
 
         Friend Sub SetValues(ByVal pName As String, ByVal pFlag As String)
             With mudtProps
-                If pName.ToUpper.Contains(TEXTREG) Then
+                If pName.ToUpper.Contains(MySettings.AmadeusValue("TextREG")) Then
                     If pFlag.Trim = "" Then
-                        pFlag = pName.Substring(pName.ToUpper.IndexOf(TEXTREG) + 6).Trim
-                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(TEXTREG)).Trim
+                        pFlag = pName.Substring(pName.ToUpper.IndexOf(MySettings.AmadeusValue("TextREG")) + 6).Trim
+                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(MySettings.AmadeusValue("TextREG"))).Trim
                     Else
-                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(TEXTREG)).Trim
+                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(MySettings.AmadeusValue("TextREG"))).Trim
                     End If
                 End If
                 .Name = pName.Trim
@@ -50,16 +51,7 @@
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = " SELECT DISTINCT " & _
-                               " RTRIM(LTRIM(TFEntityDepartments.Name)) AS Name " & _
-                               " ,ISNULL(RTRIM(LTRIM(Flag)), '') AS Flag " & _
-                               " FROM [TravelForceCosmos].[dbo].[TFEntityDepartments] " & _
-                               " 		LEFT OUTER JOIN TravelForceCosmos.dbo.TFEntities  " & _
-                               " 			ON TravelForceCosmos.dbo.TFEntityDepartments.EntityID = TravelForceCosmos.dbo.TFEntities.Id " & _
-                               " WHERE InUse = 1  " & _
-                               " AND (TravelForceCosmos.dbo.TFEntityDepartments.Name = '" & pVesselName & "') " & _
-                               " AND (TravelForceCosmos.dbo.TFEntities.Code = '" & pCustCode & "') " & _
-                               " ORDER BY Name "
+                .CommandText = PrepareVesselSelectCommand(pCustCode, pVesselName)
                 pobjReader = .ExecuteReader
             End With
 
@@ -72,6 +64,31 @@
                 .Close()
             End With
             pobjConn.Close()
+        End Function
+        Private Function PrepareVesselSelectCommand(ByVal pCustCode As String, ByVal pVesselName As String)
+            Select Case MySettings.PCCBackOffice
+                Case 1
+                    PrepareVesselSelectCommand = " SELECT DISTINCT " &
+                                               " RTRIM(LTRIM(TFEntityDepartments.Name)) AS Name " &
+                                               " ,ISNULL(RTRIM(LTRIM(Flag)), '') AS Flag " &
+                                               " FROM [TravelForceCosmos].[dbo].[TFEntityDepartments] " &
+                                               " 		LEFT OUTER JOIN TravelForceCosmos.dbo.TFEntities  " &
+                                               " 			ON TravelForceCosmos.dbo.TFEntityDepartments.EntityID = TravelForceCosmos.dbo.TFEntities.Id " &
+                                               " WHERE InUse = 1  " &
+                                               " AND (TravelForceCosmos.dbo.TFEntityDepartments.Name = '" & pVesselName & "') " &
+                                               " AND (TravelForceCosmos.dbo.TFEntities.Code = '" & pCustCode & "') " &
+                                               " ORDER BY Name "
+                Case 2
+                    PrepareVesselSelectCommand = "SELECT [Child_Value] AS Name " &
+                                                " , '' AS Flag " &
+                                                " FROM [Disco_Instone_EU].[dbo].[Costcen] " &
+                                                " LEFT JOIN Company " &
+                                                " ON Costcen.Account_Id=Company.Account_Id " &
+                                                " WHERE Company.Account_Abbriviation = '" & pCustCode & "' AND Child_Name = 'CC1' AND Child_Value = '" & pVesselName & "' "
+
+                Case Else
+                    PrepareVesselSelectCommand = ""
+            End Select
         End Function
     End Class
 
@@ -92,13 +109,7 @@
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = " SELECT DISTINCT " & _
-                               " RTRIM(LTRIM(Name)) AS Name " & _
-                               " ,ISNULL(RTRIM(LTRIM(Flag)), '') AS Flag " & _
-                               " FROM [TravelForceCosmos].[dbo].[TFEntityDepartments] " & _
-                               " WHERE InUse = 1 " & _
-                               " AND RTRIM(LTRIM(Name)) <> '' AND EntityID = " & mlngEntityID & " " & _
-                               " ORDER BY Name "
+                .CommandText = PrepareVesselSelectCommand(mlngEntityID)
                 pobjReader = .ExecuteReader
             End With
 
@@ -114,6 +125,27 @@
             End With
             pobjConn.Close()
         End Sub
+        Private Function PrepareVesselSelectCommand(ByVal pEntityID As Integer) As String
+
+            Select Case MySettings.PCCBackOffice
+                Case 1
+                    PrepareVesselSelectCommand = " SELECT DISTINCT " &
+                               " RTRIM(LTRIM(Name)) AS Name " &
+                               " ,ISNULL(RTRIM(LTRIM(Flag)), '') AS Flag " &
+                               " FROM [TravelForceCosmos].[dbo].[TFEntityDepartments] " &
+                               " WHERE InUse = 1 " &
+                               " AND RTRIM(LTRIM(Name)) <> '' AND EntityID = " & pEntityID & " " &
+                               " ORDER BY Name "
+                Case 2
+                    PrepareVesselSelectCommand = " SELECT [Child_Value] AS Name " &
+                                                 ",'' AS Flag " &
+                                                 "  FROM [Disco_Instone_EU].[dbo].[Costcen] " &
+                                                 "  WHERE Child_Name = 'CC1' AND CostCen.Account_id =  " & pEntityID
+                Case Else
+                    PrepareVesselSelectCommand = ""
+            End Select
+
+        End Function
     End Class
 
 End Namespace

@@ -1,10 +1,9 @@
 Option Strict Off
 Option Explicit On
-Friend Class gtmAirports
+Friend Class Airports
 
     Private mCode As String = ""
     Private mCityName As String
-    Private mAirportname As String
     Private mCityAirportName As String
     Private mAirportShortname As String
 
@@ -14,12 +13,6 @@ Friend Class gtmAirports
             CityAirportName = mCityAirportName
         End Get
     End Property
-    'Public ReadOnly Property AirportName(ByVal CityCode As String) As String
-    '    Get
-    '        ReadCityName(CityCode)
-    '        AirportName = mAirportname
-    '    End Get
-    'End Property
     Public ReadOnly Property CityName(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
@@ -62,12 +55,10 @@ Friend Class gtmAirports
                         mCityAirportName = .Item("cityName") & " " & .Item("airportName")
                     End If
                     mCityName = .Item("cityName")
-                    mAirportname = .Item("airportName")
                     mAirportShortname = .Item("airportShortName")
                 Else
                     mCityAirportName = cityCode
                     mCityName = cityCode
-                    mAirportname = cityCode
                 End If
                 .Close()
             End With
