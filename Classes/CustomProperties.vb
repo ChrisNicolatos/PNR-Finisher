@@ -441,7 +441,8 @@ Namespace CustomProperties
                 " 		, CAST(REPLACE(REPLACE(ClientCustomProperties.DependsOnLookUpValues, 'utf-8', 'utf-16'), ' xmlns:xsd=" & Chr(34) & "http://www.w3.org/2001/XMLSchema" & Chr(34) & " xmlns:xsi=" & Chr(34) & "http://www.w3.org/2001/XMLSchema-instance" & Chr(34) & "', '') AS XML) AS DependsOnLookUpValues   " &
                 " 		INTO #TempTable   " &
                 " FROM ClientCustomProperties     " &
-                " WHERE CustomPropertyID=5     "
+                " LEFT JOIN TFEntities ON TFEntityId = TFEntities.Id" &
+                " WHERE CustomPropertyID=5 AND TFEntities.IsActive = 1  "
                     If byGroup Then
                         pCommandText &= " 		AND TFEntityID IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
                     Else
@@ -474,7 +475,7 @@ Namespace CustomProperties
                 " LEFT JOIN TFEntities   ON TFEntities.Id = #TempTable.TFEntityID   " &
                 " LEFT JOIN #TempTable1  ON #TempTable.TFEntityID=#TempTable1.TFEntityID     " &
                 "                           AND CustomProperties.CustProps.value('@Value[1]','VARCHAR(1000)') = #TempTable1.CostCentre   " &
-                " WHERE #TempTable1.Vessel IS NOT NULL     " &
+                " WHERE #TempTable1.Vessel IS NOT NULL AND TFEntities.IsActive = 1     " &
                 " UNION " &
                 " SELECT DISTINCT TFEntities.Id " &
                 " 				, TFEntities.Code " &
@@ -487,7 +488,7 @@ Namespace CustomProperties
                 " LEFT JOIN TFEntityDepartments ON TFEntityDepartments.EntityID=TFEntities.Id  " &
                 " 		  AND TFEntityDepartments.InUse=1 " &
                 " 		  AND (SELECT COUNT(*) FROM #TempTable1 WHERE TFEntityDepartments.Name = #TempTable1.Vessel) = 0 " &
-                " WHERE TFEntityDepartments.Name IS NOT NULL "
+                " WHERE TFEntityDepartments.Name IS NOT NULL AND TFEntities.IsActive = 1 "
                     If byGroup Then
                         pCommandText &= " 		AND TFEntities.Id IN (SELECT TFEntityID FROM TravelForceCosmos.dbo.TFEntityTags WHERE TagID=" & Id & ") "
                     Else

@@ -42,8 +42,8 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>8</ApplicationRevision>
-    <ApplicationVersion>2.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -80,6 +80,9 @@
     <TargetZone>Custom</TargetZone>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="itextsharp">
+      <HintPath>..\..\..\..\Visual Studio 2017\Projects\ATPIPDFMerge\ATPIPDFMerge\bin\itextsharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -129,6 +132,7 @@
     <Compile Include="Classes\AmadeusPax.vb" />
     <Compile Include="Classes\AmadeusPNR.vb" />
     <Compile Include="Classes\AmadeusSeg.vb" />
+    <Compile Include="Classes\OsmLOG.vb" />
     <Compile Include="Classes\Ticket.vb" />
     <Compile Include="Classes\osmVessels.vb" />
     <Compile Include="Classes\PriceLookup.vb" />
@@ -263,6 +267,7 @@
     <None Include="PNR Finisher.ruleset" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="My Project\download.png" />
     <Content Include="Notes\PNRFinisher.txt">
       <SubType>Designer</SubType>
     </Content>
@@ -273,6 +278,7 @@
     <Content Include="Notes\PARTIAL PNR DISPLAY ELEMENT CODES.txt" />
     <Content Include="Notes\PNR History Display Codes.txt" />
     <Content Include="Notes\SSR Docs.txt" />
+    <None Include="Resources\download.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -348,9 +354,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <PublishFile Include="Notes\Airline Points Commands.txt">
       <Visible>False</Visible>

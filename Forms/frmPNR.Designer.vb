@@ -73,9 +73,9 @@ Partial Class frmPNR
         Me.cmdItnRefresh = New System.Windows.Forms.Button()
         Me.cmdItnReadQueue = New System.Windows.Forms.Button()
         Me.fraItnFormat = New System.Windows.Forms.GroupBox()
+        Me.optItnFormatSeaChefsWith3LetterCode = New System.Windows.Forms.RadioButton()
         Me.optItnFormatEuronav = New System.Windows.Forms.RadioButton()
         Me.optItnFormatMSReport = New System.Windows.Forms.RadioButton()
-        Me.chkItnSeaChefsWithCode = New System.Windows.Forms.CheckBox()
         Me.optItnFormatSeaChefs = New System.Windows.Forms.RadioButton()
         Me.optItnFormatPlain = New System.Windows.Forms.RadioButton()
         Me.optItnFormatDefault = New System.Windows.Forms.RadioButton()
@@ -111,6 +111,7 @@ Partial Class frmPNR
         Me.txtItnPNR = New System.Windows.Forms.TextBox()
         Me.lblItnPNR = New System.Windows.Forms.Label()
         Me.tabOSM = New System.Windows.Forms.TabPage()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.cmbOSMVesselGroup = New System.Windows.Forms.ComboBox()
         Me.chkOSMVesselInUse = New System.Windows.Forms.CheckBox()
         Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
@@ -144,7 +145,6 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.Label2 = New System.Windows.Forms.Label()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -695,25 +695,36 @@ Partial Class frmPNR
         '
         'fraItnFormat
         '
+        Me.fraItnFormat.Controls.Add(Me.optItnFormatSeaChefsWith3LetterCode)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatEuronav)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatMSReport)
-        Me.fraItnFormat.Controls.Add(Me.chkItnSeaChefsWithCode)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatSeaChefs)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatPlain)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatDefault)
         Me.fraItnFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.fraItnFormat.Location = New System.Drawing.Point(333, 58)
         Me.fraItnFormat.Name = "fraItnFormat"
-        Me.fraItnFormat.Size = New System.Drawing.Size(265, 118)
+        Me.fraItnFormat.Size = New System.Drawing.Size(265, 130)
         Me.fraItnFormat.TabIndex = 5
         Me.fraItnFormat.TabStop = False
         Me.fraItnFormat.Text = "Custom Format"
+        '
+        'optItnFormatSeaChefsWith3LetterCode
+        '
+        Me.optItnFormatSeaChefsWith3LetterCode.AutoSize = True
+        Me.optItnFormatSeaChefsWith3LetterCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.optItnFormatSeaChefsWith3LetterCode.Location = New System.Drawing.Point(17, 71)
+        Me.optItnFormatSeaChefsWith3LetterCode.Name = "optItnFormatSeaChefsWith3LetterCode"
+        Me.optItnFormatSeaChefsWith3LetterCode.Size = New System.Drawing.Size(158, 17)
+        Me.optItnFormatSeaChefsWith3LetterCode.TabIndex = 7
+        Me.optItnFormatSeaChefsWith3LetterCode.Text = "Sea Chefs with 3 letter code"
+        Me.optItnFormatSeaChefsWith3LetterCode.UseVisualStyleBackColor = True
         '
         'optItnFormatEuronav
         '
         Me.optItnFormatEuronav.AutoSize = True
         Me.optItnFormatEuronav.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatEuronav.Location = New System.Drawing.Point(17, 71)
+        Me.optItnFormatEuronav.Location = New System.Drawing.Point(17, 88)
         Me.optItnFormatEuronav.Name = "optItnFormatEuronav"
         Me.optItnFormatEuronav.Size = New System.Drawing.Size(65, 17)
         Me.optItnFormatEuronav.TabIndex = 6
@@ -724,23 +735,12 @@ Partial Class frmPNR
         '
         Me.optItnFormatMSReport.AutoSize = True
         Me.optItnFormatMSReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 88)
+        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 105)
         Me.optItnFormatMSReport.Name = "optItnFormatMSReport"
         Me.optItnFormatMSReport.Size = New System.Drawing.Size(76, 17)
         Me.optItnFormatMSReport.TabIndex = 5
         Me.optItnFormatMSReport.Text = "MS Report"
         Me.optItnFormatMSReport.UseVisualStyleBackColor = True
-        '
-        'chkItnSeaChefsWithCode
-        '
-        Me.chkItnSeaChefsWithCode.AutoSize = True
-        Me.chkItnSeaChefsWithCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnSeaChefsWithCode.Location = New System.Drawing.Point(110, 54)
-        Me.chkItnSeaChefsWithCode.Name = "chkItnSeaChefsWithCode"
-        Me.chkItnSeaChefsWithCode.Size = New System.Drawing.Size(107, 17)
-        Me.chkItnSeaChefsWithCode.TabIndex = 4
-        Me.chkItnSeaChefsWithCode.Text = "with 3 letter code"
-        Me.chkItnSeaChefsWithCode.UseVisualStyleBackColor = True
         '
         'optItnFormatSeaChefs
         '
@@ -1187,6 +1187,17 @@ Partial Class frmPNR
         Me.tabOSM.Text = "OSM"
         Me.tabOSM.UseVisualStyleBackColor = True
         '
+        'Label2
+        '
+        Me.Label2.BackColor = System.Drawing.Color.Yellow
+        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.Label2.Location = New System.Drawing.Point(18, 46)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(193, 13)
+        Me.Label2.TabIndex = 27
+        Me.Label2.Text = "Vessel Group"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
         'cmbOSMVesselGroup
         '
         Me.cmbOSMVesselGroup.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
@@ -1483,17 +1494,6 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
         '
-        'Label2
-        '
-        Me.Label2.BackColor = System.Drawing.Color.Yellow
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.Label2.Location = New System.Drawing.Point(18, 46)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(193, 13)
-        Me.Label2.TabIndex = 27
-        Me.Label2.Text = "Vessel Group"
-        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
         'frmPNR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1590,7 +1590,6 @@ Partial Class frmPNR
     Friend WithEvents optItnFormatDefault As System.Windows.Forms.RadioButton
     Friend WithEvents optItnAirportCityName As System.Windows.Forms.RadioButton
     Friend WithEvents optItnAirportCityBoth As System.Windows.Forms.RadioButton
-    Friend WithEvents chkItnSeaChefsWithCode As System.Windows.Forms.CheckBox
     Friend WithEvents tabOSM As System.Windows.Forms.TabPage
     Friend WithEvents cmdOSMRefresh As System.Windows.Forms.Button
     Friend WithEvents lblOSMEmailsCC As System.Windows.Forms.Label
@@ -1643,4 +1642,5 @@ Partial Class frmPNR
     Friend WithEvents optItnFormatEuronav As RadioButton
     Friend WithEvents cmbOSMVesselGroup As ComboBox
     Friend WithEvents Label2 As Label
+    Friend WithEvents optItnFormatSeaChefsWith3LetterCode As RadioButton
 End Class

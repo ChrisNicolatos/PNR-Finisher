@@ -9,6 +9,8 @@ Public Class ReadPNR
     Private mstrPNRNumber As String
     Private mflgNewPNR As Boolean
     Private mstrPaxNames As String
+    Private mstrGroupName As String
+    Private mintGroupNamesCount As Integer
     Private mstrItinerary As String
 
     Private mstrOfficeOfResponsibility As String
@@ -49,6 +51,21 @@ Public Class ReadPNR
     Public ReadOnly Property PaxName As String
         Get
             PaxName = mstrPaxNames
+        End Get
+    End Property
+    Public ReadOnly Property GroupName As String
+        Get
+            GroupName = mstrGroupName
+        End Get
+    End Property
+    Public ReadOnly Property GroupNamesCount As Integer
+        Get
+            GroupNamesCount = mintGroupNamesCount
+        End Get
+    End Property
+    Public ReadOnly Property IsGroup As Boolean
+        Get
+            IsGroup = (mstrGroupName <> "")
         End Get
     End Property
     Public ReadOnly Property DepartureDate As Date
@@ -119,6 +136,7 @@ Public Class ReadPNR
                     GetPnrNumber()
                     GetCreationDate()
 
+                    GetGroup()
                     GetPassengers()
                     GetSegments()
                     GetPhoneElement()
@@ -466,7 +484,21 @@ Public Class ReadPNR
         End If
 
     End Sub
+    Private Sub GetGroup()
 
+        mstrGroupName = ""
+        mintGroupNamesCount = 0
+
+        For Each pGroup As s1aPNR.GroupNameElement In mobjPNR.GroupNameElements
+            mstrGroupName = pGroup.GroupName
+            mintGroupNamesCount = pGroup.NbrOfAssignedNames + pGroup.NbrNamesMissing
+            Exit For
+        Next
+        If mobjPNR.GroupNameElements.Count > 1 Then
+            mstrGroupName &= "x" & mobjPNR.GroupNameElements.Count
+        End If
+
+    End Sub
     Private Sub GetPassengers()
 
         mstrPaxNames = ""

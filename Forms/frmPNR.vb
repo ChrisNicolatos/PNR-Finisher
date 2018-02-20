@@ -232,7 +232,7 @@
                 InitSettings(mAmadeusUser)
                 SetupPCCOptions()
                 pDMI = .Read
-                If .NumberOfPax = 0 Then
+                If .NumberOfPax = 0 And Not .IsGroup Then
                     Throw New Exception("Need passenger names")
                 End If
                 If pDMI <> "" Then
@@ -244,7 +244,12 @@
                 mflgReadPNR = True
                 .PrepareNewAmadeusElements()
                 lblPNR.Text = .PnrNumber
-                lblPax.Text = .PaxName
+                If .IsGroup Then
+                    lblPax.Text = "Group:" & .GroupName & " " & .GroupNamesCount
+                Else
+                    lblPax.Text = .PaxName
+                End If
+
                 lblSegs.Text = .Itinerary
 
                 Dim pFromDate As Date = DateAdd(DateInterval.Month, -3, Today)
@@ -481,75 +486,80 @@
     End Sub
     Private Sub SetupPCCOptions()
 
-        Dim pText As String = "Athens PNR Finisher (14/02/2018 10:17) "
+        Try
 
-        If MySettings.AmadeusPCC <> "" And MySettings.AmadeusUser <> "" Then
-            pText &= MySettings.AmadeusPCC & " " & MySettings.AmadeusUser
-            If MySettings.AmadeusPCC <> RequestedPCC Or MySettings.AmadeusUser <> RequestedUser Then
-                pText &= " (Jump in to " & RequestedPCC & " as user " & RequestedUser & ")"
+            mflgLoading = True
+            Dim pText As String = "Athens PNR Finisher (14/02/2018 10:17) "
+
+            If MySettings.AmadeusPCC <> "" And MySettings.AmadeusUser <> "" Then
+                pText &= MySettings.AmadeusPCC & " " & MySettings.AmadeusUser
+                If MySettings.AmadeusPCC <> RequestedPCC Or MySettings.AmadeusUser <> RequestedUser Then
+                    pText &= " (Jump in to " & RequestedPCC & " as user " & RequestedUser & ")"
+                End If
+                If MySettings.AmadeusPCC <> MyHomeSettings.AmadeusPCC Or MySettings.AmadeusUser <> MyHomeSettings.AmadeusUser Then
+                    pText &= " (Jump in from " & MyHomeSettings.AmadeusPCC & " user " & MyHomeSettings.AmadeusUser & ")"
+                End If
+                Text = pText
+            Else
+                Throw New Exception("Please start Amadeus and restart the program")
             End If
-            If MySettings.AmadeusPCC <> MyHomeSettings.AmadeusPCC Or MySettings.AmadeusUser <> MyHomeSettings.AmadeusUser Then
-                pText &= " (Jump in from " & MyHomeSettings.AmadeusPCC & " user " & MyHomeSettings.AmadeusUser & ")"
+            If CheckOptions() Then
+                ' finisher tab
+                mflgReadPNR = False
+                ClearForm()
+                SetEnabled()
+                PrepareForm()
+                APISPrepareGrid()
+
+                ' itinerary tab
+                LoadRemarks()
+                If MySettings.AirportName = 0 Then
+                    optItnAirportCode.Checked = True
+                ElseIf MySettings.AirportName = 1 Then
+                    optItnAirportname.Checked = True
+                ElseIf MySettings.AirportName = 3 Then
+                    optItnAirportCityName.Checked = True
+                    optItnAirportBoth.Checked = True
+                End If
+
+                Select Case MySettings.FormatStyle
+                    Case 0
+                        optItnFormatDefault.Checked = True
+                    Case 1
+                        optItnFormatPlain.Checked = True
+                    Case 2
+                        optItnFormatSeaChefs.Checked = True
+                    Case 3
+                        optItnFormatSeaChefsWith3LetterCode.Checked = True
+                    Case 4
+                        optItnFormatEuronav.Checked = True
+                End Select
+                SetITNEnabled(True)
+
+                chkItnVessel.Checked = MySettings.Vessel
+                chkItnClass.Checked = MySettings.ClassOfService
+                chkItnAirlineLocator.Checked = MySettings.AirlineLocator
+                chkItnTickets.Checked = MySettings.Tickets
+                chkItnPaxSegPerTicket.Checked = MySettings.PaxSegPerTkt
+                chkItnSeating.Checked = MySettings.Seating
+                chkItnStopovers.Checked = MySettings.ShowStopovers
+                chkItnTerminal.Checked = MySettings.ShowTerminal
+                chkItnFlyingTime.Checked = MySettings.FlyingTime
+                chkItnCostCentre.Checked = MySettings.CostCentre
+
+                chkItnElecItemsBan.Checked = MySettings.BanElectricalEquipment
+                chkItnBrazilText.Checked = MySettings.BrazilText
+                chkItnUSAText.Checked = MySettings.USAText
+
+                cmdItnReadPNR.Enabled = False
+                cmdItnReadQueue.Enabled = False
+            Else
+                Throw New Exception("User not authorized for this PCC")
             End If
-            Text = pText
-        Else
-            Throw New Exception("Please start Amadeus and restart the program")
-        End If
-        If CheckOptions() Then
-            ' finisher tab
-            mflgReadPNR = False
-            ClearForm()
-            SetEnabled()
-            PrepareForm()
-            APISPrepareGrid()
-
-            ' itinerary tab
-            LoadRemarks()
-            If MySettings.AirportName = 0 Then
-                optItnAirportCode.Checked = True
-            ElseIf MySettings.AirportName = 1 Then
-                optItnAirportname.Checked = True
-            ElseIf MySettings.AirportName = 3 Then
-                optItnAirportCityName.Checked = True
-                optItnAirportBoth.Checked = True
-            End If
-
-            Select Case MySettings.FormatStyle
-                Case 0
-                    optItnFormatDefault.Checked = True
-                Case 1
-                    optItnFormatPlain.Checked = True
-                Case 2
-                    optItnFormatSeaChefs.Checked = True
-                    chkItnSeaChefsWithCode.Checked = False
-                Case 3
-                    optItnFormatSeaChefs.Checked = True
-                    chkItnSeaChefsWithCode.Checked = True
-                Case 4
-                    optItnFormatEuronav.Checked = True
-            End Select
-            SetITNEnabled(True)
-
-            chkItnVessel.Checked = MySettings.Vessel
-            chkItnClass.Checked = MySettings.ClassOfService
-            chkItnAirlineLocator.Checked = MySettings.AirlineLocator
-            chkItnTickets.Checked = MySettings.Tickets
-            chkItnPaxSegPerTicket.Checked = MySettings.PaxSegPerTkt
-            chkItnSeating.Checked = MySettings.Seating
-            chkItnStopovers.Checked = MySettings.ShowStopovers
-            chkItnTerminal.Checked = MySettings.ShowTerminal
-            chkItnFlyingTime.Checked = MySettings.FlyingTime
-            chkItnCostCentre.Checked = MySettings.CostCentre
-
-            chkItnElecItemsBan.Checked = MySettings.BanElectricalEquipment
-            chkItnBrazilText.Checked = MySettings.BrazilText
-            chkItnUSAText.Checked = MySettings.USAText
-
-            cmdItnReadPNR.Enabled = False
-            cmdItnReadQueue.Enabled = False
-        Else
-            Throw New Exception("User not authorized for this PCC")
-        End If
+        Catch ex As Exception
+        Finally
+            mflgLoading = False
+        End Try
 
     End Sub
     Private Sub LoadRemarks()
@@ -1075,7 +1085,9 @@
 
             pPNR.Read()
 
-            If pPNR.PnrNumber = mobjReadPNR.PnrNumber And pPNR.PaxName = mobjReadPNR.PaxName And pPNR.Itinerary = mobjReadPNR.Itinerary Then
+            If pPNR.PnrNumber = mobjReadPNR.PnrNumber And
+                                pPNR.Itinerary = mobjReadPNR.Itinerary And
+                                ((pPNR.IsGroup And mobjReadPNR.IsGroup) Or (pPNR.PaxName = mobjReadPNR.PaxName)) Then
                 mobjReadPNR.SendNewAmadeusEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, txtAirlineEntries)
             Else
                 Throw New Exception("PNR has been changed since read" & vbCrLf & "Please read again and re-enter data", New Exception("DifferentPNR"))
@@ -1399,6 +1411,11 @@
                         iPaxCount = iPaxCount + 1
                         pString.AppendLine(pobjPax.ElementNo & " " & pobjPax.PaxName & " " & pobjPax.PaxID & "<br />")
                     Next pobjPax
+                ElseIf mobjAmadeus.IsGroup Then
+                    pString.AppendLine("<b><u>")
+                    pString.AppendLine("GROUP<br />")
+                    pString.AppendLine("</u></b>")
+                    pString.AppendLine(mobjAmadeus.GroupName & " " & mobjAmadeus.GroupNamesCount & "<br />")
                 Else
                     pString.AppendLine("PASSENGER INFORMATION NOT AVAILABLE")
                 End If
@@ -1553,7 +1570,7 @@
                 'TODO - Fix length of output line total 78 characters including spaces
                 pString.Append(MakeRTBDocPart1)
                 pString.Append(MakeRTBDocTickets)
-                If Not optItnFormatSeaChefs.Checked And mintMaxString > 0 Then
+                If Not (optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked) And mintMaxString > 0 Then
                     pString.AppendLine(StrDup(mintHeaderLength, "-"))
                 End If
                 pString.AppendLine()
@@ -1697,19 +1714,20 @@
 
             With mobjAmadeus
 
-                Dim iPaxCount As Integer = 0
-                If optItnFormatSeaChefs.Checked Then
-                    pString.AppendLine("FOR PASSENGER" & If(.Passengers.Count > 1, "(S)", ""))
-                End If
-                For Each pobjPax In .Passengers.Values
-                    iPaxCount = iPaxCount + 1
-                    If optItnFormatSeaChefs.Checked Then
-                        pString.AppendLine(pobjPax.PaxName)
-                    Else
-                        pString.AppendLine(pobjPax.ElementNo & " " & pobjPax.PaxName & " " & pobjPax.PaxID)
+                If .Passengers.Count > 0 Then
+                    If optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Then
+                        pString.AppendLine("FOR PASSENGER" & If(.Passengers.Count > 1, "(S)", ""))
                     End If
-                Next pobjPax
-                If iPaxCount = 0 Then
+                    For Each pobjPax In .Passengers.Values
+                        If optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Then
+                            pString.AppendLine(pobjPax.PaxName)
+                        Else
+                            pString.AppendLine(pobjPax.ElementNo & " " & pobjPax.PaxName & " " & pobjPax.PaxID)
+                        End If
+                    Next pobjPax
+                ElseIf .IsGroup Then
+                    pString.AppendLine("GROUP: " & .GroupName & " " & .GroupNamesCount)
+                Else
                     pString.AppendLine("PASSENGER INFORMATION NOT AVAILABLE")
                 End If
 
@@ -1720,10 +1738,10 @@
 
                 pString.Clear()
                 Dim pTemp As String = ""
-                If Not optItnFormatSeaChefs.Checked And MySettings.Vessel And .VesselName <> "" Then
+                If Not (optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked) And MySettings.Vessel And .VesselName <> "" Then
                     pTemp &= "VESSEL     : " & .VesselName
                 End If
-                If Not optItnFormatSeaChefs.Checked And MySettings.CostCentre And .CostCentre <> "" Then
+                If Not (optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked) And MySettings.CostCentre And .CostCentre <> "" Then
                     If pTemp <> "" Then
                         pTemp &= vbCrLf
                     End If
@@ -1769,10 +1787,10 @@
                     pString.AppendLine(StrDup(mintHeaderLength, "-"))
                     pString.AppendLine(pHeader.ToString)
                     pString.AppendLine(StrDup(mintHeaderLength, "-"))
-                ElseIf optItnFormatSeaChefs.Checked Then
+                ElseIf optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Then
                     pHeader.Append("Flight ")
                     pHeader.Append("Date  ")
-                    If chkItnSeaChefsWithCode.Checked Then
+                    If optItnFormatSeaChefsWith3LetterCode.Checked Then
                         pHeader.Append("Org    " & StrDup(.MaxAirportShortNameLength - 1, " ") & "Dest       " & StrDup(.MaxAirportShortNameLength - 5, " "))
                     Else
                         pHeader.Append("Org    " & StrDup(.MaxAirportShortNameLength - 5, " ") & "Dest       " & StrDup(.MaxAirportShortNameLength - 9, " "))
@@ -1794,10 +1812,10 @@
                     iSegCount = iSegCount + 1
                     Dim pSeg As New System.Text.StringBuilder
 
-                    If optItnFormatSeaChefs.Checked Then
+                    If optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Then
                         pSeg.Append(pobjSeg.Airline & pobjSeg.FlightNo.PadLeft(4) & " ")
                         pSeg.Append(pobjSeg.DepartureDateIATA & " ")
-                        If chkItnSeaChefsWithCode.Checked Then
+                        If optItnFormatSeaChefsWith3LetterCode.Checked Then
                             pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
                             pSeg.Append(pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
                         Else
@@ -1888,7 +1906,7 @@
                         If pobjSeg.OperatedBy <> "" Then
                             pString.AppendLine(StrDup(13, " ") & pobjSeg.OperatedBy)
                         End If
-                        If (optItnFormatSeaChefs.Checked Or MySettings.ShowStopovers) And pobjSeg.Stopovers <> "" Then
+                        If (optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Or MySettings.ShowStopovers) And pobjSeg.Stopovers <> "" Then
                             pString.AppendLine("             *INTERMEDIATE STOP*  " & pobjSeg.Stopovers)
                         End If
                     End If
@@ -1904,7 +1922,7 @@
 
                 If .RequestedPNR <> "" Then
                     pString.AppendLine(" ")
-                    If optItnFormatSeaChefs.Checked Then
+                    If optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Then
                         pString.AppendLine("ATPI REF: " & .RequestedPNR)
                         If pAirlineLocator <> "" Then
                             pString.AppendLine("AIRLINE REF: " & pAirlineLocator)
@@ -1948,13 +1966,13 @@
             pString.Clear()
 
             With mobjAmadeus
-                If (optItnFormatSeaChefs.Checked Or MySettings.Tickets) And .Tickets.Count >= 1 Then
+                If (optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Or MySettings.Tickets) And .Tickets.Count >= 1 Then
                     If optItnFormatDefault.Checked Then
                         pString.AppendLine(StrDup(mintHeaderLength, "-"))
                     ElseIf optItnFormatPlain.Checked Then
                         pString.AppendLine()
                     End If
-                    If Not optItnFormatSeaChefs.Checked Then
+                    If Not (optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked) Then
                         Dim pHeader As String = "Ticket Number   "
                         If MySettings.PaxSegPerTkt Then
                             pHeader &= "Routing      Passenger"
@@ -1965,7 +1983,7 @@
                         End If
                     End If
 
-                    If optItnFormatSeaChefs.Checked Then
+                    If optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Then
                         For Each pobjPax In .Passengers.Values
                             pString.AppendLine()
                             pString.AppendLine(pobjPax.PaxName)
@@ -2002,7 +2020,7 @@
 
                 End If
 
-                If optItnFormatSeaChefs.Checked Or MySettings.Seating Then
+                If optItnFormatSeaChefs.Checked Or optItnFormatSeaChefsWith3LetterCode.Checked Or MySettings.Seating Then
                     If .Seats <> "" Then
                         If Not optItnFormatPlain.Checked Then
                             pString.AppendLine(StrDup(mintHeaderLength, "-"))
@@ -2851,37 +2869,37 @@
         lstItnRemarks.Enabled = AllowOptions
 
     End Sub
-    Private Sub optItnFormatDefault_CheckedChanged(sender As Object, e As EventArgs) Handles optItnFormatDefault.CheckedChanged, optItnFormatPlain.CheckedChanged, optItnFormatSeaChefs.CheckedChanged, chkItnSeaChefsWithCode.CheckedChanged, optItnFormatMSReport.CheckedChanged, optItnFormatEuronav.CheckedChanged
+    Private Sub optItnFormatDefault_CheckedChanged(sender As Object, e As EventArgs) Handles optItnFormatDefault.CheckedChanged, optItnFormatPlain.CheckedChanged, optItnFormatSeaChefs.CheckedChanged, optItnFormatSeaChefsWith3LetterCode.CheckedChanged, optItnFormatMSReport.CheckedChanged, optItnFormatEuronav.CheckedChanged
 
         Try
-            If Not MySettings Is Nothing Then
-                ' optItnFormatDefault = 0
-                ' optItnFormatPlain = 1
-                ' optItnFormatSeaChefs = 2
-                ' chkItnSeaChefsWithCode = 3
-                ' optItnFormatEuronav = 4
-                If optItnFormatDefault.Checked Then
-                    MySettings.FormatStyle = 0
-                ElseIf optItnFormatPlain.Checked Then
-                    MySettings.FormatStyle = 1
-                ElseIf optItnFormatSeaChefs.Checked Then
-                    If chkItnSeaChefsWithCode.Checked Then
+            If Not mflgLoading Then
+                If Not MySettings Is Nothing Then
+                    ' optItnFormatDefault = 0
+                    ' optItnFormatPlain = 1
+                    ' optItnFormatSeaChefs = 2
+                    ' chkItnSeaChefsWithCode = 3
+                    ' optItnFormatEuronav = 4
+                    If optItnFormatDefault.Checked Then
+                        MySettings.FormatStyle = 0
+                    ElseIf optItnFormatPlain.Checked Then
+                        MySettings.FormatStyle = 1
+                    ElseIf optItnFormatSeaChefs.Checked Then
                         MySettings.FormatStyle = 2
-                    Else
+                    ElseIf optItnFormatSeaChefsWith3LetterCode.Checked Then
                         MySettings.FormatStyle = 3
+                    ElseIf optItnFormatEuronav.Checked Then
+                        MySettings.FormatStyle = 4
                     End If
-                ElseIf optItnFormatEuronav.Checked Then
-                    MySettings.FormatStyle = 4
-                End If
-                MySettings.Save()
+                    MySettings.Save()
 
-                If cmdItnRefresh.Enabled Then
-                    ReadPNRandCreateItn(True)
-                End If
-                If sender.Name = "optItnFormatDefault" Or sender.name = "optItnFormatPlain" Then
-                    SetITNEnabled(True)
-                Else
-                    SetITNEnabled(False)
+                    If cmdItnRefresh.Enabled Then
+                        ReadPNRandCreateItn(True)
+                    End If
+                    If sender.Name = "optItnFormatDefault" Or sender.name = "optItnFormatPlain" Then
+                        SetITNEnabled(True)
+                    Else
+                        SetITNEnabled(False)
+                    End If
                 End If
             End If
         Catch ex As Exception
@@ -3025,21 +3043,19 @@
             End If
         Next
 
-        mflgAPISUpdate = mflgAPISUpdate Or (Not mobjReadPNR.SSRDocsExists And mobjReadPNR.SegmentsExist And pflgBirthDateOK And pflgGenderFound And pflgPassportNumberOK)
+        mflgAPISUpdate = mflgAPISUpdate Or (Not mobjReadPNR.SSRDocsExists And mobjReadPNR.SegmentsExist And pflgBirthDateOK) ' And pflgGenderFound And pflgPassportNumberOK)
 
-        If Not mflgAPISUpdate Then
-            If Not pflgBirthDateOK Then
-                pstrErrorText &= "Invalid birth date" & vbCrLf
-            End If
-            If Not pflgGenderFound Then
-                pstrErrorText &= "Invalid gender" & vbCrLf
-            End If
-            If Not pflgPassportNumberOK Then
-                pstrErrorText &= "Passport number missing" & vbCrLf
-            End If
-            If Not mflgExpiryDateOK Then
-                pstrErrorText &= "Invalid expiry date" & vbCrLf
-            End If
+        If Not pflgBirthDateOK Then
+            pstrErrorText &= "Invalid birth date" & vbCrLf
+        End If
+        If Not pflgGenderFound Then
+            pstrErrorText &= "Invalid gender" & vbCrLf
+        End If
+        If Not pflgPassportNumberOK Then
+            pstrErrorText &= "Passport number missing" & vbCrLf
+        End If
+        If Not mflgExpiryDateOK Then
+            pstrErrorText &= "Invalid expiry date" & vbCrLf
         End If
         If mobjReadPNR.SSRDocsExists Then
             lblSSRDocs.Text = "SSR DOCS already exist in the PNR"

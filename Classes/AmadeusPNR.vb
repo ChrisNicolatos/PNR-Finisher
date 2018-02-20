@@ -37,8 +37,9 @@ Friend Class AmadeusPNR
     Private mobjFrequentFlyer As FrequentFlyer.FrequentFlyerColl
     Private mstrCC As String
     Private mstrCLN As String
-    Private mstrCLA As string
-
+    Private mstrCLA As String
+    Private mstrGroupName As String
+    Private mintGroupNamesCount As Integer
     Private mflgCancelError As Boolean
 
     Private mintStatus As Short
@@ -161,6 +162,21 @@ Friend Class AmadeusPNR
             Passengers = mobjPax
         End Get
     End Property
+    Public ReadOnly Property GroupName As String
+        Get
+            GroupName = mstrGroupName
+        End Get
+    End Property
+    Public ReadOnly Property GroupNamesCount As Integer
+        Get
+            GroupNamesCount = mintGroupNamesCount
+        End Get
+    End Property
+    Public ReadOnly Property IsGroup As Boolean
+        Get
+            IsGroup = (mstrGroupName <> "")
+        End Get
+    End Property
     Public Function RetrievePNRsFromQueue(ByVal Queue As String) As String
 
         Dim pobjHostSessions As k1aHostToolKit.HostSessions
@@ -273,17 +289,19 @@ Friend Class AmadeusPNR
             If pintPNRStatus = 0 Or pintPNRStatus = 1005 Then
                 .RequestedPNR = setRecordLocator()
                 If ForReportOnly Then
-                    getPax()
-                    getSegs(ForReportOnly)
-                    getOtherServiceElements()
+                    GetGroup()
+                    GetPax()
+                    GetSegs(ForReportOnly)
+                    GetOtherServiceElements()
                     GetRMElements()
                 Else
-                    getTQT()
-                    getPax()
-                    getSegs(ForReportOnly)
-                    getAutoTickets()
-                    getOtherServiceElements()
-                    getSSRElements()
+                    GetTQT()
+                    GetGroup()
+                    GetPax()
+                    GetSegs(ForReportOnly)
+                    GetAutoTickets()
+                    GetOtherServiceElements()
+                    GetSSRElements()
                     GetRMElements()
                 End If
                 RetrievePNR = True
@@ -300,7 +318,7 @@ Friend Class AmadeusPNR
             setRecordLocator = UCase(mudtProps.RequestedPNR)
         End Try
     End Function
-    Private Sub getAutoTickets()
+    Private Sub GetAutoTickets()
 
         Dim pobjFareAutoTktElement As s1aPNR.FareAutoTktElement
         Dim pobjFareOriginalIssueElement As s1aPNR.FareOriginalIssueElement
@@ -452,7 +470,22 @@ Friend Class AmadeusPNR
         End Try
 
     End Sub
-    Private Sub getPax()
+    Private Sub GetGroup()
+
+        mstrGroupName = ""
+        mintGroupNamesCount = 0
+
+        For Each pGroup As s1aPNR.GroupNameElement In mobjPNR.GroupNameElements
+            mstrGroupName = pGroup.GroupName
+            mintGroupNamesCount = pGroup.NbrOfAssignedNames + pGroup.NbrNamesMissing
+            Exit For
+        Next
+        If mobjPNR.GroupNameElements.Count > 1 Then
+            mstrGroupName &= "x" & mobjPNR.GroupNameElements.Count
+        End If
+
+    End Sub
+    Private Sub GetPax()
 
         Dim i As Short
         Dim j As Short
@@ -480,7 +513,7 @@ Friend Class AmadeusPNR
 
     End Sub
 
-    Private Sub getSegs(ByVal ForReportOnly As Boolean)
+    Private Sub GetSegs(ByVal ForReportOnly As Boolean)
 
         Dim pobjSeg As Object
 
@@ -639,7 +672,7 @@ Friend Class AmadeusPNR
 
     End Function
 
-    Private Sub getOtherServiceElements()
+    Private Sub GetOtherServiceElements()
 
         Dim pobjOtherServiceElement As s1aPNR.OtherServiceElement
 
@@ -694,7 +727,7 @@ Friend Class AmadeusPNR
 
     End Sub
 
-    Private Sub getSSRElements()
+    Private Sub GetSSRElements()
 
         Dim pobjSSR As s1aPNR.SSRfqtvElement
 
@@ -770,7 +803,7 @@ Friend Class AmadeusPNR
         End If
 
     End Sub
-    Private Sub getTQT()
+    Private Sub GetTQT()
 
         Dim pTQTtext As k1aHostToolKit.CHostResponse = mobjHostSession.Send("TQT")
         Dim pTQT() As String = pTQTtext.Text.Split(vbCrLf)
