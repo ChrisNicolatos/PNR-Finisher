@@ -20,10 +20,12 @@ Namespace AmadeusSeg
             Dim BoardAirportName As String
             Dim BoardCityName As String
             Dim BoardAirportShortName As String
+            Dim BoardCountryName As String
             Dim OffPoint As String
             Dim OffPointAirportName As String
             Dim OffPointCityName As String
             Dim OffPointAirportShortName As String
+            Dim offPointCountryName As String
             Dim DepartTime As Date
             Dim ArriveTime As Date
             Dim EstimatedFlyingTime As String
@@ -80,6 +82,11 @@ Namespace AmadeusSeg
                 End If
             End Get
         End Property
+        Public ReadOnly Property BoardCountryName As String
+            Get
+                BoardCountryName = mudtProps.BoardCountryName
+            End Get
+        End Property
         Public ReadOnly Property OffPointAirportName() As String
             Get
                 OffPointAirportName = mudtProps.OffPointAirportName.Trim
@@ -97,6 +104,11 @@ Namespace AmadeusSeg
                 Else
                     OffPointAirportShortName = mudtProps.OffPointAirportShortName.Trim
                 End If
+            End Get
+        End Property
+        Public ReadOnly Property OffPointCountryName As String
+            Get
+                OffPointCountryName = mudtProps.offPointCountryName
             End Get
         End Property
         Public ReadOnly Property Status As String
@@ -283,10 +295,12 @@ Namespace AmadeusSeg
                 .BoardAirportName = mobjCityName.CityAirportName(.BoardPoint)
                 .BoardCityName = mobjCityName.CityName(.BoardPoint)
                 .BoardAirportShortName = mobjCityName.AirportShortname(.BoardPoint)
+                .BoardCountryName = mobjCityName.CountryName(.BoardPoint)
                 .OffPoint = pOffPoint
                 .OffPointAirportName = mobjCityName.CityAirportName(.OffPoint)
                 .OffPointCityName = mobjCityName.CityName(.OffPoint)
                 .OffPointAirportShortName = mobjCityName.AirportShortname(.OffPoint)
+                .offPointCountryName = mobjCityName.CountryName(.OffPoint)
                 .Status = pStatus
                 .DepartTime = pDepartTime
                 .ArriveTime = pArriveTime

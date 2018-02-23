@@ -30,11 +30,13 @@ Friend Class AmadeusPNR
     Private mobjPNR As s1aPNR.PNR
     Private mobjPax As AmadeusPax.AmadeusPaxColl
     Private mobjSegs As AmadeusSeg.AmadeusSegColl
+    Private mSegsFirstElement As Integer
     Private mSegsLastElement As Integer
     Private mobjNumberParser As AmadeusNumberParser
     Private mstrVesselName As String
     Private mobjTickets As Ticket.TicketColl
     Private mobjFrequentFlyer As FrequentFlyer.FrequentFlyerColl
+    Private mstrBookedBy As String
     Private mstrCC As String
     Private mstrCLN As String
     Private mstrCLA As String
@@ -93,6 +95,11 @@ Friend Class AmadeusPNR
             ClientCode = mstrCLN
         End Get
     End Property
+    Public ReadOnly Property BookedBy As String
+        Get
+            BookedBy = mstrBookedBy
+        End Get
+    End Property
     Public ReadOnly Property CostCentre As String
         Get
             CostCentre = mstrCC
@@ -131,6 +138,15 @@ Friend Class AmadeusPNR
     Public ReadOnly Property HasSegments As Boolean
         Get
             HasSegments = (mSegsLastElement > -1)
+        End Get
+    End Property
+    Public ReadOnly Property FirstSegment As AmadeusSeg.AmadeusSegItem
+        Get
+            If mSegsFirstElement = -1 Then
+                FirstSegment = New AmadeusSeg.AmadeusSegItem
+            Else
+                FirstSegment = mobjSegs(Format(mSegsFirstElement))
+            End If
         End Get
     End Property
     Public ReadOnly Property LastSegment As AmadeusSeg.AmadeusSegItem
@@ -273,6 +289,7 @@ Friend Class AmadeusPNR
         mobjPNR = New s1aPNR.PNR
         mobjTickets = New Ticket.TicketColl
         mstrVesselName = ""
+        mstrBookedBy = ""
         mstrCC = ""
         mstrCLA = ""
         mstrCLN = ""
@@ -519,6 +536,7 @@ Friend Class AmadeusPNR
 
         mobjSegs.Clear()
         mSegsLastElement = -1
+        mSegsFirstElement = -1
 
         For Each pobjSeg In mobjPNR.AllAirSegments
             Dim pElementNo As Short = airElementNo(pobjSeg)
@@ -527,6 +545,9 @@ Friend Class AmadeusPNR
             Else
                 Dim pSegDo As k1aHostToolKit.CHostResponse = mobjHostSession.Send("DO" & pobjSeg.ElementNo)
                 mobjSegs.AddItem(airAirline(pobjSeg), airBoardPoint(pobjSeg), airClass(pobjSeg), airDepartureDate(pobjSeg), airArrivalDate(pobjSeg), pElementNo, airFlightNo(pobjSeg), airOffPoint(pobjSeg), airStatus(pobjSeg), airDepartTime(pobjSeg), airArriveTime(pobjSeg), airText(pobjSeg), pSegDo.Text)
+            End If
+            If mSegsFirstElement = -1 Then
+                mSegsFirstElement = pElementNo
             End If
             If pElementNo > mSegsLastElement Then
                 mSegsLastElement = pElementNo
@@ -791,7 +812,7 @@ Friend Class AmadeusPNR
         pstrText = ConcatenateText(Element.Text)
         pintLen = Len(pstrText)
         pstrSplit = Split(Left(pstrText, pintLen), "/")
-
+        ' TODO - make necessary changes for Cyprus Discovery remarks
         If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
             If pstrSplit(1) = "CC" Then
                 mstrCC = pstrSplit(2)
@@ -799,8 +820,19 @@ Friend Class AmadeusPNR
                 mstrCLN = pstrSplit(2)
             ElseIf pstrSplit(1) = "CLA" Then
                 mstrCLA = pstrSplit(2)
+            ElseIf pstrSplit(1) = "BBY" Then
+                mstrBookedBy = pstrSplit(2)
             End If
         End If
+        pstrSplit = Split(Left(pstrText, pintLen), "-")
+        If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
+            If pstrSplit(0).IndexOf("D,BOOKED") > 0 Then
+                mstrBookedBy = pstrSplit(1)
+            ElseIf pstrSplit(0).IndexOf("D,AC") > 0 Then
+                mstrCLN = pstrSplit(1)
+            End If
+        End If
+
 
     End Sub
     Private Sub GetTQT()

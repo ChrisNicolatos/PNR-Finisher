@@ -36,7 +36,6 @@
 
     Private mItnFromDate As Date
     Private mItnToDate As Date
-    Private mWebItnDocCompleted As Boolean
 
     Private mflgExpiryDateOK As Boolean
     Private mflgAPISUpdate As Boolean
@@ -217,18 +216,7 @@
         Try
             With mobjReadPNR
                 mflgReadPNR = False
-                'pDMI = .Read
-                'If .NumberOfPax = 0 Then
-                '    Throw New Exception("Need passenger names")
-                'End If
-                'If pDMI <> "" Then
-                '    If MessageBox.Show("There is a problem with your itinerary. Do you want to cancel the PNR Finisher?" & vbCrLf & pDMI, "Itinerary Check", MessageBoxButtons.YesNo) = Windows.Forms.DialogResult.Yes Then
-                '        Throw New Exception("PNR Finisher cancelled because of itinerary check")
-                '    End If
-                'End If
-                'If .OfficeOfResponsibility <> MySettings.AmadeusPCC Then
                 Dim mAmadeusUser As New AmadeusUser
-
                 InitSettings(mAmadeusUser)
                 SetupPCCOptions()
                 pDMI = .Read
@@ -260,7 +248,7 @@
                 PrepareAirlinePoints()
             End With
             DisplayCustomer()
-            APISDisplayPax(dgvApis, mobjReadPNR.PNR)
+            APISDisplayPax()
 
         Catch ex As Exception
             Throw New Exception("ReadPNR()" & vbCrLf & ex.Message)
@@ -346,12 +334,9 @@
         End Try
 
     End Sub
-
-    Private Sub DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As PNR_Finisher.AmadeusExisting.Item)
-
+    Private Sub DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As AmadeusExisting.Item)
         Try
             If Item.Key <> "" Then
-
                 If cmbList.DropDownStyle = ComboBoxStyle.DropDown Then
                     If Item.Key <> "" Then
                         cmbList.Text = Item.Key
@@ -370,12 +355,9 @@
         End Try
 
     End Sub
-
     Private Sub DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As String)
-
         Try
             If Item <> "" Then
-
                 If cmbList.DropDownStyle = ComboBoxStyle.DropDown Then
                     cmbList.Text = Item
                 Else
@@ -393,11 +375,8 @@
 
     End Sub
     Private Sub PrepareAirlinePoints()
-
         Try
-
             txtAirlineEntries.Clear()
-
             For Each pSeg As s1aPNR.AirSegment In mobjReadPNR.AirSegments
                 mobjAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline)
                 For Each pItem As AirlinePoints.Item In mobjAirlinePoints.Values
@@ -517,9 +496,12 @@
                     optItnAirportCode.Checked = True
                 ElseIf MySettings.AirportName = 1 Then
                     optItnAirportname.Checked = True
+                ElseIf MySettings.AirportName = 2 Then
+                    optItnAirportBoth.Checked = True
                 ElseIf MySettings.AirportName = 3 Then
                     optItnAirportCityName.Checked = True
-                    optItnAirportBoth.Checked = True
+                ElseIf MySettings.AirportName = 4 Then
+                    optItnAirportCityBoth.Checked = True
                 End If
 
                 Select Case MySettings.FormatStyle
@@ -1224,6 +1206,7 @@
             ProcessRequestedPNRs(txtItnPNR)
             CopyItinToClipboard()
             cmdItnRefresh.Enabled = False
+            cmdItnFormatOSMLoG.Enabled = True
             Cursor = Cursors.Default
             MessageBox.Show("Ready", "Read PNR", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Catch ex As Exception
@@ -1248,6 +1231,7 @@
             ProcessRequestedPNRs(txtItnPNR)
             CopyItinToClipboard()
             cmdItnRefresh.Enabled = False
+            cmdItnFormatOSMLoG.Enabled = False
             Cursor = Cursors.Default
             MessageBox.Show("Ready", "Read PNR", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Catch ex As Exception
@@ -1285,7 +1269,6 @@
                 webItnDoc.Top = rtbItnDoc.Top
                 webItnDoc.Visible = True
                 rtbItnDoc.Visible = False
-                mWebItnDocCompleted = False
                 webItnDoc.DocumentText = makeWebHead() & makeWebDoc() & makeWebClose()
             Else
                 webItnDoc.Visible = False
@@ -1317,7 +1300,6 @@
                 webItnDoc.Top = rtbItnDoc.Top
                 webItnDoc.Visible = True
                 rtbItnDoc.Visible = False
-                mWebItnDocCompleted = False
                 pWebItn = makeWebHead()
             Else
                 webItnDoc.Visible = False
@@ -1392,7 +1374,10 @@
                 pString.AppendLine("<span style='font-size:10.0pt;font-family:arial'>")
                 pString.AppendLine(MySettings.FormalOfficeName & "<br />")
                 pString.AppendLine("Flight routing information<br />")
-                pString.AppendLine("For: " & .ClientName & "<br /><br />")
+                If .ClientName.Trim <> "" Then
+                    pString.AppendLine("For: " & .ClientName)
+                End If
+                pString.AppendLine("<br /><br />")
                 pString.AppendLine("Date: " & Format(Now, "dd/MM/yyyy") & "<br /><br />")
                 If mobjAmadeus.VesselName <> "" Then
                     pString.AppendLine("<b><u>VESSEL:</u></b><br />" & mobjAmadeus.VesselName & "<br /><br />")
@@ -2051,6 +2036,7 @@
             lblItnPNRCounter.Text = ""
             ReadPNRandCreateItn(False)
             cmdItnRefresh.Enabled = True
+            cmdItnFormatOSMLoG.Enabled = True
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -2441,11 +2427,13 @@
     End Sub
     Private Sub cmbOSMVesselGroup_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOSMVesselGroup.SelectedIndexChanged
         Try
-            Dim pSelectedItem As osmVessels.VesselGroupItem
+            If Not mflgLoading Then
+                Dim pSelectedItem As osmVessels.VesselGroupItem
             pSelectedItem = cmbOSMVesselGroup.SelectedItem
             MySettings.OSMVesselGroup = pSelectedItem.Id
             MySettings.Save()
-            OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
+                OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
+            End If
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -2737,15 +2725,10 @@
             MessageBox.Show(ex.Message)
         End Try
     End Sub
-
     Private Sub OSMAnalyzePax()
-
         Try
-
             mOSMPax.Load(txtOSMPax.Text)
-
             dgvOSMPax.Rows.Clear()
-
             For Each iPax As osmPax.Pax In mOSMPax.Values
                 Dim pId As New DataGridViewTextBoxCell
                 Dim pLastName As New DataGridViewTextBoxCell
@@ -2762,7 +2745,6 @@
                 If iPax.JoinerLeaver <> "" Then
                     pJoiner.Value = iPax.JoinerLeaver
                 End If
-                'pVisaType.Value = 0
                 Dim pRow As New DataGridViewRow
                 pRow.Cells.Add(pId)
                 pRow.Cells.Add(pLastName)
@@ -2776,11 +2758,8 @@
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub cmdOSMPrepareDoc_Click(sender As Object, e As EventArgs) Handles cmdOSMPrepareDoc.Click
-
         Try
             OSMWebCreate()
             cmdOSMCopyDocument.Enabled = True
@@ -2788,36 +2767,27 @@
         Catch ex As Exception
             MessageBox.Show("cmdOSMPrepareDoc_Click()" & vbCrLf & ex.Message)
         End Try
-
     End Sub
     Private Sub cmdOSMVesselsEdit_Click(sender As Object, e As EventArgs) Handles cmdOSMVesselsEdit.Click
-
         Try
             Dim pFrm As New frmOSMVessels
-
             pFrm.ShowDialog(Me)
             OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub cmdOSMAgentEdit_Click(sender As Object, e As EventArgs) Handles cmdOSMAgentEdit.Click
         Try
             Dim pFrm As New frmOSMAgents
-
             If pFrm.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
                 OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
             End If
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub dgvOSMPax_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles dgvOSMPax.CellValueChanged
-
         Dim pflgLoading As Boolean = mflgLoading
         Try
             If Not mflgLoading Then
@@ -2835,42 +2805,37 @@
         Finally
             mflgLoading = pflgLoading
         End Try
-
     End Sub
-
     Private Sub cmdOSMEmailClear_Click(sender As Object, e As EventArgs) Handles cmdOSMEmailClear.Click
-
         Try
             txtOSMPax.Clear()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
     End Sub
-
 #End Region
-
     Private Sub tabPNR_SelectedIndexChanged(sender As Object, e As EventArgs) Handles tabPNR.SelectedIndexChanged
-
         Try
-            If tabPNR.SelectedIndex = 2 Then
+            mflgLoading = True
+            If tabPNR.SelectedIndex = 1 Then
+                cmdItnFormatOSMLoG.Enabled = False
+            ElseIf tabPNR.SelectedIndex = 2 Then
                 OSMRefreshVesselGroup(cmbOSMVesselGroup)
                 OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
                 cmdOSMCopyDocument.Enabled = False
             End If
         Catch ex As Exception
             MessageBox.Show(ex.Message)
+        Finally
+            mflgLoading = False
         End Try
-
     End Sub
     Private Sub SetITNEnabled(ByVal AllowOptions As Boolean)
-
         fraItnAirportName.Enabled = AllowOptions
         fraItnOptions.Enabled = AllowOptions
         lstItnRemarks.Enabled = AllowOptions
-
     End Sub
     Private Sub optItnFormatDefault_CheckedChanged(sender As Object, e As EventArgs) Handles optItnFormatDefault.CheckedChanged, optItnFormatPlain.CheckedChanged, optItnFormatSeaChefs.CheckedChanged, optItnFormatSeaChefsWith3LetterCode.CheckedChanged, optItnFormatMSReport.CheckedChanged, optItnFormatEuronav.CheckedChanged
-
         Try
             If Not mflgLoading Then
                 If Not MySettings Is Nothing Then
@@ -2880,15 +2845,15 @@
                     ' chkItnSeaChefsWithCode = 3
                     ' optItnFormatEuronav = 4
                     If optItnFormatDefault.Checked Then
-                        MySettings.FormatStyle = 0
+                        MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatDefault
                     ElseIf optItnFormatPlain.Checked Then
-                        MySettings.FormatStyle = 1
+                        MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatPlain
                     ElseIf optItnFormatSeaChefs.Checked Then
-                        MySettings.FormatStyle = 2
+                        MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs
                     ElseIf optItnFormatSeaChefsWith3LetterCode.Checked Then
-                        MySettings.FormatStyle = 3
+                        MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode
                     ElseIf optItnFormatEuronav.Checked Then
-                        MySettings.FormatStyle = 4
+                        MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatEuronav
                     End If
                     MySettings.Save()
 
@@ -2905,7 +2870,14 @@
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
+    End Sub
+    Private Sub cmdItnFormatOSMLoG_Click(sender As Object, e As EventArgs) Handles cmdItnFormatOSMLoG.Click
+        Try
+            Dim pOSMLoG = New OsmLOG
+            pOSMLoG.CreatePDF(mobjAmadeus)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
     End Sub
     Private Sub lstItnRemarks_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstItnRemarks.SelectedIndexChanged
         Try
@@ -2918,7 +2890,6 @@
     End Sub
 
     Private Sub cmdOSMClearSelected_Click(sender As Object, e As EventArgs) Handles cmdOSMClearSelected.Click
-
         Try
             mflgLoading = True
             For i As Integer = 0 To lstOSMVessels.Items.Count - 1
@@ -2933,14 +2904,10 @@
             mflgLoading = False
             MessageBox.Show("cmdOSMClearSelected_Click()" & vbCrLf & ex.Message)
         End Try
-
     End Sub
-
     Private Sub lstOSMAgents_MouseMove(sender As Object, e As MouseEventArgs) Handles lstOSMAgents.MouseMove
-
         Try
             Dim pIndex As Integer = lstOSMAgents.IndexFromPoint(e.Location)
-
             If pIndex >= 0 And pIndex < lstOSMAgents.Items.Count And mOSMAgentIndex <> pIndex Then
                 ttpToolTip.SetToolTip(lstOSMAgents, lstOSMAgents.Items(pIndex).ToString)
                 mOSMAgentIndex = pIndex
@@ -2948,25 +2915,18 @@
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub lstOSMAgents_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstOSMAgents.SelectedIndexChanged
-
         Try
             cmdOSMCopyTo.Enabled = (lstOSMToEmail.Items.Count > 0 Or lstOSMAgents.SelectedItems.Count > 0)
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub txtOSMAgentsFilter_TextChanged(sender As Object, e As EventArgs) Handles txtOSMAgentsFilter.TextChanged
-
         Try
             lstOSMAgents.Items.Clear()
             mOSMAgentIndex = -1
-
             If txtOSMAgentsFilter.Text.Trim = "" Then
                 For Each pAgent As osmVessels.emailItem In mOSMAgents.Values
                     lstOSMAgents.Items.Add(pAgent)
@@ -2983,15 +2943,11 @@
                     Next
                 Next
             End If
-
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
     Private Sub chkOSMVesselInUse_CheckedChanged(sender As Object, e As EventArgs) Handles chkOSMVesselInUse.CheckedChanged
-
         Try
             If Not mflgLoading And chkOSMVesselInUse.Visible Then
                 OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
@@ -2999,22 +2955,14 @@
         Catch ex As Exception
             Throw New Exception(ex.Message)
         End Try
-
     End Sub
-
     Public Function APISValidateDataRow(ByVal Row As DataGridViewRow) As Boolean
-
-        ' TODO
-        ' Allow partial update if some of the DOCS entries are valid
         Dim pdteDate As DateTime
         Dim pflgGenderFound As Boolean = False
         Dim pflgBirthDateOK As Boolean = False
         Dim pflgPassportNumberOK As Boolean = False
-
         Dim pstrErrorText As String = ""
-
         pflgPassportNumberOK = (Trim(Row.Cells("PassportNumber").Value).Length > 0)
-
         If Not Date.TryParse(Row.Cells("Birthdate").Value, pdteDate) Then
             pdteDate = APISDateFromIATA(Row.Cells("Birthdate").Value)
             If pdteDate > Date.MinValue Then
@@ -3025,7 +2973,6 @@
         Else
             pflgBirthDateOK = True
         End If
-
         If Not Date.TryParse(Row.Cells("ExpiryDate").Value, pdteDate) Then
             pdteDate = APISDateFromIATA(Row.Cells("ExpiryDate").Value)
         End If
@@ -3034,7 +2981,6 @@
         Else
             mflgExpiryDateOK = False
         End If
-
         pflgGenderFound = False
         For i As Integer = 0 To mstrGenderIndicator.GetUpperBound(0)
             If Row.Cells("Gender").Value = mstrGenderIndicator(i) Then
@@ -3042,9 +2988,7 @@
                 Exit For
             End If
         Next
-
         mflgAPISUpdate = mflgAPISUpdate Or (Not mobjReadPNR.SSRDocsExists And mobjReadPNR.SegmentsExist And pflgBirthDateOK) ' And pflgGenderFound And pflgPassportNumberOK)
-
         If Not pflgBirthDateOK Then
             pstrErrorText &= "Invalid birth date" & vbCrLf
         End If
@@ -3070,38 +3014,25 @@
             End If
         End If
         Row.ErrorText = pstrErrorText
-
         SetEnabled()
-
     End Function
-
     Private Sub dgvApis_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles dgvApis.CellValueChanged
-
         Try
             dgvApis.Rows(e.RowIndex).Cells(e.ColumnIndex).Value = dgvApis.Rows(e.RowIndex).Cells(e.ColumnIndex).Value.ToString.ToUpper
         Catch ex As Exception
 
         End Try
-
         APISValidateDataRow(dgvApis.Rows(e.RowIndex))
-
     End Sub
-
     Private Sub dgvApis_RowValidating(sender As Object, e As DataGridViewCellCancelEventArgs) Handles dgvApis.RowValidating
-
         APISValidateDataRow(dgvApis.Rows(e.RowIndex))
-
     End Sub
-
-    Public Sub APISDisplayPax(ByRef dgvApis As Windows.Forms.DataGridView, ByVal mobjPNR As s1aPNR.PNR)
-
+    Public Sub APISDisplayPax()
         Dim pobjPax As s1aPNR.NameElement
         Dim pobjPaxApis As New PaxApisDB.Collection
         Dim pobjPaxItem As PaxApisDB.Item
-
         dgvApis.Rows.Clear()
-
-        For Each pobjPax In mobjPNR.NameElements
+        For Each pobjPax In mobjReadPNR.PNR.NameElements
             pobjPaxItem = pobjPaxApis.Read(pobjPax.LastName, APISModifyFirstName(pobjPax.Initial))
             Dim dgvRow As New DataGridViewRow With {
                 .DefaultCellStyle = dgvApis.RowsDefaultCellStyle
@@ -3125,8 +3056,6 @@
                 dgvRow.Cells(7).Value = "M" ' Gender
                 dgvRow.Cells.Add(New DataGridViewTextBoxCell)
                 dgvRow.Cells(8).Value = 0 ' Expiry Date
-                'dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                'dgvRow.Cells(9).Value = "" ' QR Frequent flyer
             Else
                 dgvRow.Cells.Add(New DataGridViewTextBoxCell)
                 dgvRow.Cells(0).Value = pobjPax.ElementNo
@@ -3149,106 +3078,23 @@
                 If pobjPaxItem.ExpiryDate > Date.MinValue Then
                     dgvRow.Cells(8).Value = APISDateToIATA(pobjPaxItem.ExpiryDate) ' Expiry Date
                 End If
-
-                'dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                'dgvRow.Cells(9).Value = pobjPaxItem.QRFreqFlyer  ' QR Frequent flyer
             End If
-
             dgvApis.Rows.Add(dgvRow)
             APISValidateDataRow(dgvApis.Rows(dgvApis.RowCount - 1))
         Next
-
     End Sub
-    Public Sub APISDisplayPax(ByRef dgvApis As DataGridView, ByRef mobjPNR As s1aPNR.PNR, cmdAPISUpdate As Button)
-
-        Dim pobjPax As s1aPNR.NameElement
-        Dim pobjPaxApis As New PaxApisDB.Collection
-        Dim pobjPaxItem As PaxApisDB.Item
-
-        cmdAPISUpdate.Enabled = False
-
-        APISPrepareGrid()
-        dgvApis.Rows.Clear()
-        cmdAPISUpdate.Enabled = False
-
-        For Each pobjPax In mobjPNR.NameElements
-            pobjPaxItem = pobjPaxApis.Read(pobjPax.LastName, APISModifyFirstName(pobjPax.Initial))
-            Dim dgvRow As New DataGridViewRow With {
-                .DefaultCellStyle = dgvApis.RowsDefaultCellStyle
-            }
-            If pobjPaxApis.Count = 0 Then
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(0).Value = pobjPax.ElementNo
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(1).Value = pobjPax.LastName
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(2).Value = APISModifyFirstName(pobjPax.Initial)
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(3).Value = "" ' Issuing Country
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(4).Value = "" ' Passport Number
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(5).Value = "" ' Nationality
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(6).Value = 0 ' Birth date
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(7).Value = "M" ' Gender
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(8).Value = 0 ' Expiry Date
-                'dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                'dgvRow.Cells(9).Value = "" ' QR Frequent flyer
-            Else
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(0).Value = pobjPax.ElementNo
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(1).Value = pobjPax.LastName
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(2).Value = APISModifyFirstName(pobjPax.Initial)
-
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(3).Value = pobjPaxItem.IssuingCountry ' Issuing Country
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(4).Value = pobjPaxItem.PassportNumber ' Passport Number
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(5).Value = pobjPaxItem.Nationality ' Nationality
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(6).Value = APISDateToIATA(pobjPaxItem.BirthDate) ' Birth date
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                dgvRow.Cells(7).Value = pobjPaxItem.Gender ' Gender
-                dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                If pobjPaxItem.ExpiryDate > Date.MinValue Then
-                    dgvRow.Cells(8).Value = APISDateToIATA(pobjPaxItem.ExpiryDate) ' Expiry Date
-                End If
-
-                'dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-                'dgvRow.Cells(9).Value = pobjPaxItem.QRFreqFlyer  ' QR Frequent flyer
-            End If
-
-            dgvApis.Rows.Add(dgvRow)
-            cmdAPISUpdate.Enabled = APISValidateDataRow(dgvApis.Rows(dgvApis.RowCount - 1))
-        Next
-
-    End Sub
-
     Private Function APISModifyFirstName(ByVal FirstName As String) As String
-
         Dim pintFindPos As Integer
-
         FirstName = Trim(FirstName)
-
         For i As Short = 0 To mstrSalutations.GetUpperBound(0)
             pintFindPos = FirstName.IndexOf(mstrSalutations(i))
             If pintFindPos > 0 And pintFindPos = FirstName.Length - mstrSalutations(i).Length Then
                 FirstName = FirstName.Substring(0, pintFindPos).Trim
             End If
         Next
-
         Return FirstName
-
     End Function
-
     Private Sub APISPrepareGrid()
-
         dgvApis.Columns.Clear()
         dgvApis.Columns.Add("Id", "Id")
         dgvApis.Columns.Add("Surname", "Surname")
@@ -3259,23 +3105,21 @@
         dgvApis.Columns.Add("BirthDate", "Birth Date")
         dgvApis.Columns.Add("Gender", "Gender")
         dgvApis.Columns.Add("ExpiryDate", "Expiry Date")
-
     End Sub
     Private Sub MenuCopyItn_Click(sender As Object, e As EventArgs) Handles MenuCopyItn.Click
-
-        rtbItnDoc.SelectAll()
-        Clipboard.Clear()
-        Clipboard.SetText(rtbItnDoc.Rtf, TextDataFormat.Rtf)
-        Clipboard.SetText(rtbItnDoc.SelectedText, TextDataFormat.Text)
-
+        Try
+            rtbItnDoc.SelectAll()
+            Clipboard.Clear()
+            Clipboard.SetText(rtbItnDoc.Rtf, TextDataFormat.Rtf)
+            Clipboard.SetText(rtbItnDoc.SelectedText, TextDataFormat.Text)
+        Catch ex As Exception
+            ' ignore any error that occurs when copying to clipboard
+        End Try
     End Sub
-
     Private Sub cmdAdmin_Click(sender As Object, e As EventArgs) Handles cmdAdmin.Click
-
         Try
             Dim pfrmAdmin As New frmAdmin
             pfrmAdmin.ShowDialog(Me)
-
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -3296,6 +3140,4 @@
         End Try
 
     End Sub
-
-
 End Class

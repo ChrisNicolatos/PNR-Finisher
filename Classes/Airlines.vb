@@ -19,9 +19,10 @@ Friend Class Airlines
 
         With pobjComm
             .CommandType = CommandType.Text
-            .CommandText = " SELECT airlineName " & _
-                           " FROM [AmadeusReports].[dbo].[zzAirlines] " & _
-                           " WHERE airlineCode2 = '" & airlineCode & "'"
+            .Parameters.Add("@AirlineCode", SqlDbType.NVarChar, 2).Value = airlineCode
+            .CommandText = " SELECT airlineName " &
+                           " FROM [AmadeusReports].[dbo].[zzAirlines] " &
+                           " WHERE airlineCode2 = @AirlineCode"
             pobjReader = .ExecuteReader
         End With
 

@@ -645,7 +645,7 @@ Public Class ReadPNR
 
         mflgExistsSSRDocs = False
         For Each pSSR As s1aPNR.SSRElement In mobjPNR.SSRElements
-            If pSSR.Text.Contains("SSR DOCS") Then
+            If pSSR.Text.IndexOf("SSR DOCS") > 0 And pSSR.Text.IndexOf("SSR DOCS") < 10 Then
                 mflgExistsSSRDocs = True
             End If
         Next

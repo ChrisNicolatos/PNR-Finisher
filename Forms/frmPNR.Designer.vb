@@ -68,6 +68,7 @@ Partial Class frmPNR
         Me.lblAvPriceDetails = New System.Windows.Forms.Label()
         Me.cmdCostCentre = New System.Windows.Forms.Button()
         Me.tabPageItinerary = New System.Windows.Forms.TabPage()
+        Me.cmdItnFormatOSMLoG = New System.Windows.Forms.Button()
         Me.webItnDoc = New System.Windows.Forms.WebBrowser()
         Me.lblItnPNRCounter = New System.Windows.Forms.Label()
         Me.cmdItnRefresh = New System.Windows.Forms.Button()
@@ -624,6 +625,7 @@ Partial Class frmPNR
         '
         'tabPageItinerary
         '
+        Me.tabPageItinerary.Controls.Add(Me.cmdItnFormatOSMLoG)
         Me.tabPageItinerary.Controls.Add(Me.webItnDoc)
         Me.tabPageItinerary.Controls.Add(Me.lblItnPNRCounter)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnRefresh)
@@ -647,12 +649,21 @@ Partial Class frmPNR
         Me.tabPageItinerary.Text = "PNR Itinerary"
         Me.tabPageItinerary.UseVisualStyleBackColor = True
         '
+        'cmdItnFormatOSMLoG
+        '
+        Me.cmdItnFormatOSMLoG.Location = New System.Drawing.Point(315, 189)
+        Me.cmdItnFormatOSMLoG.Name = "cmdItnFormatOSMLoG"
+        Me.cmdItnFormatOSMLoG.Size = New System.Drawing.Size(108, 27)
+        Me.cmdItnFormatOSMLoG.TabIndex = 17
+        Me.cmdItnFormatOSMLoG.Text = "OSM LoG"
+        Me.cmdItnFormatOSMLoG.UseVisualStyleBackColor = True
+        '
         'webItnDoc
         '
         Me.webItnDoc.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.webItnDoc.Location = New System.Drawing.Point(315, 176)
+        Me.webItnDoc.Location = New System.Drawing.Point(476, 189)
         Me.webItnDoc.MinimumSize = New System.Drawing.Size(20, 20)
         Me.webItnDoc.Name = "webItnDoc"
         Me.webItnDoc.Size = New System.Drawing.Size(20, 20)
@@ -702,9 +713,9 @@ Partial Class frmPNR
         Me.fraItnFormat.Controls.Add(Me.optItnFormatPlain)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatDefault)
         Me.fraItnFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.fraItnFormat.Location = New System.Drawing.Point(333, 58)
+        Me.fraItnFormat.Location = New System.Drawing.Point(315, 58)
         Me.fraItnFormat.Name = "fraItnFormat"
-        Me.fraItnFormat.Size = New System.Drawing.Size(265, 130)
+        Me.fraItnFormat.Size = New System.Drawing.Size(294, 118)
         Me.fraItnFormat.TabIndex = 5
         Me.fraItnFormat.TabStop = False
         Me.fraItnFormat.Text = "Custom Format"
@@ -713,7 +724,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatSeaChefsWith3LetterCode.AutoSize = True
         Me.optItnFormatSeaChefsWith3LetterCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatSeaChefsWith3LetterCode.Location = New System.Drawing.Point(17, 71)
+        Me.optItnFormatSeaChefsWith3LetterCode.Location = New System.Drawing.Point(116, 74)
         Me.optItnFormatSeaChefsWith3LetterCode.Name = "optItnFormatSeaChefsWith3LetterCode"
         Me.optItnFormatSeaChefsWith3LetterCode.Size = New System.Drawing.Size(158, 17)
         Me.optItnFormatSeaChefsWith3LetterCode.TabIndex = 7
@@ -724,7 +735,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatEuronav.AutoSize = True
         Me.optItnFormatEuronav.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatEuronav.Location = New System.Drawing.Point(17, 88)
+        Me.optItnFormatEuronav.Location = New System.Drawing.Point(116, 20)
         Me.optItnFormatEuronav.Name = "optItnFormatEuronav"
         Me.optItnFormatEuronav.Size = New System.Drawing.Size(65, 17)
         Me.optItnFormatEuronav.TabIndex = 6
@@ -735,7 +746,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatMSReport.AutoSize = True
         Me.optItnFormatMSReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 105)
+        Me.optItnFormatMSReport.Location = New System.Drawing.Point(116, 47)
         Me.optItnFormatMSReport.Name = "optItnFormatMSReport"
         Me.optItnFormatMSReport.Size = New System.Drawing.Size(76, 17)
         Me.optItnFormatMSReport.TabIndex = 5
@@ -746,7 +757,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatSeaChefs.AutoSize = True
         Me.optItnFormatSeaChefs.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatSeaChefs.Location = New System.Drawing.Point(17, 54)
+        Me.optItnFormatSeaChefs.Location = New System.Drawing.Point(17, 74)
         Me.optItnFormatSeaChefs.Name = "optItnFormatSeaChefs"
         Me.optItnFormatSeaChefs.Size = New System.Drawing.Size(74, 17)
         Me.optItnFormatSeaChefs.TabIndex = 2
@@ -757,7 +768,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatPlain.AutoSize = True
         Me.optItnFormatPlain.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatPlain.Location = New System.Drawing.Point(17, 37)
+        Me.optItnFormatPlain.Location = New System.Drawing.Point(17, 47)
         Me.optItnFormatPlain.Name = "optItnFormatPlain"
         Me.optItnFormatPlain.Size = New System.Drawing.Size(48, 17)
         Me.optItnFormatPlain.TabIndex = 1
@@ -792,9 +803,9 @@ Partial Class frmPNR
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstItnRemarks.CheckOnClick = True
         Me.lstItnRemarks.FormattingEnabled = True
-        Me.lstItnRemarks.Location = New System.Drawing.Point(610, 65)
+        Me.lstItnRemarks.Location = New System.Drawing.Point(615, 65)
         Me.lstItnRemarks.Name = "lstItnRemarks"
-        Me.lstItnRemarks.Size = New System.Drawing.Size(744, 109)
+        Me.lstItnRemarks.Size = New System.Drawing.Size(739, 154)
         Me.lstItnRemarks.TabIndex = 8
         '
         'lblItnRemarks
@@ -805,10 +816,10 @@ Partial Class frmPNR
         Me.lblItnRemarks.Cursor = System.Windows.Forms.Cursors.Default
         Me.lblItnRemarks.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.lblItnRemarks.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblItnRemarks.Location = New System.Drawing.Point(610, 48)
+        Me.lblItnRemarks.Location = New System.Drawing.Point(757, 48)
         Me.lblItnRemarks.Name = "lblItnRemarks"
         Me.lblItnRemarks.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.lblItnRemarks.Size = New System.Drawing.Size(744, 16)
+        Me.lblItnRemarks.Size = New System.Drawing.Size(597, 16)
         Me.lblItnRemarks.TabIndex = 7
         Me.lblItnRemarks.Text = "Remarks"
         Me.lblItnRemarks.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -918,9 +929,9 @@ Partial Class frmPNR
         Me.fraItnOptions.Controls.Add(Me.chkItnVessel)
         Me.fraItnOptions.Controls.Add(Me.chkItnAirlineLocator)
         Me.fraItnOptions.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.fraItnOptions.Location = New System.Drawing.Point(172, 194)
+        Me.fraItnOptions.Location = New System.Drawing.Point(172, 182)
         Me.fraItnOptions.Name = "fraItnOptions"
-        Me.fraItnOptions.Size = New System.Drawing.Size(137, 391)
+        Me.fraItnOptions.Size = New System.Drawing.Size(137, 403)
         Me.fraItnOptions.TabIndex = 6
         Me.fraItnOptions.TabStop = False
         Me.fraItnOptions.Text = "Options"
@@ -1088,9 +1099,9 @@ Partial Class frmPNR
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.rtbItnDoc.ContextMenuStrip = Me.menuITNSelectCopy
         Me.rtbItnDoc.Font = New System.Drawing.Font("Courier New", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.rtbItnDoc.Location = New System.Drawing.Point(315, 194)
+        Me.rtbItnDoc.Location = New System.Drawing.Point(315, 222)
         Me.rtbItnDoc.Name = "rtbItnDoc"
-        Me.rtbItnDoc.Size = New System.Drawing.Size(1039, 391)
+        Me.rtbItnDoc.Size = New System.Drawing.Size(1039, 363)
         Me.rtbItnDoc.TabIndex = 11
         Me.rtbItnDoc.Text = ""
         '
@@ -1643,4 +1654,5 @@ Partial Class frmPNR
     Friend WithEvents cmbOSMVesselGroup As ComboBox
     Friend WithEvents Label2 As Label
     Friend WithEvents optItnFormatSeaChefsWith3LetterCode As RadioButton
+    Friend WithEvents cmdItnFormatOSMLoG As Button
 End Class

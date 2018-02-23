@@ -58,13 +58,10 @@ Namespace osmVessels
                 End If
             End Get
         End Property
-        Public Property Vessel_VesselGroup As Vessel_VesselGroupCollection
+        Public ReadOnly Property Vessel_VesselGroup As Vessel_VesselGroupCollection
             Get
                 Vessel_VesselGroup = mobjVessel_VesselGroup
             End Get
-            Set(value As Vessel_VesselGroupCollection)
-                mobjVessel_VesselGroup = value
-            End Set
         End Property
         Public Property InUse As Boolean
             Get

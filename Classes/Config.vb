@@ -1,6 +1,13 @@
 ﻿Option Strict Off
 Option Explicit On
 Public Class Config
+    Public Enum OPTItinFormat
+        ItnFormatDefault = 0
+        ItnFormatPlain = 1
+        ItnFormatSeaChefs = 2
+        ItnSeaChefsWithCode = 3
+        ItnFormatEuronav = 4
+    End Enum
     Private Structure ClassProps
         Dim PCCId As Integer
         Dim OfficeCityCode As String
@@ -40,6 +47,9 @@ Public Class Config
         Dim Administrator As String
         Dim FormatStyle As Integer
         Dim OSMVesselGroup As Integer
+        Dim OSMLoGPerPax As Boolean
+        Dim OSMLoGOnsigner As Boolean
+        Dim OSMLoGPath As String
 
     End Structure
     Private mudtProps As ClassProps
@@ -77,11 +87,11 @@ Public Class Config
             Administrator = mudtProps.Administrator
         End Get
     End Property
-    Public Property FormatStyle As Integer
+    Public Property FormatStyle As OPTItinFormat
         Get
             FormatStyle = mudtProps.FormatStyle
         End Get
-        Set(value As Integer)
+        Set(value As OPTItinFormat)
             If value <> mudtProps.FormatStyle Then
                 mflgIsDirtyUser = True
             End If
@@ -266,6 +276,39 @@ Public Class Config
                 mflgIsDirtyUser = True
             End If
             mudtProps.PlainFormat = value
+        End Set
+    End Property
+    Public Property OSMLoGPerPax As Boolean
+        Get
+            OSMLoGPerPax = mudtProps.OSMLoGPerPax
+        End Get
+        Set(value As Boolean)
+            If value <> mudtProps.OSMLoGPerPax Then
+                mflgIsDirtyUser = True
+            End If
+            mudtProps.OSMLoGPerPax = value
+        End Set
+    End Property
+    Public Property OSMLoGOnSigner As Boolean
+        Get
+            OSMLoGOnSigner = mudtProps.OSMLoGOnsigner
+        End Get
+        Set(value As Boolean)
+            If value <> mudtProps.OSMLoGOnsigner Then
+                mflgIsDirtyUser = True
+            End If
+            mudtProps.OSMLoGOnsigner = value
+        End Set
+    End Property
+    Public Property OSMLoGPath As String
+        Get
+            OSMLoGPath = mudtProps.OSMLoGPath
+        End Get
+        Set(value As String)
+            If value <> mudtProps.OSMLoGPath Then
+                mflgIsDirtyUser = True
+            End If
+            mudtProps.OSMLoGPath = value
         End Set
     End Property
     Public ReadOnly Property PCCId As Integer
@@ -607,28 +650,31 @@ Public Class Config
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = " UPDATE [AmadeusReports].[dbo].[PNRFinisherUsers]" &
-                               "  SET [pfAgentQueue] ='" & AgentQueue & "'" &
-                               "     ,[pfAgentOPQueue] ='" & AgentOPQueue & "'" &
-                               "     ,[pfAgentName] ='" & AgentName & "'" &
-                               "     ,[pfAgentEmail] ='" & AgentEmail & "'" &
-                               "     ,[pfAirportName] =" & AirportName &
-                               "     ,[pfAirlineLocator] =" & If(AirlineLocator, 1, 0) &
-                               "     ,[pfClassOfService] =" & If(ClassOfService, 1, 0) &
-                               "     ,[pfBanElectricalEquipment] =" & If(BanElectricalEquipment, 1, 0) &
-                               "     ,[pfBrazilText] =" & If(BrazilText, 1, 0) &
-                               "     ,[pfUSAText] =" & If(USAText, 1, 0) &
-                               "     ,[pfTickets] =" & If(Tickets, 1, 0) &
-                               "     ,[pfPaxSegPerTkt] =" & If(PaxSegPerTkt, 1, 0) &
-                               "     ,[pfShowStopovers] =" & If(ShowStopovers, 1, 0) &
-                               "     ,[pfShowTerminal] =" & If(ShowTerminal, 1, 0) &
-                               "     ,[pfFlyingTime] =" & If(FlyingTime, 1, 0) &
-                               "     ,[pfCostCentre] =" & If(CostCentre, 1, 0) &
-                               "     ,[pfSeating] =" & If(Seating, 1, 0) &
-                               "     ,[pfVessel] =" & If(Vessel, 1, 0) &
-                               "     ,[pfPlainFormat] =" & If(PlainFormat, 1, 0) &
-                               "     ,[pfFormatStyle] =" & FormatStyle &
+                .CommandText = " UPDATE AmadeusReports.dbo.PNRFinisherUsers" &
+                               "  SET pfAgentQueue ='" & AgentQueue & "'" &
+                               "     ,pfAgentOPQueue ='" & AgentOPQueue & "'" &
+                               "     ,pfAgentName ='" & AgentName & "'" &
+                               "     ,pfAgentEmail ='" & AgentEmail & "'" &
+                               "     ,pfAirportName =" & AirportName &
+                               "     ,pfAirlineLocator =" & If(AirlineLocator, 1, 0) &
+                               "     ,pfClassOfService =" & If(ClassOfService, 1, 0) &
+                               "     ,pfBanElectricalEquipment =" & If(BanElectricalEquipment, 1, 0) &
+                               "     ,pfBrazilText =" & If(BrazilText, 1, 0) &
+                               "     ,pfUSAText =" & If(USAText, 1, 0) &
+                               "     ,pfTickets =" & If(Tickets, 1, 0) &
+                               "     ,pfPaxSegPerTkt =" & If(PaxSegPerTkt, 1, 0) &
+                               "     ,pfShowStopovers =" & If(ShowStopovers, 1, 0) &
+                               "     ,pfShowTerminal =" & If(ShowTerminal, 1, 0) &
+                               "     ,pfFlyingTime =" & If(FlyingTime, 1, 0) &
+                               "     ,pfCostCentre =" & If(CostCentre, 1, 0) &
+                               "     ,pfSeating =" & If(Seating, 1, 0) &
+                               "     ,pfVessel =" & If(Vessel, 1, 0) &
+                               "     ,pfPlainFormat =" & If(PlainFormat, 1, 0) &
+                               "     ,pfFormatStyle =" & FormatStyle &
                                "     ,pfOSMVesselGroup = " & OSMVesselGroup &
+                               "     ,pfOSMLOGPerPax = " & If(OSMLoGPerPax, 1, 0) &
+                               "     ,pfOSMLOGOnSigner = " & If(OSMLoGOnSigner, 1, 0) &
+                               "     ,pfOSMLOGPath = '" & OSMLoGPath & "' " &
                                "   WHERE pfPCC = '" & mobjAmadeusUser.PCC & "' AND pfUser = '" & mobjAmadeusUser.User & "'"
                 .ExecuteNonQuery()
             End With
@@ -673,9 +719,11 @@ Public Class Config
                            "       ,[pfAdministrator] " &
                            "       ,[pfFormatStyle] " &
                            "       ,ISNULL(pfOSMVesselGroup,0) AS pfOSMVesselGroup " &
+                           "       ,ISNULL(pfOSMLOGPerPax,0) AS pfOSMLOGPerPax " &
+                           "       ,ISNULL(pfOSMLOGOnSigner,0) AS pfOSMLOGOnSigner " &
+                           "       ,ISNULL(pfOSMLOGPath,'') AS pfOSMLOGPath " &
                            "   FROM [AmadeusReports].[dbo].[PNRFinisherUsers] " &
                            "   WHERE pfPCC = '" & mobjAmadeusUser.PCC & "' AND pfUser = '" & mobjAmadeusUser.User & "'"
-
             pobjReader = .ExecuteReader
         End With
         With pobjReader
@@ -703,6 +751,9 @@ Public Class Config
                 mudtProps.Administrator = .Item("pfAdministrator")
                 mudtProps.FormatStyle = .Item("pfFormatStyle")
                 mudtProps.OSMVesselGroup = .Item("pfOSMVesselGroup")
+                mudtProps.OSMLoGPerPax = .Item("pfOSMLOGPerPax")
+                mudtProps.OSMLoGOnsigner = .Item("pfOSMLOGOnSigner")
+                mudtProps.OSMLoGPath = .Item("pfOSMLOGPath")
             Else
                 mudtProps.AgentId = 0
                 mudtProps.AgentQueue = ""
@@ -727,6 +778,9 @@ Public Class Config
                 mudtProps.Administrator = False
                 mudtProps.FormatStyle = 0
                 mudtProps.OSMVesselGroup = 0
+                mudtProps.OSMLoGPerPax = False
+                mudtProps.OSMLoGOnsigner = False
+                mudtProps.OSMLoGPath = ""
             End If
             .Close()
         End With

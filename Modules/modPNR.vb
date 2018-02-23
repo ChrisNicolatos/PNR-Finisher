@@ -13,6 +13,7 @@ Module modPNR
     Private Const MONTH_NAMES As String = "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC"
     Private Const mstrDBConnectionsFileGT As String = "\\192.168.102.223\Common\Click-Once Applications\PNR Finisher ATH V2\Config\PNRFinisher.txt"
     Private Const mstrDBConnectionsFile As String = "\\ath2-svrdc1\PNR Finisher ATH Config\PNRFinisher.txt"
+    Private Const msrtConfigFolder As String = "\\192.168.102.223\Common\Click-Once Applications\PNR Finisher ATH V2\Config"
     Private mstrDBConnectionFileActual As String
 
     Private mMySettings As Config
@@ -54,6 +55,11 @@ Module modPNR
     Public ReadOnly Property MyHomeSettings As Config
         Get
             MyHomeSettings = mHomeSettings
+        End Get
+    End Property
+    Public ReadOnly Property MyConfigPath As String
+        Get
+            MyConfigPath = msrtConfigFolder
         End Get
     End Property
     Public ReadOnly Property RequestedPCC As String
@@ -358,12 +364,14 @@ Module modPNR
         Try
             If Not Date.TryParse(InDate, APISDateFromIATA) Then
                 APISDateFromIATA = Date.MinValue
-                pintDay = InDate.Substring(0, 2)
-                pintMonth = (MONTH_NAMES.IndexOf(InDate.Substring(3, 3)) + 2) / 3
-                pintYear = InDate.Substring(5)
+                If InDate.Length > 5 Then
+                    pintDay = InDate.Substring(0, 2)
+                    pintMonth = (MONTH_NAMES.IndexOf(InDate.Substring(3, 3)) + 2) / 3
+                    pintYear = InDate.Substring(5)
 
-                If pintMonth >= 1 Then
-                    APISDateFromIATA = DateSerial(pintYear, pintMonth, pintDay)
+                    If pintMonth >= 1 Then
+                        APISDateFromIATA = DateSerial(pintYear, pintMonth, pintDay)
+                    End If
                 End If
             End If
         Catch ex As Exception

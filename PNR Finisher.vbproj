@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -157,6 +157,12 @@
     <Compile Include="Forms\frmItnMSReportDates.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\frmOSMLoG.Designer.vb">
+      <DependentUpon>frmOSMLoG.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmOSMLoG.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmShowOptions.Designer.vb">
       <DependentUpon>frmShowOptions.vb</DependentUpon>
     </Compile>
@@ -222,6 +228,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmItnMSReportDates.resx">
       <DependentUpon>frmItnMSReportDates.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmOSMLoG.resx">
+      <DependentUpon>frmOSMLoG.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmShowOptions.resx">
       <DependentUpon>frmShowOptions.vb</DependentUpon>

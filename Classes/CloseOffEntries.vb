@@ -29,9 +29,11 @@ Namespace CloseOffEntries
 
             With pobjComm
                 .CommandType = CommandType.Text
+                .Parameters.Add("@PCC", SqlDbType.NChar, 9).Value = AmadeusPCC
+                .Parameters.Add("@OwnPCC", SqlDbType.Bit).Value = IIf(OwnPCC, 1, 0)
                 .CommandText = "SELECT pfcEntry " &
                 "  FROM AmadeusReports.dbo.PNRFinisherCloseOff " &
-                "  WHERE pfcPCC = '" & AmadeusPCC & "' AND pfcOwnPCC = " & IIf(OwnPCC, 1, 0) & " " &
+                "  WHERE pfcPCC = @PCC AND pfcOwnPCC = @OwnPCC " &
                 "  ORDER BY pfcSeqNo "
                 pobjReader = .ExecuteReader
             End With
