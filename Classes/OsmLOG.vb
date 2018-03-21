@@ -2,11 +2,11 @@
 Imports iTextSharp.text
 Imports System.IO
 Friend Class OsmLOG
-    Private mobjPNR As AmadeusPNR
+    Private mobjPNR As GDSPnr
     Private mobjPortAgent As osmVessels.emailItem
     Private mflgNoPortAgent As Boolean
     Private mstrSignedBy As String
-    Public Sub CreatePDF(ByRef pPNR As AmadeusPNR)
+    Public Sub CreatePDF(ByRef pPNR As GDSPnr)
 
         mobjPNR = pPNR
         ReadOptions()
@@ -19,7 +19,7 @@ Friend Class OsmLOG
 
         CreateDocs = ""
         If MySettings.OSMLoGPerPax Then
-            For Each pPax As AmadeusPax.AmadeusPaxitem In mobjPNR.Passengers.Values
+            For Each pPax As GDSPax.GDSPaxItem In mobjPNR.Passengers.Values
                 pFileName = GetPDFFileName(mobjPNR.RequestedPNR & "-" & pPax.ElementNo & pPax.LastName)
                 MakePDFDocument(pFileName, pstrTextCrewMembers, pPax)
                 CreateDocs &= pFileName & vbCrLf
@@ -35,7 +35,7 @@ Friend Class OsmLOG
 
 
     End Function
-    Private Sub MakePDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As AmadeusPax.AmadeusPaxitem = Nothing)
+    Private Sub MakePDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
 
         Dim pLogoFile As String = System.IO.Path.Combine(MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
@@ -111,7 +111,7 @@ Friend Class OsmLOG
         AddParagraph = x2
 
     End Function
-    Private Function MakePaxTable(ByRef pPassengers As AmadeusPax.AmadeusPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+    Private Function MakePaxTable(ByRef pPassengers As GDSPax.GDSPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
 
         Dim Table As New PdfPTable(2) With {
             .LockedWidth = False,
@@ -121,7 +121,7 @@ Friend Class OsmLOG
         }
 
         Dim pPosition As Boolean = False
-        For Each pPax As AmadeusPax.AmadeusPaxitem In pPassengers.Values
+        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
             If pPax.IdNo <> "" Then
                 pPosition = True
                 Exit For
@@ -137,7 +137,7 @@ Friend Class OsmLOG
             Table.AddCell(AddCell(" ", pHeaderFont))
         End If
 
-        For Each pPax As AmadeusPax.AmadeusPaxitem In pPassengers.Values
+        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
             Table.AddCell(AddCell(pPax.PaxName, pFont))
             Table.AddCell(AddCell(pPax.IdNo, pFont))
         Next pPax
@@ -145,7 +145,7 @@ Friend Class OsmLOG
         MakePaxTable = Table
 
     End Function
-    Private Function MakePaxTable(ByRef pPax As AmadeusPax.AmadeusPaxitem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+    Private Function MakePaxTable(ByRef pPax As GDSPax.GDSPaxItem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
 
         Dim Table As New PdfPTable(2) With {
             .LockedWidth = False,
@@ -171,7 +171,7 @@ Friend Class OsmLOG
         MakePaxTable = Table
 
     End Function
-    Private Function MakeSegTable(ByRef pSegs As AmadeusSeg.AmadeusSegColl, ByVal pFont As Font) As PdfPTable
+    Private Function MakeSegTable(ByRef pSegs As GDSSeg.GDSSegColl, ByVal pFont As Font) As PdfPTable
 
         Dim pWidths(6) As Integer
         Dim pVBFont As New Drawing.Font(pFont.Familyname, pFont.Size, If(pFont.IsBold, FontStyle.Bold, FontStyle.Regular))
@@ -184,7 +184,7 @@ Friend Class OsmLOG
             .SpacingBefore = 14,
             .SpacingAfter = 14
         }
-        For Each pSeg As AmadeusSeg.AmadeusSegItem In pSegs.Values
+        For Each pSeg As GDSSeg.GDSSegItem In pSegs.Values
             With pSeg
 
                 pWidths(0) = Math.Max(pWidths(0), g.MeasureString(.Airline, pVBFont).Width)
@@ -200,7 +200,7 @@ Friend Class OsmLOG
 
         Table.SetWidths(pWidths)
 
-        For Each pSeg As AmadeusSeg.AmadeusSegItem In pSegs.Values
+        For Each pSeg As GDSSeg.GDSSegItem In pSegs.Values
             With pSeg
                 Table.AddCell(AddCell(.Airline, pFont))
                 Table.AddCell(AddCell(.FlightNo, pFont))

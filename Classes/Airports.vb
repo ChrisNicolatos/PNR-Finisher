@@ -69,6 +69,7 @@ Friend Class Airports
                 Else
                     mCityAirportName = airportCode
                     mCityName = airportCode
+                    mCountryName = ""
                 End If
                 .Close()
             End With

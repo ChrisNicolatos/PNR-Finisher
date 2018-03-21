@@ -2,17 +2,18 @@
 Option Explicit On
 Namespace PaxApisDB
     Public Class Item
+        Event Valid(IsValid As Boolean)
         Private Structure ClassProps
             Friend Id As Integer
             Friend Surname As String
             Friend FirstName As String
             Friend Birthdate As Date
             Friend Gender As String
-
             Friend IssuingCountry As String
             Friend PassportNumber As String
             Friend ExpiryDate As Date
             Friend Nationality As String
+            Friend IsValid As Boolean
         End Structure
         Private mudtProps As ClassProps
         Public Sub New()
@@ -27,6 +28,7 @@ Namespace PaxApisDB
                 .ExpiryDate = Date.MinValue
                 .Nationality = ""
             End With
+            SetValid()
         End Sub
         Public Sub New(ByVal pId As Integer, ByVal pSurname As String, ByVal pFirstName As String, ByVal pBirthDate As Date,
                        ByVal pGender As String, ByVal pIssuingCountry As String, ByVal pPassportNumber As String,
@@ -37,13 +39,24 @@ Namespace PaxApisDB
                 .FirstName = pFirstName
                 .Birthdate = pBirthDate
                 .Gender = pGender
-
                 .IssuingCountry = pIssuingCountry
                 .PassportNumber = pPassportNumber
                 .ExpiryDate = pExpiryDate
                 .Nationality = pNationality
             End With
+            SetValid()
         End Sub
+        Private Sub SetValid()
+
+            mudtProps.IsValid = (Surname <> "" And FirstName <> "" And Gender <> "" And BirthDate > Date.MinValue)
+            RaiseEvent Valid(mudtProps.IsValid)
+
+        End Sub
+        Public ReadOnly Property IsValid As Boolean
+            Get
+                IsValid = mudtProps.IsValid
+            End Get
+        End Property
         Public ReadOnly Property Id() As Integer
             Get
                 Id = mudtProps.Id
@@ -51,18 +64,20 @@ Namespace PaxApisDB
         End Property
         Public Property Surname() As String
             Get
-                Surname = mudtProps.Surname
+                Surname = mudtProps.Surname.Trim
             End Get
             Set(ByVal value As String)
-                mudtProps.Surname = value
+                mudtProps.Surname = value.Trim
+                SetValid()
             End Set
         End Property
         Public Property FirstName() As String
             Get
-                FirstName = mudtProps.FirstName
+                FirstName = mudtProps.FirstName.Trim
             End Get
             Set(ByVal value As String)
-                mudtProps.FirstName = value
+                mudtProps.FirstName = value.Trim
+                SetValid()
             End Set
         End Property
         Public Property BirthDate() As Date
@@ -71,30 +86,34 @@ Namespace PaxApisDB
             End Get
             Set(ByVal value As Date)
                 mudtProps.Birthdate = value
+                SetValid()
             End Set
         End Property
         Public Property Gender() As String
             Get
-                Gender = mudtProps.Gender
+                Gender = mudtProps.Gender.Trim
             End Get
             Set(ByVal value As String)
-                mudtProps.Gender = value
+                mudtProps.Gender = value.Trim
+                SetValid()
             End Set
         End Property
         Public Property IssuingCountry() As String
             Get
-                IssuingCountry = mudtProps.IssuingCountry
+                IssuingCountry = mudtProps.IssuingCountry.Trim
             End Get
             Set(ByVal value As String)
-                mudtProps.IssuingCountry = value
+                mudtProps.IssuingCountry = value.Trim
+                SetValid()
             End Set
         End Property
         Public Property PassportNumber() As String
             Get
-                PassportNumber = mudtProps.PassportNumber
+                PassportNumber = mudtProps.PassportNumber.Trim
             End Get
             Set(ByVal value As String)
-                mudtProps.PassportNumber = value
+                mudtProps.PassportNumber = value.Trim
+                SetValid()
             End Set
         End Property
         Public Property ExpiryDate() As Date
@@ -103,19 +122,21 @@ Namespace PaxApisDB
             End Get
             Set(ByVal value As Date)
                 mudtProps.ExpiryDate = value
+                SetValid()
             End Set
         End Property
         Public Property Nationality() As String
             Get
-                Nationality = mudtProps.Nationality
+                Nationality = mudtProps.Nationality.Trim
             End Get
             Set(ByVal value As String)
-                mudtProps.Nationality = value
+                mudtProps.Nationality = value.Trim
+                SetValid()
             End Set
         End Property
 
         Public Sub Update(ByVal ExpiryDateOK As Boolean)
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)    ' (My.Settings.AmadeusReportsConnectionString)
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -146,15 +167,14 @@ Namespace PaxApisDB
     Public Class Collection
         Inherits Collections.Generic.Dictionary(Of Integer, Item)
 
-        Public Function Read(ByVal Surname As String, ByVal FirstName As String) As Item
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)    ' (My.Settings.AmadeusReportsConnectionString)(My.Settings.AmadeusReportsConnectionString)
+        Public Sub Read(ByVal Surname As String, ByVal FirstName As String)
+            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjItem As Item
 
             pobjConn.Open()
             pobjComm = pobjConn.CreateCommand
-            Read = New Item
 
             With pobjComm
                 .CommandType = CommandType.StoredProcedure
@@ -172,14 +192,12 @@ Namespace PaxApisDB
                                         .Item("ppDocIssuingCountry"), .Item("ppDocnumber"), If(IsDBNull(.Item("ppDocExpiryDate")), Date.MinValue, .Item("ppDocExpiryDate")),
                                         .Item("ppNationality"))
                     MyBase.Add(pobjItem.Id, pobjItem)
-                    Read = pobjItem
+                    Exit Do
                 Loop
                 .Close()
             End With
             pobjConn.Close()
-
-        End Function
-
+        End Sub
     End Class
 End Namespace
 

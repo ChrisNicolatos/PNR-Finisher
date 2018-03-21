@@ -70,6 +70,7 @@ Namespace SubDepartments
         End Sub
     End Class
     Public Class Collection
+
         Inherits Collections.Generic.Dictionary(Of String, Item)
         Private mlngEntityID As Long
 

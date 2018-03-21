@@ -1,6 +1,6 @@
 ﻿Option Strict Off
 Option Explicit On
-Namespace AmadeusTickets
+Namespace GDSTickets
     Public Class Item
         Public Enum TicketDocType
             NONE = 0
@@ -274,7 +274,7 @@ Namespace AmadeusTickets
                 End If
             Next
             For Each objFA As s1aPNR.FareAutoTktElement In mobjPNR.FareAutoTktElements
-                If objFA.Text.Replace(" ", "").Contains(MySettings.AmadeusPCC) Then
+                If objFA.Text.Replace(" ", "").Contains(MySettings.GDSPcc) Then
                     FAOwnTkt &= objFA.Text & vbCrLf
                     ReDim Preserve mobjTickets(mobjTickets.GetUpperBound(0) + 1)
                     mobjTickets(mobjTickets.GetUpperBound(0)) = New Item

@@ -25,7 +25,7 @@ Partial Class frmPNR
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPNR))
         Me.cmdExit = New System.Windows.Forms.Button()
-        Me.cmdReadPNR = New System.Windows.Forms.Button()
+        Me.cmdPNRRead1APNR = New System.Windows.Forms.Button()
         Me.llbOptions = New System.Windows.Forms.LinkLabel()
         Me.lblPNR = New System.Windows.Forms.Label()
         Me.lblPax = New System.Windows.Forms.Label()
@@ -57,6 +57,8 @@ Partial Class frmPNR
         Me.lblCostCentreHighlight = New System.Windows.Forms.Label()
         Me.tabPNR = New System.Windows.Forms.TabControl()
         Me.tabPageFinisher = New System.Windows.Forms.TabPage()
+        Me.cmdAPISEditPax = New System.Windows.Forms.Button()
+        Me.cmdPNRRead1GPNR = New System.Windows.Forms.Button()
         Me.cmdAdmin = New System.Windows.Forms.Button()
         Me.cmdPNROnlyDocs = New System.Windows.Forms.Button()
         Me.cmdPNRWriteWithDocs = New System.Windows.Forms.Button()
@@ -68,11 +70,18 @@ Partial Class frmPNR
         Me.lblAvPriceDetails = New System.Windows.Forms.Label()
         Me.cmdCostCentre = New System.Windows.Forms.Button()
         Me.tabPageItinerary = New System.Windows.Forms.TabPage()
+        Me.fraGalileo = New System.Windows.Forms.GroupBox()
+        Me.cmdItn1GReadPNR = New System.Windows.Forms.Button()
+        Me.cmdItn1GReadCurrent = New System.Windows.Forms.Button()
+        Me.cmdItn1GReadQueue = New System.Windows.Forms.Button()
+        Me.fraAmadeus = New System.Windows.Forms.GroupBox()
+        Me.cmdItn1AReadPNR = New System.Windows.Forms.Button()
+        Me.cmdItn1AReadCurrent = New System.Windows.Forms.Button()
+        Me.cmdItn1AReadQueue = New System.Windows.Forms.Button()
         Me.cmdItnFormatOSMLoG = New System.Windows.Forms.Button()
         Me.webItnDoc = New System.Windows.Forms.WebBrowser()
         Me.lblItnPNRCounter = New System.Windows.Forms.Label()
         Me.cmdItnRefresh = New System.Windows.Forms.Button()
-        Me.cmdItnReadQueue = New System.Windows.Forms.Button()
         Me.fraItnFormat = New System.Windows.Forms.GroupBox()
         Me.optItnFormatSeaChefsWith3LetterCode = New System.Windows.Forms.RadioButton()
         Me.optItnFormatEuronav = New System.Windows.Forms.RadioButton()
@@ -82,8 +91,6 @@ Partial Class frmPNR
         Me.optItnFormatDefault = New System.Windows.Forms.RadioButton()
         Me.cmdItnExit = New System.Windows.Forms.Button()
         Me.lstItnRemarks = New System.Windows.Forms.CheckedListBox()
-        Me.lblItnRemarks = New System.Windows.Forms.Label()
-        Me.cmdItnReadCurrent = New System.Windows.Forms.Button()
         Me.fraItnAirportName = New System.Windows.Forms.GroupBox()
         Me.optItnAirportCityBoth = New System.Windows.Forms.RadioButton()
         Me.optItnAirportCityName = New System.Windows.Forms.RadioButton()
@@ -108,7 +115,6 @@ Partial Class frmPNR
         Me.rtbItnDoc = New System.Windows.Forms.RichTextBox()
         Me.menuITNSelectCopy = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.MenuCopyItn = New System.Windows.Forms.ToolStripMenuItem()
-        Me.cmdItnReadPNR = New System.Windows.Forms.Button()
         Me.txtItnPNR = New System.Windows.Forms.TextBox()
         Me.lblItnPNR = New System.Windows.Forms.Label()
         Me.tabOSM = New System.Windows.Forms.TabPage()
@@ -150,6 +156,8 @@ Partial Class frmPNR
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabPageItinerary.SuspendLayout()
+        Me.fraGalileo.SuspendLayout()
+        Me.fraAmadeus.SuspendLayout()
         Me.fraItnFormat.SuspendLayout()
         Me.fraItnAirportName.SuspendLayout()
         Me.fraItnOptions.SuspendLayout()
@@ -162,19 +170,19 @@ Partial Class frmPNR
         '
         Me.cmdExit.Location = New System.Drawing.Point(996, 6)
         Me.cmdExit.Name = "cmdExit"
-        Me.cmdExit.Size = New System.Drawing.Size(154, 35)
+        Me.cmdExit.Size = New System.Drawing.Size(154, 29)
         Me.cmdExit.TabIndex = 37
         Me.cmdExit.Text = "Exit"
         Me.cmdExit.UseVisualStyleBackColor = True
         '
-        'cmdReadPNR
+        'cmdPNRRead1APNR
         '
-        Me.cmdReadPNR.Location = New System.Drawing.Point(16, 6)
-        Me.cmdReadPNR.Name = "cmdReadPNR"
-        Me.cmdReadPNR.Size = New System.Drawing.Size(133, 35)
-        Me.cmdReadPNR.TabIndex = 0
-        Me.cmdReadPNR.Text = "Read Amadeus PNR"
-        Me.cmdReadPNR.UseVisualStyleBackColor = True
+        Me.cmdPNRRead1APNR.Location = New System.Drawing.Point(16, 6)
+        Me.cmdPNRRead1APNR.Name = "cmdPNRRead1APNR"
+        Me.cmdPNRRead1APNR.Size = New System.Drawing.Size(133, 35)
+        Me.cmdPNRRead1APNR.TabIndex = 0
+        Me.cmdPNRRead1APNR.Text = "Read Amadeus PNR"
+        Me.cmdPNRRead1APNR.UseVisualStyleBackColor = True
         '
         'llbOptions
         '
@@ -190,7 +198,7 @@ Partial Class frmPNR
         '
         Me.lblPNR.BackColor = System.Drawing.Color.Coral
         Me.lblPNR.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblPNR.Location = New System.Drawing.Point(643, 55)
+        Me.lblPNR.Location = New System.Drawing.Point(643, 91)
         Me.lblPNR.Name = "lblPNR"
         Me.lblPNR.Size = New System.Drawing.Size(337, 13)
         Me.lblPNR.TabIndex = 29
@@ -201,7 +209,7 @@ Partial Class frmPNR
         '
         Me.lblPax.BackColor = System.Drawing.Color.Coral
         Me.lblPax.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblPax.Location = New System.Drawing.Point(643, 68)
+        Me.lblPax.Location = New System.Drawing.Point(643, 104)
         Me.lblPax.Name = "lblPax"
         Me.lblPax.Size = New System.Drawing.Size(337, 13)
         Me.lblPax.TabIndex = 30
@@ -212,7 +220,7 @@ Partial Class frmPNR
         '
         Me.lblSegs.BackColor = System.Drawing.Color.Coral
         Me.lblSegs.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblSegs.Location = New System.Drawing.Point(643, 81)
+        Me.lblSegs.Location = New System.Drawing.Point(643, 117)
         Me.lblSegs.Name = "lblSegs"
         Me.lblSegs.Size = New System.Drawing.Size(337, 13)
         Me.lblSegs.TabIndex = 31
@@ -222,7 +230,7 @@ Partial Class frmPNR
         'lstVessels
         '
         Me.lstVessels.FormattingEnabled = True
-        Me.lstVessels.Location = New System.Drawing.Point(363, 91)
+        Me.lstVessels.Location = New System.Drawing.Point(363, 127)
         Me.lstVessels.Name = "lstVessels"
         Me.lstVessels.Size = New System.Drawing.Size(265, 277)
         Me.lstVessels.TabIndex = 13
@@ -231,7 +239,7 @@ Partial Class frmPNR
         '
         Me.lblCRM.BackColor = System.Drawing.Color.Yellow
         Me.lblCRM.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblCRM.Location = New System.Drawing.Point(13, 264)
+        Me.lblCRM.Location = New System.Drawing.Point(13, 300)
         Me.lblCRM.Name = "lblCRM"
         Me.lblCRM.Size = New System.Drawing.Size(337, 13)
         Me.lblCRM.TabIndex = 8
@@ -241,7 +249,7 @@ Partial Class frmPNR
         'lstSubDepartments
         '
         Me.lstSubDepartments.FormattingEnabled = True
-        Me.lstSubDepartments.Location = New System.Drawing.Point(13, 193)
+        Me.lstSubDepartments.Location = New System.Drawing.Point(13, 229)
         Me.lstSubDepartments.Name = "lstSubDepartments"
         Me.lstSubDepartments.Size = New System.Drawing.Size(337, 69)
         Me.lstSubDepartments.TabIndex = 7
@@ -249,7 +257,7 @@ Partial Class frmPNR
         'txtCRM
         '
         Me.txtCRM.Font = New System.Drawing.Font("Courier New", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.txtCRM.Location = New System.Drawing.Point(13, 277)
+        Me.txtCRM.Location = New System.Drawing.Point(13, 313)
         Me.txtCRM.Name = "txtCRM"
         Me.txtCRM.Size = New System.Drawing.Size(337, 20)
         Me.txtCRM.TabIndex = 9
@@ -257,7 +265,7 @@ Partial Class frmPNR
         'txtVessel
         '
         Me.txtVessel.Font = New System.Drawing.Font("Courier New", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.txtVessel.Location = New System.Drawing.Point(363, 71)
+        Me.txtVessel.Location = New System.Drawing.Point(363, 107)
         Me.txtVessel.Name = "txtVessel"
         Me.txtVessel.Size = New System.Drawing.Size(265, 20)
         Me.txtVessel.TabIndex = 12
@@ -265,7 +273,7 @@ Partial Class frmPNR
         'lstCRM
         '
         Me.lstCRM.FormattingEnabled = True
-        Me.lstCRM.Location = New System.Drawing.Point(13, 299)
+        Me.lstCRM.Location = New System.Drawing.Point(13, 335)
         Me.lstCRM.Name = "lstCRM"
         Me.lstCRM.Size = New System.Drawing.Size(337, 69)
         Me.lstCRM.TabIndex = 10
@@ -273,7 +281,7 @@ Partial Class frmPNR
         'txtSubdepartment
         '
         Me.txtSubdepartment.Font = New System.Drawing.Font("Courier New", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.txtSubdepartment.Location = New System.Drawing.Point(13, 173)
+        Me.txtSubdepartment.Location = New System.Drawing.Point(13, 209)
         Me.txtSubdepartment.Name = "txtSubdepartment"
         Me.txtSubdepartment.Size = New System.Drawing.Size(337, 20)
         Me.txtSubdepartment.TabIndex = 6
@@ -290,7 +298,7 @@ Partial Class frmPNR
         'txtCustomer
         '
         Me.txtCustomer.Font = New System.Drawing.Font("Courier New", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.txtCustomer.Location = New System.Drawing.Point(13, 71)
+        Me.txtCustomer.Location = New System.Drawing.Point(13, 107)
         Me.txtCustomer.Name = "txtCustomer"
         Me.txtCustomer.Size = New System.Drawing.Size(337, 20)
         Me.txtCustomer.TabIndex = 3
@@ -299,7 +307,7 @@ Partial Class frmPNR
         '
         Me.lblReference.BackColor = System.Drawing.Color.Cyan
         Me.lblReference.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblReference.Location = New System.Drawing.Point(640, 117)
+        Me.lblReference.Location = New System.Drawing.Point(640, 153)
         Me.lblReference.Name = "lblReference"
         Me.lblReference.Size = New System.Drawing.Size(125, 27)
         Me.lblReference.TabIndex = 15
@@ -310,7 +318,7 @@ Partial Class frmPNR
         '
         Me.lblAirlinePoints.BackColor = System.Drawing.Color.Silver
         Me.lblAirlinePoints.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblAirlinePoints.Location = New System.Drawing.Point(990, 117)
+        Me.lblAirlinePoints.Location = New System.Drawing.Point(990, 153)
         Me.lblAirlinePoints.Name = "lblAirlinePoints"
         Me.lblAirlinePoints.Size = New System.Drawing.Size(280, 31)
         Me.lblAirlinePoints.TabIndex = 25
@@ -321,7 +329,7 @@ Partial Class frmPNR
         '
         Me.lblSubDepartment.BackColor = System.Drawing.Color.Yellow
         Me.lblSubDepartment.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblSubDepartment.Location = New System.Drawing.Point(13, 160)
+        Me.lblSubDepartment.Location = New System.Drawing.Point(13, 196)
         Me.lblSubDepartment.Name = "lblSubDepartment"
         Me.lblSubDepartment.Size = New System.Drawing.Size(337, 13)
         Me.lblSubDepartment.TabIndex = 5
@@ -331,7 +339,7 @@ Partial Class frmPNR
         'txtReference
         '
         Me.txtReference.Font = New System.Drawing.Font("Courier New", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.txtReference.Location = New System.Drawing.Point(773, 120)
+        Me.txtReference.Location = New System.Drawing.Point(773, 156)
         Me.txtReference.Name = "txtReference"
         Me.txtReference.Size = New System.Drawing.Size(207, 20)
         Me.txtReference.TabIndex = 16
@@ -340,7 +348,7 @@ Partial Class frmPNR
         '
         Me.lblVessel.BackColor = System.Drawing.Color.Yellow
         Me.lblVessel.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblVessel.Location = New System.Drawing.Point(363, 55)
+        Me.lblVessel.Location = New System.Drawing.Point(363, 91)
         Me.lblVessel.Name = "lblVessel"
         Me.lblVessel.Size = New System.Drawing.Size(265, 13)
         Me.lblVessel.TabIndex = 11
@@ -351,7 +359,7 @@ Partial Class frmPNR
         '
         Me.cmbBookedby.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbBookedby.FormattingEnabled = True
-        Me.cmbBookedby.Location = New System.Drawing.Point(773, 190)
+        Me.cmbBookedby.Location = New System.Drawing.Point(773, 226)
         Me.cmbBookedby.Name = "cmbBookedby"
         Me.cmbBookedby.Size = New System.Drawing.Size(207, 21)
         Me.cmbBookedby.TabIndex = 20
@@ -360,7 +368,7 @@ Partial Class frmPNR
         '
         Me.lblCustomer.BackColor = System.Drawing.Color.Yellow
         Me.lblCustomer.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblCustomer.Location = New System.Drawing.Point(13, 55)
+        Me.lblCustomer.Location = New System.Drawing.Point(13, 91)
         Me.lblCustomer.Name = "lblCustomer"
         Me.lblCustomer.Size = New System.Drawing.Size(337, 13)
         Me.lblCustomer.TabIndex = 2
@@ -371,7 +379,7 @@ Partial Class frmPNR
         '
         Me.cmbDepartment.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbDepartment.FormattingEnabled = True
-        Me.cmbDepartment.Location = New System.Drawing.Point(773, 155)
+        Me.cmbDepartment.Location = New System.Drawing.Point(773, 191)
         Me.cmbDepartment.Name = "cmbDepartment"
         Me.cmbDepartment.Size = New System.Drawing.Size(207, 21)
         Me.cmbDepartment.TabIndex = 18
@@ -390,7 +398,7 @@ Partial Class frmPNR
         '
         Me.lblBookedByHighlight.BackColor = System.Drawing.Color.Pink
         Me.lblBookedByHighlight.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblBookedByHighlight.Location = New System.Drawing.Point(640, 187)
+        Me.lblBookedByHighlight.Location = New System.Drawing.Point(640, 223)
         Me.lblBookedByHighlight.Name = "lblBookedByHighlight"
         Me.lblBookedByHighlight.Size = New System.Drawing.Size(125, 27)
         Me.lblBookedByHighlight.TabIndex = 19
@@ -401,7 +409,7 @@ Partial Class frmPNR
         '
         Me.lblDepartmentHighlight.BackColor = System.Drawing.Color.Pink
         Me.lblDepartmentHighlight.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblDepartmentHighlight.Location = New System.Drawing.Point(640, 152)
+        Me.lblDepartmentHighlight.Location = New System.Drawing.Point(640, 188)
         Me.lblDepartmentHighlight.Name = "lblDepartmentHighlight"
         Me.lblDepartmentHighlight.Size = New System.Drawing.Size(125, 27)
         Me.lblDepartmentHighlight.TabIndex = 17
@@ -411,7 +419,7 @@ Partial Class frmPNR
         'lstCustomers
         '
         Me.lstCustomers.FormattingEnabled = True
-        Me.lstCustomers.Location = New System.Drawing.Point(13, 91)
+        Me.lstCustomers.Location = New System.Drawing.Point(13, 127)
         Me.lstCustomers.Name = "lstCustomers"
         Me.lstCustomers.Size = New System.Drawing.Size(337, 69)
         Me.lstCustomers.TabIndex = 4
@@ -420,7 +428,7 @@ Partial Class frmPNR
         '
         Me.cmbReasonForTravel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbReasonForTravel.FormattingEnabled = True
-        Me.cmbReasonForTravel.Location = New System.Drawing.Point(773, 225)
+        Me.cmbReasonForTravel.Location = New System.Drawing.Point(773, 261)
         Me.cmbReasonForTravel.Name = "cmbReasonForTravel"
         Me.cmbReasonForTravel.Size = New System.Drawing.Size(207, 21)
         Me.cmbReasonForTravel.TabIndex = 22
@@ -429,7 +437,7 @@ Partial Class frmPNR
         '
         Me.lblReasonForTravelHighLight.BackColor = System.Drawing.Color.Pink
         Me.lblReasonForTravelHighLight.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblReasonForTravelHighLight.Location = New System.Drawing.Point(640, 222)
+        Me.lblReasonForTravelHighLight.Location = New System.Drawing.Point(640, 258)
         Me.lblReasonForTravelHighLight.Name = "lblReasonForTravelHighLight"
         Me.lblReasonForTravelHighLight.Size = New System.Drawing.Size(125, 27)
         Me.lblReasonForTravelHighLight.TabIndex = 21
@@ -440,7 +448,7 @@ Partial Class frmPNR
         '
         Me.cmbCostCentre.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cmbCostCentre.FormattingEnabled = True
-        Me.cmbCostCentre.Location = New System.Drawing.Point(773, 260)
+        Me.cmbCostCentre.Location = New System.Drawing.Point(773, 296)
         Me.cmbCostCentre.Name = "cmbCostCentre"
         Me.cmbCostCentre.Size = New System.Drawing.Size(207, 21)
         Me.cmbCostCentre.TabIndex = 24
@@ -449,7 +457,7 @@ Partial Class frmPNR
         '
         Me.lblCostCentreHighlight.BackColor = System.Drawing.Color.Pink
         Me.lblCostCentreHighlight.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblCostCentreHighlight.Location = New System.Drawing.Point(640, 257)
+        Me.lblCostCentreHighlight.Location = New System.Drawing.Point(640, 293)
         Me.lblCostCentreHighlight.Name = "lblCostCentreHighlight"
         Me.lblCostCentreHighlight.Size = New System.Drawing.Size(125, 27)
         Me.lblCostCentreHighlight.TabIndex = 23
@@ -471,6 +479,8 @@ Partial Class frmPNR
         '
         'tabPageFinisher
         '
+        Me.tabPageFinisher.Controls.Add(Me.cmdAPISEditPax)
+        Me.tabPageFinisher.Controls.Add(Me.cmdPNRRead1GPNR)
         Me.tabPageFinisher.Controls.Add(Me.cmdAdmin)
         Me.tabPageFinisher.Controls.Add(Me.cmdPNROnlyDocs)
         Me.tabPageFinisher.Controls.Add(Me.cmdPNRWriteWithDocs)
@@ -481,7 +491,7 @@ Partial Class frmPNR
         Me.tabPageFinisher.Controls.Add(Me.lblAveragePrice)
         Me.tabPageFinisher.Controls.Add(Me.lblAvPriceDetails)
         Me.tabPageFinisher.Controls.Add(Me.cmdCostCentre)
-        Me.tabPageFinisher.Controls.Add(Me.cmdReadPNR)
+        Me.tabPageFinisher.Controls.Add(Me.cmdPNRRead1APNR)
         Me.tabPageFinisher.Controls.Add(Me.cmdExit)
         Me.tabPageFinisher.Controls.Add(Me.cmdOneTimeVessel)
         Me.tabPageFinisher.Controls.Add(Me.txtSubdepartment)
@@ -521,6 +531,24 @@ Partial Class frmPNR
         Me.tabPageFinisher.Text = "PNR Finisher"
         Me.tabPageFinisher.UseVisualStyleBackColor = True
         '
+        'cmdAPISEditPax
+        '
+        Me.cmdAPISEditPax.Location = New System.Drawing.Point(13, 414)
+        Me.cmdAPISEditPax.Name = "cmdAPISEditPax"
+        Me.cmdAPISEditPax.Size = New System.Drawing.Size(154, 29)
+        Me.cmdAPISEditPax.TabIndex = 47
+        Me.cmdAPISEditPax.Text = "Edit Pax Info"
+        Me.cmdAPISEditPax.UseVisualStyleBackColor = True
+        '
+        'cmdPNRRead1GPNR
+        '
+        Me.cmdPNRRead1GPNR.Location = New System.Drawing.Point(16, 47)
+        Me.cmdPNRRead1GPNR.Name = "cmdPNRRead1GPNR"
+        Me.cmdPNRRead1GPNR.Size = New System.Drawing.Size(133, 35)
+        Me.cmdPNRRead1GPNR.TabIndex = 46
+        Me.cmdPNRRead1GPNR.Text = "Read Galileo PNR"
+        Me.cmdPNRRead1GPNR.UseVisualStyleBackColor = True
+        '
         'cmdAdmin
         '
         Me.cmdAdmin.Location = New System.Drawing.Point(1207, 27)
@@ -555,7 +583,7 @@ Partial Class frmPNR
         Me.txtAirlineEntries.BackColor = System.Drawing.Color.Aqua
         Me.txtAirlineEntries.Font = New System.Drawing.Font("Courier New", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.txtAirlineEntries.ForeColor = System.Drawing.Color.Blue
-        Me.txtAirlineEntries.Location = New System.Drawing.Point(990, 151)
+        Me.txtAirlineEntries.Location = New System.Drawing.Point(990, 187)
         Me.txtAirlineEntries.Multiline = True
         Me.txtAirlineEntries.Name = "txtAirlineEntries"
         Me.txtAirlineEntries.Size = New System.Drawing.Size(280, 217)
@@ -565,9 +593,9 @@ Partial Class frmPNR
         '
         Me.lblSSRDocs.BackColor = System.Drawing.Color.Yellow
         Me.lblSSRDocs.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblSSRDocs.Location = New System.Drawing.Point(13, 390)
+        Me.lblSSRDocs.Location = New System.Drawing.Point(173, 414)
         Me.lblSSRDocs.Name = "lblSSRDocs"
-        Me.lblSSRDocs.Size = New System.Drawing.Size(1257, 13)
+        Me.lblSSRDocs.Size = New System.Drawing.Size(1097, 29)
         Me.lblSSRDocs.TabIndex = 41
         Me.lblSSRDocs.Text = "SSR DOCS"
         Me.lblSSRDocs.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
@@ -579,14 +607,14 @@ Partial Class frmPNR
         Me.dgvApis.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.dgvApis.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvApis.Location = New System.Drawing.Point(13, 406)
+        Me.dgvApis.Location = New System.Drawing.Point(13, 449)
         Me.dgvApis.Name = "dgvApis"
-        Me.dgvApis.Size = New System.Drawing.Size(1257, 179)
+        Me.dgvApis.Size = New System.Drawing.Size(1257, 136)
         Me.dgvApis.TabIndex = 40
         '
         'cmdAveragePrice
         '
-        Me.cmdAveragePrice.Location = New System.Drawing.Point(990, 55)
+        Me.cmdAveragePrice.Location = New System.Drawing.Point(990, 91)
         Me.cmdAveragePrice.Name = "cmdAveragePrice"
         Me.cmdAveragePrice.Size = New System.Drawing.Size(61, 39)
         Me.cmdAveragePrice.TabIndex = 32
@@ -597,7 +625,7 @@ Partial Class frmPNR
         '
         Me.lblAveragePrice.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.lblAveragePrice.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblAveragePrice.Location = New System.Drawing.Point(1064, 77)
+        Me.lblAveragePrice.Location = New System.Drawing.Point(1064, 113)
         Me.lblAveragePrice.Name = "lblAveragePrice"
         Me.lblAveragePrice.Size = New System.Drawing.Size(206, 17)
         Me.lblAveragePrice.TabIndex = 34
@@ -607,7 +635,7 @@ Partial Class frmPNR
         '
         Me.lblAvPriceDetails.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer))
         Me.lblAvPriceDetails.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblAvPriceDetails.Location = New System.Drawing.Point(1064, 55)
+        Me.lblAvPriceDetails.Location = New System.Drawing.Point(1064, 91)
         Me.lblAvPriceDetails.Name = "lblAvPriceDetails"
         Me.lblAvPriceDetails.Size = New System.Drawing.Size(206, 22)
         Me.lblAvPriceDetails.TabIndex = 33
@@ -625,20 +653,18 @@ Partial Class frmPNR
         '
         'tabPageItinerary
         '
+        Me.tabPageItinerary.Controls.Add(Me.fraGalileo)
+        Me.tabPageItinerary.Controls.Add(Me.fraAmadeus)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnFormatOSMLoG)
         Me.tabPageItinerary.Controls.Add(Me.webItnDoc)
         Me.tabPageItinerary.Controls.Add(Me.lblItnPNRCounter)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnRefresh)
-        Me.tabPageItinerary.Controls.Add(Me.cmdItnReadQueue)
         Me.tabPageItinerary.Controls.Add(Me.fraItnFormat)
         Me.tabPageItinerary.Controls.Add(Me.cmdItnExit)
         Me.tabPageItinerary.Controls.Add(Me.lstItnRemarks)
-        Me.tabPageItinerary.Controls.Add(Me.lblItnRemarks)
-        Me.tabPageItinerary.Controls.Add(Me.cmdItnReadCurrent)
         Me.tabPageItinerary.Controls.Add(Me.fraItnAirportName)
         Me.tabPageItinerary.Controls.Add(Me.fraItnOptions)
         Me.tabPageItinerary.Controls.Add(Me.rtbItnDoc)
-        Me.tabPageItinerary.Controls.Add(Me.cmdItnReadPNR)
         Me.tabPageItinerary.Controls.Add(Me.txtItnPNR)
         Me.tabPageItinerary.Controls.Add(Me.lblItnPNR)
         Me.tabPageItinerary.Location = New System.Drawing.Point(4, 22)
@@ -649,11 +675,106 @@ Partial Class frmPNR
         Me.tabPageItinerary.Text = "PNR Itinerary"
         Me.tabPageItinerary.UseVisualStyleBackColor = True
         '
+        'fraGalileo
+        '
+        Me.fraGalileo.Controls.Add(Me.cmdItn1GReadPNR)
+        Me.fraGalileo.Controls.Add(Me.cmdItn1GReadCurrent)
+        Me.fraGalileo.Controls.Add(Me.cmdItn1GReadQueue)
+        Me.fraGalileo.Location = New System.Drawing.Point(306, 6)
+        Me.fraGalileo.Name = "fraGalileo"
+        Me.fraGalileo.Size = New System.Drawing.Size(289, 46)
+        Me.fraGalileo.TabIndex = 22
+        Me.fraGalileo.TabStop = False
+        Me.fraGalileo.Text = "Galileo"
+        '
+        'cmdItn1GReadPNR
+        '
+        Me.cmdItn1GReadPNR.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdItn1GReadPNR.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdItn1GReadPNR.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdItn1GReadPNR.Location = New System.Drawing.Point(6, 14)
+        Me.cmdItn1GReadPNR.Name = "cmdItn1GReadPNR"
+        Me.cmdItn1GReadPNR.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdItn1GReadPNR.Size = New System.Drawing.Size(73, 21)
+        Me.cmdItn1GReadPNR.TabIndex = 0
+        Me.cmdItn1GReadPNR.Text = "Read PNR"
+        Me.cmdItn1GReadPNR.UseVisualStyleBackColor = True
+        '
+        'cmdItn1GReadCurrent
+        '
+        Me.cmdItn1GReadCurrent.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdItn1GReadCurrent.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdItn1GReadCurrent.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdItn1GReadCurrent.Location = New System.Drawing.Point(85, 14)
+        Me.cmdItn1GReadCurrent.Name = "cmdItn1GReadCurrent"
+        Me.cmdItn1GReadCurrent.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdItn1GReadCurrent.Size = New System.Drawing.Size(99, 21)
+        Me.cmdItn1GReadCurrent.TabIndex = 1
+        Me.cmdItn1GReadCurrent.Text = "Read Current"
+        Me.cmdItn1GReadCurrent.UseVisualStyleBackColor = False
+        '
+        'cmdItn1GReadQueue
+        '
+        Me.cmdItn1GReadQueue.Location = New System.Drawing.Point(190, 14)
+        Me.cmdItn1GReadQueue.Name = "cmdItn1GReadQueue"
+        Me.cmdItn1GReadQueue.Size = New System.Drawing.Size(80, 21)
+        Me.cmdItn1GReadQueue.TabIndex = 13
+        Me.cmdItn1GReadQueue.Text = "Read Queue"
+        Me.cmdItn1GReadQueue.UseVisualStyleBackColor = True
+        '
+        'fraAmadeus
+        '
+        Me.fraAmadeus.Controls.Add(Me.cmdItn1AReadPNR)
+        Me.fraAmadeus.Controls.Add(Me.cmdItn1AReadCurrent)
+        Me.fraAmadeus.Controls.Add(Me.cmdItn1AReadQueue)
+        Me.fraAmadeus.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.fraAmadeus.Location = New System.Drawing.Point(11, 6)
+        Me.fraAmadeus.Name = "fraAmadeus"
+        Me.fraAmadeus.Size = New System.Drawing.Size(289, 46)
+        Me.fraAmadeus.TabIndex = 21
+        Me.fraAmadeus.TabStop = False
+        Me.fraAmadeus.Text = "Amadeus"
+        '
+        'cmdItn1AReadPNR
+        '
+        Me.cmdItn1AReadPNR.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdItn1AReadPNR.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdItn1AReadPNR.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdItn1AReadPNR.Location = New System.Drawing.Point(6, 14)
+        Me.cmdItn1AReadPNR.Name = "cmdItn1AReadPNR"
+        Me.cmdItn1AReadPNR.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdItn1AReadPNR.Size = New System.Drawing.Size(73, 21)
+        Me.cmdItn1AReadPNR.TabIndex = 0
+        Me.cmdItn1AReadPNR.Text = "Read PNR"
+        Me.cmdItn1AReadPNR.UseVisualStyleBackColor = True
+        '
+        'cmdItn1AReadCurrent
+        '
+        Me.cmdItn1AReadCurrent.BackColor = System.Drawing.SystemColors.Control
+        Me.cmdItn1AReadCurrent.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cmdItn1AReadCurrent.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cmdItn1AReadCurrent.Location = New System.Drawing.Point(85, 14)
+        Me.cmdItn1AReadCurrent.Name = "cmdItn1AReadCurrent"
+        Me.cmdItn1AReadCurrent.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.cmdItn1AReadCurrent.Size = New System.Drawing.Size(99, 21)
+        Me.cmdItn1AReadCurrent.TabIndex = 1
+        Me.cmdItn1AReadCurrent.Text = "Read Current"
+        Me.cmdItn1AReadCurrent.UseVisualStyleBackColor = False
+        '
+        'cmdItn1AReadQueue
+        '
+        Me.cmdItn1AReadQueue.Location = New System.Drawing.Point(190, 14)
+        Me.cmdItn1AReadQueue.Name = "cmdItn1AReadQueue"
+        Me.cmdItn1AReadQueue.Size = New System.Drawing.Size(80, 21)
+        Me.cmdItn1AReadQueue.TabIndex = 13
+        Me.cmdItn1AReadQueue.Text = "Read Queue"
+        Me.cmdItn1AReadQueue.UseVisualStyleBackColor = True
+        '
         'cmdItnFormatOSMLoG
         '
-        Me.cmdItnFormatOSMLoG.Location = New System.Drawing.Point(315, 189)
+        Me.cmdItnFormatOSMLoG.Location = New System.Drawing.Point(615, 20)
         Me.cmdItnFormatOSMLoG.Name = "cmdItnFormatOSMLoG"
-        Me.cmdItnFormatOSMLoG.Size = New System.Drawing.Size(108, 27)
+        Me.cmdItnFormatOSMLoG.Size = New System.Drawing.Size(108, 21)
         Me.cmdItnFormatOSMLoG.TabIndex = 17
         Me.cmdItnFormatOSMLoG.Text = "OSM LoG"
         Me.cmdItnFormatOSMLoG.UseVisualStyleBackColor = True
@@ -663,7 +784,7 @@ Partial Class frmPNR
         Me.webItnDoc.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.webItnDoc.Location = New System.Drawing.Point(476, 189)
+        Me.webItnDoc.Location = New System.Drawing.Point(986, 20)
         Me.webItnDoc.MinimumSize = New System.Drawing.Size(20, 20)
         Me.webItnDoc.Name = "webItnDoc"
         Me.webItnDoc.Size = New System.Drawing.Size(20, 20)
@@ -688,21 +809,12 @@ Partial Class frmPNR
         'cmdItnRefresh
         '
         Me.cmdItnRefresh.Enabled = False
-        Me.cmdItnRefresh.Location = New System.Drawing.Point(575, 6)
+        Me.cmdItnRefresh.Location = New System.Drawing.Point(759, 20)
         Me.cmdItnRefresh.Name = "cmdItnRefresh"
-        Me.cmdItnRefresh.Size = New System.Drawing.Size(162, 35)
+        Me.cmdItnRefresh.Size = New System.Drawing.Size(80, 21)
         Me.cmdItnRefresh.TabIndex = 14
         Me.cmdItnRefresh.Text = "Refresh"
         Me.cmdItnRefresh.UseVisualStyleBackColor = True
-        '
-        'cmdItnReadQueue
-        '
-        Me.cmdItnReadQueue.Location = New System.Drawing.Point(388, 6)
-        Me.cmdItnReadQueue.Name = "cmdItnReadQueue"
-        Me.cmdItnReadQueue.Size = New System.Drawing.Size(162, 35)
-        Me.cmdItnReadQueue.TabIndex = 13
-        Me.cmdItnReadQueue.Text = "Read Queue"
-        Me.cmdItnReadQueue.UseVisualStyleBackColor = True
         '
         'fraItnFormat
         '
@@ -713,18 +825,18 @@ Partial Class frmPNR
         Me.fraItnFormat.Controls.Add(Me.optItnFormatPlain)
         Me.fraItnFormat.Controls.Add(Me.optItnFormatDefault)
         Me.fraItnFormat.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.fraItnFormat.Location = New System.Drawing.Point(315, 58)
+        Me.fraItnFormat.Location = New System.Drawing.Point(317, 58)
         Me.fraItnFormat.Name = "fraItnFormat"
-        Me.fraItnFormat.Size = New System.Drawing.Size(294, 118)
+        Me.fraItnFormat.Size = New System.Drawing.Size(183, 134)
         Me.fraItnFormat.TabIndex = 5
         Me.fraItnFormat.TabStop = False
-        Me.fraItnFormat.Text = "Custom Format"
+        Me.fraItnFormat.Text = "Format"
         '
         'optItnFormatSeaChefsWith3LetterCode
         '
         Me.optItnFormatSeaChefsWith3LetterCode.AutoSize = True
         Me.optItnFormatSeaChefsWith3LetterCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatSeaChefsWith3LetterCode.Location = New System.Drawing.Point(116, 74)
+        Me.optItnFormatSeaChefsWith3LetterCode.Location = New System.Drawing.Point(17, 71)
         Me.optItnFormatSeaChefsWith3LetterCode.Name = "optItnFormatSeaChefsWith3LetterCode"
         Me.optItnFormatSeaChefsWith3LetterCode.Size = New System.Drawing.Size(158, 17)
         Me.optItnFormatSeaChefsWith3LetterCode.TabIndex = 7
@@ -735,7 +847,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatEuronav.AutoSize = True
         Me.optItnFormatEuronav.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatEuronav.Location = New System.Drawing.Point(116, 20)
+        Me.optItnFormatEuronav.Location = New System.Drawing.Point(17, 88)
         Me.optItnFormatEuronav.Name = "optItnFormatEuronav"
         Me.optItnFormatEuronav.Size = New System.Drawing.Size(65, 17)
         Me.optItnFormatEuronav.TabIndex = 6
@@ -746,7 +858,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatMSReport.AutoSize = True
         Me.optItnFormatMSReport.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatMSReport.Location = New System.Drawing.Point(116, 47)
+        Me.optItnFormatMSReport.Location = New System.Drawing.Point(17, 105)
         Me.optItnFormatMSReport.Name = "optItnFormatMSReport"
         Me.optItnFormatMSReport.Size = New System.Drawing.Size(76, 17)
         Me.optItnFormatMSReport.TabIndex = 5
@@ -757,7 +869,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatSeaChefs.AutoSize = True
         Me.optItnFormatSeaChefs.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatSeaChefs.Location = New System.Drawing.Point(17, 74)
+        Me.optItnFormatSeaChefs.Location = New System.Drawing.Point(17, 54)
         Me.optItnFormatSeaChefs.Name = "optItnFormatSeaChefs"
         Me.optItnFormatSeaChefs.Size = New System.Drawing.Size(74, 17)
         Me.optItnFormatSeaChefs.TabIndex = 2
@@ -768,7 +880,7 @@ Partial Class frmPNR
         '
         Me.optItnFormatPlain.AutoSize = True
         Me.optItnFormatPlain.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnFormatPlain.Location = New System.Drawing.Point(17, 47)
+        Me.optItnFormatPlain.Location = New System.Drawing.Point(17, 37)
         Me.optItnFormatPlain.Name = "optItnFormatPlain"
         Me.optItnFormatPlain.Size = New System.Drawing.Size(48, 17)
         Me.optItnFormatPlain.TabIndex = 1
@@ -790,9 +902,9 @@ Partial Class frmPNR
         '
         'cmdItnExit
         '
-        Me.cmdItnExit.Location = New System.Drawing.Point(757, 6)
+        Me.cmdItnExit.Location = New System.Drawing.Point(843, 20)
         Me.cmdItnExit.Name = "cmdItnExit"
-        Me.cmdItnExit.Size = New System.Drawing.Size(162, 35)
+        Me.cmdItnExit.Size = New System.Drawing.Size(80, 21)
         Me.cmdItnExit.TabIndex = 12
         Me.cmdItnExit.Text = "Exit"
         Me.cmdItnExit.UseVisualStyleBackColor = True
@@ -803,39 +915,10 @@ Partial Class frmPNR
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.lstItnRemarks.CheckOnClick = True
         Me.lstItnRemarks.FormattingEnabled = True
-        Me.lstItnRemarks.Location = New System.Drawing.Point(615, 65)
+        Me.lstItnRemarks.Location = New System.Drawing.Point(508, 65)
         Me.lstItnRemarks.Name = "lstItnRemarks"
-        Me.lstItnRemarks.Size = New System.Drawing.Size(739, 154)
+        Me.lstItnRemarks.Size = New System.Drawing.Size(846, 124)
         Me.lstItnRemarks.TabIndex = 8
-        '
-        'lblItnRemarks
-        '
-        Me.lblItnRemarks.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblItnRemarks.BackColor = System.Drawing.Color.Yellow
-        Me.lblItnRemarks.Cursor = System.Windows.Forms.Cursors.Default
-        Me.lblItnRemarks.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblItnRemarks.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.lblItnRemarks.Location = New System.Drawing.Point(757, 48)
-        Me.lblItnRemarks.Name = "lblItnRemarks"
-        Me.lblItnRemarks.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.lblItnRemarks.Size = New System.Drawing.Size(597, 16)
-        Me.lblItnRemarks.TabIndex = 7
-        Me.lblItnRemarks.Text = "Remarks"
-        Me.lblItnRemarks.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
-        '
-        'cmdItnReadCurrent
-        '
-        Me.cmdItnReadCurrent.BackColor = System.Drawing.SystemColors.Control
-        Me.cmdItnReadCurrent.Cursor = System.Windows.Forms.Cursors.Default
-        Me.cmdItnReadCurrent.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdItnReadCurrent.Location = New System.Drawing.Point(202, 6)
-        Me.cmdItnReadCurrent.Name = "cmdItnReadCurrent"
-        Me.cmdItnReadCurrent.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.cmdItnReadCurrent.Size = New System.Drawing.Size(162, 35)
-        Me.cmdItnReadCurrent.TabIndex = 1
-        Me.cmdItnReadCurrent.Text = "Read Current"
-        Me.cmdItnReadCurrent.UseVisualStyleBackColor = False
         '
         'fraItnAirportName
         '
@@ -847,7 +930,7 @@ Partial Class frmPNR
         Me.fraItnAirportName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.fraItnAirportName.Location = New System.Drawing.Point(172, 58)
         Me.fraItnAirportName.Name = "fraItnAirportName"
-        Me.fraItnAirportName.Size = New System.Drawing.Size(137, 118)
+        Me.fraItnAirportName.Size = New System.Drawing.Size(137, 134)
         Me.fraItnAirportName.TabIndex = 4
         Me.fraItnAirportName.TabStop = False
         Me.fraItnAirportName.Text = "Airport Name"
@@ -856,7 +939,7 @@ Partial Class frmPNR
         '
         Me.optItnAirportCityBoth.AutoSize = True
         Me.optItnAirportCityBoth.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnAirportCityBoth.Location = New System.Drawing.Point(7, 95)
+        Me.optItnAirportCityBoth.Location = New System.Drawing.Point(7, 88)
         Me.optItnAirportCityBoth.Name = "optItnAirportCityBoth"
         Me.optItnAirportCityBoth.Size = New System.Drawing.Size(109, 17)
         Me.optItnAirportCityBoth.TabIndex = 4
@@ -868,7 +951,7 @@ Partial Class frmPNR
         '
         Me.optItnAirportCityName.AutoSize = True
         Me.optItnAirportCityName.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnAirportCityName.Location = New System.Drawing.Point(7, 79)
+        Me.optItnAirportCityName.Location = New System.Drawing.Point(7, 71)
         Me.optItnAirportCityName.Name = "optItnAirportCityName"
         Me.optItnAirportCityName.Size = New System.Drawing.Size(92, 17)
         Me.optItnAirportCityName.TabIndex = 3
@@ -880,7 +963,7 @@ Partial Class frmPNR
         '
         Me.optItnAirportBoth.AutoSize = True
         Me.optItnAirportBoth.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnAirportBoth.Location = New System.Drawing.Point(6, 62)
+        Me.optItnAirportBoth.Location = New System.Drawing.Point(6, 54)
         Me.optItnAirportBoth.Name = "optItnAirportBoth"
         Me.optItnAirportBoth.Size = New System.Drawing.Size(122, 17)
         Me.optItnAirportBoth.TabIndex = 2
@@ -892,7 +975,7 @@ Partial Class frmPNR
         '
         Me.optItnAirportname.AutoSize = True
         Me.optItnAirportname.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnAirportname.Location = New System.Drawing.Point(6, 45)
+        Me.optItnAirportname.Location = New System.Drawing.Point(6, 37)
         Me.optItnAirportname.Name = "optItnAirportname"
         Me.optItnAirportname.Size = New System.Drawing.Size(105, 17)
         Me.optItnAirportname.TabIndex = 1
@@ -904,7 +987,7 @@ Partial Class frmPNR
         '
         Me.optItnAirportCode.AutoSize = True
         Me.optItnAirportCode.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.optItnAirportCode.Location = New System.Drawing.Point(6, 28)
+        Me.optItnAirportCode.Location = New System.Drawing.Point(6, 20)
         Me.optItnAirportCode.Name = "optItnAirportCode"
         Me.optItnAirportCode.Size = New System.Drawing.Size(89, 17)
         Me.optItnAirportCode.TabIndex = 0
@@ -929,9 +1012,9 @@ Partial Class frmPNR
         Me.fraItnOptions.Controls.Add(Me.chkItnVessel)
         Me.fraItnOptions.Controls.Add(Me.chkItnAirlineLocator)
         Me.fraItnOptions.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.fraItnOptions.Location = New System.Drawing.Point(172, 182)
+        Me.fraItnOptions.Location = New System.Drawing.Point(172, 192)
         Me.fraItnOptions.Name = "fraItnOptions"
-        Me.fraItnOptions.Size = New System.Drawing.Size(137, 403)
+        Me.fraItnOptions.Size = New System.Drawing.Size(137, 377)
         Me.fraItnOptions.TabIndex = 6
         Me.fraItnOptions.TabStop = False
         Me.fraItnOptions.Text = "Options"
@@ -1099,9 +1182,9 @@ Partial Class frmPNR
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.rtbItnDoc.ContextMenuStrip = Me.menuITNSelectCopy
         Me.rtbItnDoc.Font = New System.Drawing.Font("Courier New", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.rtbItnDoc.Location = New System.Drawing.Point(315, 222)
+        Me.rtbItnDoc.Location = New System.Drawing.Point(315, 199)
         Me.rtbItnDoc.Name = "rtbItnDoc"
-        Me.rtbItnDoc.Size = New System.Drawing.Size(1039, 363)
+        Me.rtbItnDoc.Size = New System.Drawing.Size(1039, 370)
         Me.rtbItnDoc.TabIndex = 11
         Me.rtbItnDoc.Text = ""
         '
@@ -1116,19 +1199,6 @@ Partial Class frmPNR
         Me.MenuCopyItn.Name = "MenuCopyItn"
         Me.MenuCopyItn.Size = New System.Drawing.Size(148, 22)
         Me.MenuCopyItn.Text = "Copy Itinerary"
-        '
-        'cmdItnReadPNR
-        '
-        Me.cmdItnReadPNR.BackColor = System.Drawing.SystemColors.Control
-        Me.cmdItnReadPNR.Cursor = System.Windows.Forms.Cursors.Default
-        Me.cmdItnReadPNR.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.cmdItnReadPNR.Location = New System.Drawing.Point(16, 6)
-        Me.cmdItnReadPNR.Name = "cmdItnReadPNR"
-        Me.cmdItnReadPNR.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.cmdItnReadPNR.Size = New System.Drawing.Size(162, 35)
-        Me.cmdItnReadPNR.TabIndex = 0
-        Me.cmdItnReadPNR.Text = "Read Amadeus PNR"
-        Me.cmdItnReadPNR.UseVisualStyleBackColor = True
         '
         'txtItnPNR
         '
@@ -1520,6 +1590,8 @@ Partial Class frmPNR
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tabPageItinerary.ResumeLayout(False)
         Me.tabPageItinerary.PerformLayout()
+        Me.fraGalileo.ResumeLayout(False)
+        Me.fraAmadeus.ResumeLayout(False)
         Me.fraItnFormat.ResumeLayout(False)
         Me.fraItnFormat.PerformLayout()
         Me.fraItnAirportName.ResumeLayout(False)
@@ -1534,7 +1606,7 @@ Partial Class frmPNR
 
     End Sub
     Friend WithEvents cmdExit As System.Windows.Forms.Button
-    Friend WithEvents cmdReadPNR As System.Windows.Forms.Button
+    Friend WithEvents cmdPNRRead1APNR As System.Windows.Forms.Button
     Friend WithEvents llbOptions As System.Windows.Forms.LinkLabel
     Friend WithEvents lblPNR As System.Windows.Forms.Label
     Friend WithEvents lblPax As System.Windows.Forms.Label
@@ -1568,9 +1640,8 @@ Partial Class frmPNR
     Friend WithEvents tabPageFinisher As System.Windows.Forms.TabPage
     Friend WithEvents tabPageItinerary As System.Windows.Forms.TabPage
     Friend WithEvents lstItnRemarks As System.Windows.Forms.CheckedListBox
-    Public WithEvents lblItnRemarks As System.Windows.Forms.Label
     Friend WithEvents chkItnElecItemsBan As System.Windows.Forms.CheckBox
-    Public WithEvents cmdItnReadCurrent As System.Windows.Forms.Button
+    Public WithEvents cmdItn1AReadCurrent As System.Windows.Forms.Button
     Friend WithEvents fraItnAirportName As System.Windows.Forms.GroupBox
     Friend WithEvents optItnAirportBoth As System.Windows.Forms.RadioButton
     Friend WithEvents optItnAirportname As System.Windows.Forms.RadioButton
@@ -1581,7 +1652,7 @@ Partial Class frmPNR
     Friend WithEvents chkItnVessel As System.Windows.Forms.CheckBox
     Friend WithEvents chkItnAirlineLocator As System.Windows.Forms.CheckBox
     Friend WithEvents rtbItnDoc As System.Windows.Forms.RichTextBox
-    Public WithEvents cmdItnReadPNR As System.Windows.Forms.Button
+    Public WithEvents cmdItn1AReadPNR As System.Windows.Forms.Button
     Public WithEvents txtItnPNR As System.Windows.Forms.TextBox
     Public WithEvents lblItnPNR As System.Windows.Forms.Label
     Friend WithEvents cmdItnExit As System.Windows.Forms.Button
@@ -1632,7 +1703,7 @@ Partial Class frmPNR
     Friend WithEvents ttpToolTip As System.Windows.Forms.ToolTip
     Friend WithEvents lblItnTextToBeAdded As System.Windows.Forms.Label
     Friend WithEvents chkItnFlyingTime As System.Windows.Forms.CheckBox
-    Friend WithEvents cmdItnReadQueue As System.Windows.Forms.Button
+    Friend WithEvents cmdItn1AReadQueue As System.Windows.Forms.Button
     Friend WithEvents cmdItnRefresh As System.Windows.Forms.Button
     Friend WithEvents chkItnCostCentre As System.Windows.Forms.CheckBox
     Friend WithEvents cmdOSMClearSelected As System.Windows.Forms.Button
@@ -1655,4 +1726,11 @@ Partial Class frmPNR
     Friend WithEvents Label2 As Label
     Friend WithEvents optItnFormatSeaChefsWith3LetterCode As RadioButton
     Friend WithEvents cmdItnFormatOSMLoG As Button
+    Friend WithEvents fraAmadeus As GroupBox
+    Friend WithEvents fraGalileo As GroupBox
+    Public WithEvents cmdItn1GReadPNR As Button
+    Public WithEvents cmdItn1GReadCurrent As Button
+    Friend WithEvents cmdItn1GReadQueue As Button
+    Friend WithEvents cmdPNRRead1GPNR As Button
+    Friend WithEvents cmdAPISEditPax As Button
 End Class

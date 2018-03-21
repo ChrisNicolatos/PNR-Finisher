@@ -1,22 +1,21 @@
 ﻿Option Strict Off
 Option Explicit On
-Namespace AmadeusNew
-
-
+Namespace GDSNew
     Public Class Item
         Private Structure NewItemClass
-            Dim AmadeusCommand As String
+            Dim GDSCommand As String
             Dim TextRequested As String
             Friend Sub Clear()
-                AmadeusCommand = ""
+                GDSCommand = ""
                 TextRequested = ""
             End Sub
 
         End Structure
         Private mudtProps As NewItemClass
-        Public ReadOnly Property AmadeusCommand As String
+
+        Public ReadOnly Property GDSCommand As String
             Get
-                AmadeusCommand = mudtProps.AmadeusCommand
+                GDSCommand = mudtProps.GDSCommand
             End Get
         End Property
         Public ReadOnly Property TextRequested As String
@@ -29,9 +28,9 @@ Namespace AmadeusNew
             mudtProps.TextRequested = Value
         End Sub
 
-        Friend Sub SetText(ByVal Value As String, ByVal pAmadeusCommand As String)
+        Friend Sub SetText(ByVal Value As String, ByVal pGDSCommand As String)
             mudtProps.TextRequested = Value
-            mudtProps.AmadeusCommand = pAmadeusCommand
+            mudtProps.GDSCommand = pGDSCommand
         End Sub
 
         Friend Sub Clear()
@@ -69,18 +68,19 @@ Namespace AmadeusNew
         Private mobjVesselNameForPNR As New Item
         Private mobjVesselFlagForPNR As New Item
 
+        Private mobjGalTracking As New Item
         Private mobjGreekToLatin As New GreekToLatin
 
         Private mstrOfficeOfResponsibility As String
-        Private mdteCreationDate As Date
         Private mdteDepartureDate As Date
         Private mintNumberOfPax As Integer
+        Private mGDSCode As Config.GDSCode
 
-        Public Sub New(ByVal pOfficeOfResponsibility As String, ByVal pCreationDate As Date, ByVal pDepartureDate As Date, ByVal pNumberOfPax As Integer)
+        Public Sub New(ByVal pOfficeOfResponsibility As String, ByVal pDepartureDate As Date, ByVal pNumberOfPax As Integer, ByVal pGDSCode As Config.GDSCode)
             mstrOfficeOfResponsibility = pOfficeOfResponsibility
-            mdteCreationDate = pCreationDate
             mdteDepartureDate = pDepartureDate
             mintNumberOfPax = pNumberOfPax
+            mGDSCode = pGDSCode
             PrepareCommands()
         End Sub
 
@@ -194,6 +194,11 @@ Namespace AmadeusNew
                 BookedBy = mobjBookedBy
             End Get
         End Property
+        Public ReadOnly Property GalileoTrackingCode As Item
+            Get
+                GalileoTrackingCode = mobjGalTracking
+            End Get
+        End Property
         Public ReadOnly Property Department As Item
             Get
                 Department = mobjDepartment
@@ -216,12 +221,14 @@ Namespace AmadeusNew
             mobjCustomerName.Clear()
             If Not Item Is Nothing Then
                 If Item.Code <> "" Then
-                    mobjCustomerCode.SetText(Item.Code, MySettings.AmadeusValue("TextCLN") & Item.Code)
+                    mobjCustomerCode.SetText(Item.Code, MySettings.GDSValue("TextCLN") & Item.Code)
                 End If
                 If Item.Name <> "" Then
-                    mobjCustomerName.SetText(Item.Name, MySettings.AmadeusValue("TextCLA") & mobjGreekToLatin.Convert(Item.Name))
+                    mobjCustomerName.SetText(Item.Name, MySettings.GDSValue("TextCLA") & mobjGreekToLatin.Convert(Item.Name))
                 End If
-                'PrepareAirlinePoints()
+                If Item.GalileoTrackingCode <> "" Then
+                    mobjGalTracking.SetText(Item.GalileoTrackingCode, MySettings.GDSValue("TextGalTrackingCode") & Item.GalileoTrackingCode)
+                End If
             End If
 
         End Sub
@@ -231,10 +238,10 @@ Namespace AmadeusNew
             mobjSubDepartmentName.Clear()
             If Not Item Is Nothing Then
                 If Item.ID > 0 Then
-                    mobjSubDepartmentCode.SetText(Item.Code, MySettings.AmadeusValue("TextSBN") & Item.ID)
+                    mobjSubDepartmentCode.SetText(Item.Code, MySettings.GDSValue("TextSBN") & Item.ID)
                 End If
                 If Item.Name <> "" Then
-                    mobjSubDepartmentName.SetText(Item.Name, MySettings.AmadeusValue("TextSBA") & mobjGreekToLatin.Convert(Item.Name))
+                    mobjSubDepartmentName.SetText(Item.Name, MySettings.GDSValue("TextSBA") & mobjGreekToLatin.Convert(Item.Name))
                 End If
             End If
 
@@ -245,10 +252,10 @@ Namespace AmadeusNew
             mobjCRMName.Clear()
             If Not Item Is Nothing Then
                 If Item.ID > 0 Then
-                    mobjCRMCode.SetText(Item.Code, MySettings.AmadeusValue("TextCRN") & Item.Code)
+                    mobjCRMCode.SetText(Item.Code, MySettings.GDSValue("TextCRN") & Item.Code)
                 End If
                 If Item.Name <> "" Then
-                    mobjCRMName.SetText(Item.Name, MySettings.AmadeusValue("TextCRA") & mobjGreekToLatin.Convert(Item.Name))
+                    mobjCRMName.SetText(Item.Name, MySettings.GDSValue("TextCRA") & mobjGreekToLatin.Convert(Item.Name))
                 End If
             End If
 
@@ -258,11 +265,11 @@ Namespace AmadeusNew
             mobjVesselName.Clear()
             mobjVesselFlag.Clear()
             If Not Item Is Nothing Then
-                mobjVesselName.SetText(Item.Name, MySettings.AmadeusValue("TextVSL") & Item.Name)
+                mobjVesselName.SetText(Item.Name, MySettings.GDSValue("TextVSL") & Item.Name)
                 If Item.Flag <> "" Then
-                    mobjVesselFlag.SetText(Item.Flag, MySettings.AmadeusValue("TextVSR") & Item.Flag)
+                    mobjVesselFlag.SetText(Item.Flag, MySettings.GDSValue("TextVSR") & Item.Flag)
                 End If
-                mobjVesselOSI.SetText("", MySettings.AmadeusValue("TextVOS") & Item.Name)
+                mobjVesselOSI.SetText("", MySettings.GDSValue("TextVOS") & Item.Name)
                 mobjVesselNameForPNR.Clear()
                 mobjVesselFlagForPNR.Clear()
             End If
@@ -273,12 +280,12 @@ Namespace AmadeusNew
             mobjVesselName.Clear()
             mobjVesselFlag.Clear()
             If pVesselName <> "" Then
-                mobjVesselName.SetText("", MySettings.AmadeusValue("TextVSL") & mobjVesselNameForPNR.TextRequested)
-                mobjVesselOSI.SetText("", MySettings.AmadeusValue("TextVOS") & mobjVesselNameForPNR.TextRequested)
+                mobjVesselName.SetText("", MySettings.GDSValue("TextVSL") & mobjVesselNameForPNR.TextRequested)
+                mobjVesselOSI.SetText("", MySettings.GDSValue("TextVOS") & mobjVesselNameForPNR.TextRequested)
                 If pVesselFlag <> "" Then
-                    mobjVesselFlag.SetText("", MySettings.AmadeusValue("TextVSR") & mobjVesselFlagForPNR.TextRequested)
-                    If mobjVesselOSI.AmadeusCommand <> "" Then
-                        mobjVesselOSI.SetText("", MySettings.AmadeusValue("TextVOS") & mobjVesselFlagForPNR.TextRequested)
+                    mobjVesselFlag.SetText("", MySettings.GDSValue("TextVSR") & mobjVesselFlagForPNR.TextRequested)
+                    If mobjVesselOSI.GDSCommand <> "" Then
+                        mobjVesselOSI.SetText("", MySettings.GDSValue("TextVOS") & mobjVesselFlagForPNR.TextRequested)
                     End If
                 End If
             End If
@@ -290,7 +297,7 @@ Namespace AmadeusNew
         Public Sub SetReference(ByVal Text As String)
             Text = Text.Trim
             If Text <> "" Then
-                mobjReference.SetText(Text, MySettings.AmadeusValue("TextREF") & Text)
+                mobjReference.SetText(Text, MySettings.GDSValue("TextREF") & Text)
             Else
                 mobjReference.Clear()
             End If
@@ -298,15 +305,23 @@ Namespace AmadeusNew
         Public Sub SetBookedBy(ByVal Text As String)
             Text = Text.Trim
             If Text <> "" Then
-                mobjBookedBy.SetText(Text, MySettings.AmadeusValue("TextBBY") & Text)
+                mobjBookedBy.SetText(Text, MySettings.GDSValue("TextBBY") & Text)
             Else
                 mobjBookedBy.Clear()
+            End If
+        End Sub
+        Public Sub SetGalileoTracking(ByVal Text As String)
+            Text = Text.Trim
+            If Text <> "" Then
+                mobjGalTracking.SetText(Text, MySettings.GDSValue("TextGalTrackingCode") & Text)
+            Else
+                mobjGalTracking.Clear()
             End If
         End Sub
         Public Sub SetDepartment(ByVal Text As String)
             Text = Text.Trim
             If Text <> "" Then
-                mobjDepartment.SetText(Text, MySettings.AmadeusValue("TextDPT") & Text)
+                mobjDepartment.SetText(Text, MySettings.GDSValue("TextDPT") & Text)
             Else
                 mobjDepartment.Clear()
             End If
@@ -314,7 +329,7 @@ Namespace AmadeusNew
         Public Sub SetReasonForTravel(ByVal Text As String)
             Text = Text.Trim
             If Text <> "" Then
-                mobjReasonForTravel.SetText(Text, MySettings.AmadeusValue("TextRFT") & Text)
+                mobjReasonForTravel.SetText(Text, MySettings.GDSValue("TextRFT") & Text)
             Else
                 mobjReasonForTravel.Clear()
             End If
@@ -322,52 +337,60 @@ Namespace AmadeusNew
         Public Sub SetCostCentre(ByVal Text As String)
             Text = Text.Trim
             If Text <> "" Then
-                mobjCostCentre.SetText(Text, MySettings.AmadeusValue("TextCC") & Text)
+                mobjCostCentre.SetText(Text, MySettings.GDSValue("TextCC") & Text)
             Else
                 mobjCostCentre.Clear()
             End If
         End Sub
         Private Sub PrepareCommands()
 
-            Dim pDate As New s1aAirlineDate.clsAirlineDate
+            Dim pDateTimeLimit As New s1aAirlineDate.clsAirlineDate
+            Dim pDateReminder As New s1aAirlineDate.clsAirlineDate
+            Dim pDateRetain As New s1aAirlineDate.clsAirlineDate
+
+            If mdteDepartureDate > DateAdd(DateInterval.Day, 3, Today) Then
+                pDateTimeLimit.VBDate = DateAdd(DateInterval.Day, -3, mdteDepartureDate)
+            Else
+                pDateTimeLimit.VBDate = Today
+            End If
+            If mdteDepartureDate > Today Then
+                pDateReminder.VBDate = DateAdd(DateInterval.Day, 1, mdteDepartureDate)
+            Else
+                pDateReminder.VBDate = Today
+            End If
 
             Try
-                pDate.VBDate = DateAdd(DateInterval.Month, 11, mdteCreationDate)
-            Catch ex As OverflowException
-                pDate.VBDate = DateAdd(DateInterval.Month, 11, Today)
+                pDateRetain.VBDate = DateAdd(DateInterval.Month, 11, Today)
             Catch ex As Exception
                 Throw New Exception("PreparePNRCommands()" & vbCrLf & ex.Message)
             End Try
-            mobjOpenSegment.SetText("",
-                                    MySettings.AmadeusValue("TextMISSegmentCommand") &
+
+            mobjPhoneElement.SetText("", (MySettings.GDSValue("TextAP").Replace("  ", " ")))
+            mobjEmailElement.SetText("", MySettings.GDSValue("TextAPE"))
+            mobjAgentID.SetText("", MySettings.GDSValue("TextAGT"))
+
+            If mGDSCode = Config.GDSCode.GDSisAmadeus Then
+                Dim pTTLString As String
+                If mstrOfficeOfResponsibility <> MySettings.GDSPcc Then
+                    pTTLString = MySettings.GDSValue("TextTTL") & pDateTimeLimit.IATA & "/" & MySettings.GDSPcc
+                Else
+                    pTTLString = MySettings.GDSValue("TextTTL") & pDateTimeLimit.IATA
+                End If
+                mobjTicketElement.SetText("", pTTLString)
+                mobjOpenSegment.SetText("",
+                                    MySettings.GDSValue("TextMISSegmentCommand") &
                                     IIf(mintNumberOfPax = 0, 1, mintNumberOfPax) & " " &
                                     MySettings.OfficeCityCode & " " &
-                                    pDate.IATA & "-" & MySettings.AmadeusValue("TextMISSegmentText"))
-            mobjPhoneElement.SetText("", (MySettings.AmadeusValue("TextAP").Replace("  ", " ")))
-            mobjEmailElement.SetText("", MySettings.AmadeusValue("TextAPE"))
-            mobjAgentID.SetText("", MySettings.AmadeusValue("TextAGT"))
-
-            If mdteDepartureDate > DateAdd(DateInterval.Day, 3, Today) Then ' Date.MinValue Then
-                pDate.VBDate = DateAdd(DateInterval.Day, -3, mdteDepartureDate)
+                                    pDateRetain.IATA & "-" & MySettings.GDSValue("TextMISSegmentText"))
+                mobjOptionQueueElement.SetText("", MySettings.GDSValue("TextOP") & MySettings.GDSPcc & "/" & pDateReminder.IATA & "/" & MySettings.AgentOPQueue)
+            ElseIf mGDSCode = Config.GDSCode.GDSisGalileo Then
+                mobjTicketElement.SetText("", MySettings.GDSValue("TextTTL") & pDateTimeLimit.IATA)
+                mobjOpenSegment.SetText("", MySettings.GDSValue("TextMISSegmentCommand") & pDateRetain.IATA & "*" & MySettings.GDSValue("TextMISSegmentText"))
+                mobjOptionQueueElement.SetText("", MySettings.GDSValue("TextOP") & "/" & pDateReminder.IATA & "/0001/Q" & MySettings.AgentOPQueue)
             Else
-                pDate.VBDate = Today
+                Throw New Exception("GDSNew.PrepareCommands()" & vbCrLf & "GDS Not selected")
             End If
-            Dim pTTLAmadeus As String
-            If mstrOfficeOfResponsibility <> MySettings.AmadeusPCC Then
-                pTTLAmadeus = MySettings.AmadeusValue("TextTTL") & pDate.IATA & "/" & MySettings.AmadeusPCC
-            Else
-                pTTLAmadeus = MySettings.AmadeusValue("TextTTL") & pDate.IATA
-            End If
-            mobjTicketElement.SetText("", pTTLAmadeus)
-
-            If mdteDepartureDate > Today Then
-                pDate.VBDate = DateAdd(DateInterval.Day, 1, mdteDepartureDate)
-            Else
-                pDate.VBDate = Today
-            End If
-            mobjOptionQueueElement.SetText("", MySettings.AmadeusValue("TextOPC") & MySettings.AmadeusPCC & "/" & pDate.IATA & "/" & MySettings.AgentOPQueue)
-
-            mobjAOH.SetText("", MySettings.AmadeusValue("TextAOH"))
+            mobjAOH.SetText("", MySettings.GDSValue("TextAOH"))
 
         End Sub
         Public Sub Clear()
@@ -398,6 +421,7 @@ Namespace AmadeusNew
             mobjVesselOSI.Clear()
             mobjReference.Clear()
             mobjBookedBy.Clear()
+            mobjGalTracking.Clear()
             mobjDepartment.Clear()
             mobjReasonForTravel.Clear()
             mobjCostCentre.Clear()

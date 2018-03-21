@@ -131,6 +131,7 @@ Namespace CustomProperties
     End Class
 
     Public Class XMLValues
+
         Inherits Collections.Generic.List(Of String)
 
         Private mstrID As String

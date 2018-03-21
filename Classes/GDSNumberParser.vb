@@ -1,6 +1,6 @@
 Option Strict Off
 Option Explicit On
-Friend Class AmadeusNumberParser
+Friend Class GDSNumberParser
 
     Private Structure ParserProps
 

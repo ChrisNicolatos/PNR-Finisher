@@ -27,12 +27,12 @@ Module modPNR
     Private mPnrUserName As String = ""
     Private mPnrPassword As String = ""
 
-    Public Sub InitSettings(ByVal mAmadeusUser As AmadeusUser)
+    Public Sub InitSettings(ByVal mGDSUser As GDSUser)
         Try
-            mstrRequestedPCC = mAmadeusUser.PCC
-            mstrRequestedUser = mAmadeusUser.User
+            mstrRequestedPCC = mGDSUser.PCC
+            mstrRequestedUser = mGDSUser.User
 
-            mMySettings = New Config(mAmadeusUser)
+            mMySettings = New Config(mGDSUser)
             If Not mHomeSettingsExist Then
                 mHomeSettings = mMySettings
                 mHomeSettingsExist = True

@@ -10,7 +10,7 @@ Namespace Vessels
         Private mudtProps As ClassProps
         Public Overrides Function ToString() As String
             With mudtProps
-                Return .Name + IIf(.Flag = "", "", MySettings.AmadeusValue("TextREG") & .Flag)
+                Return .Name + IIf(.Flag = "", "", MySettings.GDSValue("TextREG") & .Flag)
             End With
         End Function
 
@@ -28,12 +28,12 @@ Namespace Vessels
 
         Friend Sub SetValues(ByVal pName As String, ByVal pFlag As String)
             With mudtProps
-                If pName.ToUpper.Contains(MySettings.AmadeusValue("TextREG")) Then
+                If pName.ToUpper.Contains(MySettings.GDSValue("TextREG")) Then
                     If pFlag.Trim = "" Then
-                        pFlag = pName.Substring(pName.ToUpper.IndexOf(MySettings.AmadeusValue("TextREG")) + 6).Trim
-                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(MySettings.AmadeusValue("TextREG"))).Trim
+                        pFlag = pName.Substring(pName.ToUpper.IndexOf(MySettings.GDSValue("TextREG")) + 6).Trim
+                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(MySettings.GDSValue("TextREG"))).Trim
                     Else
-                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(MySettings.AmadeusValue("TextREG"))).Trim
+                        pName = (" " & pName).Substring(0, (" " & pName).ToUpper.IndexOf(MySettings.GDSValue("TextREG"))).Trim
                     End If
                 End If
                 .Name = pName.Trim

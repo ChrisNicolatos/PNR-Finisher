@@ -25,6 +25,7 @@
     End Class
     Public Class BackOfficeCollection
         Inherits Collections.Generic.Dictionary(Of String, BackOfficeItem)
+
         Public Sub Load()
 
             Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)

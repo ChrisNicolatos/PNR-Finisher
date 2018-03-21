@@ -1,8 +1,8 @@
 Option Strict Off
 Option Explicit On
-Namespace AmadeusSeg
+Namespace GDSSeg
 
-    Friend Class AmadeusSegItem
+    Friend Class GDSSegItem
 
         Public Event Valid(ByRef Status As Boolean)
 
@@ -41,7 +41,11 @@ Namespace AmadeusSeg
         Private mobjAirlineDate As New s1aAirlineDate.clsAirlineDate
         Private mobjAirlines As New Airlines
         Private mobjCityName As New Airports
-
+        Public ReadOnly Property ElementNo As Short
+            Get
+                ElementNo = mudtProps.ElementNo
+            End Get
+        End Property
         Public ReadOnly Property Airline() As String
             Get
 
@@ -281,7 +285,7 @@ Namespace AmadeusSeg
                 Next
             End Get
         End Property
-        Friend Sub SetValues(ByRef pAirline As String, ByRef pBoardPoint As String, ByRef pClass As String, ByRef pDepartureDate As Date, ByRef pArrivalDate As Date, ByRef pElementNo As Short, ByRef pFlightNo As String, ByRef pOffPoint As String, ByVal pStatus As String, ByRef pDepartTime As Date, ByRef pArriveTime As Date, ByRef pText As String, ByVal SegDo As String)
+        Friend Sub SetValues(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pText As String, ByVal SegDo As String)
 
             With mudtProps
                 .ElementNo = pElementNo
@@ -382,17 +386,17 @@ Namespace AmadeusSeg
             End If
         End Sub
     End Class
-    Friend Class AmadeusSegColl
-        Inherits Collections.Generic.Dictionary(Of String, AmadeusSeg.AmadeusSegItem)
+    Friend Class GDSSegColl
+        Inherits Collections.Generic.Dictionary(Of String, GDSSeg.GDSSegItem)
 
         Private mMaxAirportNameLength As Integer = 11
         Private mMaxCityNameLength As Integer = 11
         Private mMaxAirportShortNameLength As Integer = 11
-        Friend Sub AddItem(ByRef pAirline As String, ByRef pBoardPoint As String, ByRef pClass As String, ByRef pDepartureDate As Date, ByRef pArrivalDate As Date, ByRef pElementNo As Short, ByRef pFlightNo As String, ByRef pOffPoint As String, ByRef pStatus As String, ByRef pDepartTime As Date, ByRef pArriveTime As Date, ByRef pText As String, ByVal SegDo As String)
+        Friend Sub AddItem(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pText As String, ByVal SegDo As String)
 
-            Dim pobjClass As AmadeusSeg.AmadeusSegItem
+            Dim pobjClass As GDSSeg.GDSSegItem
 
-            pobjClass = New AmadeusSeg.AmadeusSegItem
+            pobjClass = New GDSSeg.GDSSegItem
 
             pobjClass.SetValues(pAirline, pBoardPoint, pClass, pDepartureDate, pArrivalDate, pElementNo, pFlightNo, pOffPoint, pStatus, pDepartTime, pArriveTime, pText, SegDo)
             MyBase.Add(Format(pElementNo), pobjClass)
@@ -436,7 +440,7 @@ Namespace AmadeusSeg
             Get
                 Dim PrevOff As String = ""
                 Itinerary = ""
-                For Each Seg As AmadeusSeg.AmadeusSegItem In MyBase.Values
+                For Each Seg As GDSSeg.GDSSegItem In MyBase.Values
                     With Seg
                         If PrevOff = .BoardPoint Then
                             Itinerary &= " " & .Airline & " " & .OffPoint

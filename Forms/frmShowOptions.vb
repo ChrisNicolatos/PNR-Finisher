@@ -8,7 +8,7 @@
 
         With MySettings
 
-            txtOfficePCCAmadeus.Text = .AmadeusPCC
+            txtOfficePCCAmadeus.Text = .GDSPcc
             txtOfficeCityCode.Text = .OfficeCityCode
             txtCountryCode.Text = .CountryCode
             txtOfficeName.Text = .OfficeName
@@ -16,7 +16,7 @@
             txtOfficePhone.Text = .Phone
             txtAOHPhone.Text = .AOHPhone
 
-            txtAgentIDAmadeus.Text = .AmadeusUser
+            txtAgentIDAmadeus.Text = .GDSUser
             txtAgentQueueAmadeus.Text = .AgentQueue
             txtAgentOPQueueAmadeus.Text = .AgentOPQueue
             txtAgentName.Text = .AgentName

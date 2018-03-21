@@ -8,8 +8,8 @@ Namespace AirlineNotes
             Dim FlightType As String
             Dim Seaman As Boolean
             Dim SeqNo As Integer
-            Dim AmadeusElement As String
-            Dim AmadeusText As String
+            Dim GDSElement As String
+            Dim GDSText As String
         End Structure
         Private mudtProps As ClassProps
 
@@ -38,27 +38,27 @@ Namespace AirlineNotes
                 SeqNo = mudtProps.SeqNo
             End Get
         End Property
-        Public ReadOnly Property AmadeusElement() As String
+        Public ReadOnly Property GDSElement() As String
             Get
-                AmadeusElement = mudtProps.AmadeusElement
+                GDSElement = mudtProps.GDSElement
             End Get
         End Property
-        Public ReadOnly Property AmadeusText() As String
+        Public ReadOnly Property GDSText() As String
             Get
-                AmadeusText = mudtProps.AmadeusText
+                GDSText = mudtProps.GDSText
             End Get
         End Property
 
         Friend Sub SetValues(ByVal pID As Integer, ByVal pAirlineCode As String, ByVal pFlightType As String, ByVal pSeaman As Boolean,
-                             ByVal pSeqNo As Integer, ByVal pAmadeusElement As String, ByVal pAmadeusText As String)
+                             ByVal pSeqNo As Integer, ByVal pGDSElement As String, ByVal pGDSText As String)
             With mudtProps
                 .ID = pID
                 .AirlineCode = pAirlineCode
                 .FlightType = pFlightType
                 .Seaman = pSeaman
                 .SeqNo = pSeqNo
-                .AmadeusElement = pAmadeusElement
-                .AmadeusText = pAmadeusText
+                .GDSElement = pGDSElement
+                .GDSText = pGDSText
             End With
         End Sub
     End Class
@@ -66,40 +66,38 @@ Namespace AirlineNotes
     Public Class Collection
         Inherits System.Collections.Generic.Dictionary(Of Integer, Item)
 
-        Public Sub Load(ByVal pIATACode As String)
+        Public Sub Load(ByVal pAirlineCode As String, ByVal GDSCode As Config.GDSCode)
 
             Dim pCommandText As String
-            pCommandText = "SELECT anID, " &
+            If GDSCode = Config.GDSCode.GDSisAmadeus Then
+                pCommandText = "SELECT anID, " &
                             " anAirlineCode, " &
                             " anFlightType, " &
                             " ISNULL(anSeaman, 0) AS anSeaman, " &
                             " anSeqNo, " &
-                            " anAmadeusElement, " &
-                            " anAmadeusText " &
+                            " anAmadeusElement AS GDSElement, " &
+                            " anAmadeusText AS GDSText " &
                             " FROM AmadeusReports.dbo.AirlineNotes " &
-                            " WHERE anAirlineCode = '" & pIATACode & "' " &
+                            " WHERE anAirlineCode = @AirlineCode " &
                             " ORDER BY anSeqNo"
-            ReadFromDB(pCommandText)
-
-        End Sub
-
-        Public Sub Load()
-
-            Dim pCommandText As String
-            pCommandText = "SELECT anID, " &
+            ElseIf GDSCode = Config.GDSCode.GDSisGalileo Then
+                pCommandText = "SELECT anID, " &
                             " anAirlineCode, " &
                             " anFlightType, " &
                             " ISNULL(anSeaman, 0) AS anSeaman, " &
                             " anSeqNo, " &
-                            " anAmadeusElement, " &
-                            " anAmadeusText " &
+                            " '' AS GDSElement, " &
+                            " anGalileoEntry AS GDSText " &
                             " FROM AmadeusReports.dbo.AirlineNotes " &
-                            " ORDER BY anAirlineCode, anSeqNo"
-
-            ReadFromDB(pCommandText)
+                            " WHERE anAirlineCode = @AirlineCode " &
+                            " ORDER BY anSeqNo"
+            Else
+                Throw New Exception("AirlineNotes.Collection.Load()" & vbCrLf & "GDS is not selected")
+            End If
+            ReadFromDB(pCommandText, pAirlineCode)
 
         End Sub
-        Private Sub ReadFromDB(ByVal CommandText As String)
+        Private Sub ReadFromDB(ByVal CommandText As String, ByVal pAirlineCode As String)
 
             Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
@@ -112,6 +110,7 @@ Namespace AirlineNotes
             MyBase.Clear()
             With pobjComm
                 .CommandType = CommandType.Text
+                .Parameters.Add("@AirlineCode", SqlDbType.NVarChar, 10).Value = pAirlineCode
                 .CommandText = CommandText
                 pobjReader = .ExecuteReader
             End With
@@ -121,7 +120,7 @@ Namespace AirlineNotes
                     pID += 1
                     pobjClass = New Item
                     pobjClass.SetValues(.Item("anID"), .Item("anAirlineCode"), .Item("anFlightType"), .Item("anSeaman"),
-                                        .Item("anSeqNo"), .Item("anAmadeusElement"), .Item("anAmadeusText"))
+                                        .Item("anSeqNo"), .Item("GDSElement"), .Item("GDSText"))
                     MyBase.Add(pID, pobjClass)
                 Loop
                 .Close()

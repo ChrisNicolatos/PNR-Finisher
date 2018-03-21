@@ -117,13 +117,13 @@ TextMISSegmentCommand
 TextVOS		OS YY SEMN/VESSEL-	
 			SI.YY*SEMN/VESSEL-	
 
-TextOPC		OP ATHG42100/	
+
+TextOP		OP 		
+			rb.	
+       		OP ATHG42100/	
 			OP %PCC%/	
 			RB.750B/26SEP/Q72	
 			RB.%PCC%/26SEP/Q%AGENTQ%
-
-TextOPB		OP 		
-			rb.	
 
 TextTTL		TK TL	
 			TK TL	

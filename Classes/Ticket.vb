@@ -5,7 +5,7 @@ Namespace Ticket
     Friend Class TicketItem
 
         Private Structure ClassProps
-            Dim AmadeusLine As String
+            Dim GDSLine As String
             Dim StockType As Short
             Dim Document As Decimal
             Dim Books As Short
@@ -58,10 +58,10 @@ Namespace Ticket
                 TicketType = mudtProps.TicketType
             End Get
         End Property
-        Friend Sub SetValues(ByRef pAmadeusLine As String, ByRef pStockType As Short, ByRef pDocument As Decimal, ByRef pBooks As Short, ByRef pIssuingAirline As String, ByVal AirlineCode As String, ByRef peTicket As Boolean, pSegs As String, pPax As String, pTicketType As String)
+        Friend Sub SetValues(ByRef pGDSLine As String, ByRef pStockType As Short, ByRef pDocument As Decimal, ByRef pBooks As Short, ByRef pIssuingAirline As String, ByVal AirlineCode As String, ByRef peTicket As Boolean, pSegs As String, pPax As String, pTicketType As String)
 
             With mudtProps
-                .AmadeusLine = pAmadeusLine
+                .GDSLine = pGDSLine
                 .StockType = pStockType
                 .Document = pDocument
                 .Books = pBooks
@@ -80,7 +80,7 @@ Namespace Ticket
 
         Private mintCount As Short
 
-        Public Sub addTicket(ByVal pAmadeusLine As String, ByVal pTicketType As Short, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Short, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String)
+        Public Sub addTicket(ByVal pGDSLine As String, ByVal pTicketType As Short, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Short, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String)
 
             Dim pobjTicket As TicketItem
 
@@ -88,7 +88,7 @@ Namespace Ticket
                 pobjTicket = New TicketItem
 
                 mintCount = mintCount + 1
-                pobjTicket.SetValues(pAmadeusLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType)
+                pobjTicket.SetValues(pGDSLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType)
                 MyBase.Add(Format(mintCount), pobjTicket)
             Catch ex As Exception
                 Throw New Exception("addTicket()" & vbCrLf & Err.Description)

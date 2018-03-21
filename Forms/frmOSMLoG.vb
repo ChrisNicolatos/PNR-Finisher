@@ -1,9 +1,9 @@
 ﻿Public Class frmOSMLoG
     Private mflgLoading As Boolean
     Private mobjAgent As osmVessels.emailItem
-    Private mobjPNR As AmadeusPNR
+    Private mobjPNR As GDSPnr
 
-    Friend Sub New(ByRef pPNR As AmadeusPNR)
+    Friend Sub New(ByRef pPNR As GDSPnr)
 
         ' This call is required by the designer.
         InitializeComponent()
@@ -65,12 +65,12 @@
             Else
                 lblPax.Text = .Passengers.Count & " Passenger" & vbCrLf
             End If
-            For Each pPax As AmadeusPax.AmadeusPaxitem In .Passengers.Values
+            For Each pPax As GDSPax.GDSPaxItem In .Passengers.Values
                 lblPax.Text &= pPax.ElementNo & ". " & pPax.PaxName & vbCrLf
             Next
 
             lblSegs.Text = ""
-            For Each pSeg As AmadeusSeg.AmadeusSegItem In .Segments.Values
+            For Each pSeg As GDSSeg.GDSSegItem In .Segments.Values
                 With pSeg
                     lblSegs.Text &= .Airline & " " & .FlightNo.PadLeft(5) & " " & .DepartureDateIATA.PadLeft(6) & " " & .BoardPoint & " " & .OffPoint & " " & Format(.DepartTime, "HHmm") & vbCrLf
                 End With

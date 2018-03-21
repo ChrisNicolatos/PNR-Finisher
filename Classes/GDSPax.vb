@@ -1,7 +1,7 @@
 Option Strict Off
 Option Explicit On
-Namespace AmadeusPax
-    Friend Class AmadeusPaxitem
+Namespace GDSPax
+    Friend Class GDSPaxItem
         Private Structure ClassProps
             Dim ElementNo As Short
             Dim Initial As String
@@ -77,19 +77,25 @@ Namespace AmadeusPax
 
         End Sub
     End Class
-    Friend Class AmadeusPaxColl
-        Inherits Collections.Generic.Dictionary(Of String, AmadeusPaxitem)
+    Friend Class GDSPaxColl
+        Inherits Collections.Generic.Dictionary(Of String, GDSPaxItem)
 
         Friend Sub AddItem(ByVal pElementNo As Short, ByVal pInitial As String, ByVal pLastName As String, ByVal pID As String)
 
-            Dim pobjClass As AmadeusPaxitem
+            Dim pobjClass As GDSPaxItem
 
-            pobjClass = New AmadeusPaxitem
+            pobjClass = New GDSPaxItem
 
             pobjClass.SetValues(pElementNo, pInitial, pLastName, pID)
             MyBase.Add(Format(pElementNo), pobjClass)
-
-
         End Sub
+        Public ReadOnly Property LeadName As String
+            Get
+                LeadName = MyBase.ElementAt(0).Value.LastName & "/" & MyBase.ElementAt(0).Value.Initial
+                If MyBase.Count > 1 Then
+                    LeadName &= " x " & MyBase.Count
+                End If
+            End Get
+        End Property
     End Class
 End Namespace

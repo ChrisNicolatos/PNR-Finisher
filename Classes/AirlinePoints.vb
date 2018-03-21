@@ -22,17 +22,30 @@ Namespace AirlinePoints
     Public Class Collection
         Inherits System.Collections.Generic.Dictionary(Of Integer, Item)
 
-        Public Sub Load(ByVal pCustID As Integer, ByVal pIATACode As String)
+        Public Sub Load(ByVal pCustID As Integer, ByVal pIATACode As String, ByVal GDSCode As Config.GDSCode)
 
             Dim pCommandText As String
             Select Case MySettings.PCCBackOffice
                 Case 1
-                    pCommandText = "SELECT TravelForceCosmos.dbo.FrequentFlyerCards.Remarks " &
+                    If GDSCode = Config.GDSCode.GDSisAmadeus Then
+                        pCommandText = "SELECT TravelForceCosmos.dbo.FrequentFlyerCards.Remarks " &
                                    " FROM TravelForceCosmos.dbo.FrequentFlyerCards  " &
                                    " 	LEFT OUTER JOIN TravelForceCosmos.dbo.Airlines  " &
                                    " 		ON TravelForceCosmos.dbo.FrequentFlyerCards.AirlineID = TravelForceCosmos.dbo.Airlines.Id " &
                                    " WHERE (TravelForceCosmos.dbo.FrequentFlyerCards.TFEntityID = " & pCustID & ")  " &
                                    " 			AND (TravelForceCosmos.dbo.Airlines.IATACode = '" & pIATACode & "')"
+                    ElseIf GDSCode = Config.GDSCode.GDSisGalileo Then
+                        pCommandText = "SELECT FrequentFlyerCards_1G.ff1GRemark  AS Remarks " &
+                                        " FROM TravelForceCosmos.dbo.FrequentFlyerCards " &
+                                        " LEFT OUTER JOIN TravelForceCosmos.dbo.Airlines " &
+                                        " ON TravelForceCosmos.dbo.FrequentFlyerCards.AirlineID = TravelForceCosmos.dbo.Airlines.Id " &
+                                        " LEFT JOIN [EUDC-CLSSQL14.ATPI.PRI].AmadeusReports.dbo.FrequentFlyerCards_1G " &
+                                        " ON FrequentFlyerCards.Remarks = FrequentFlyerCards_1G.ffTFCRemark " &
+                                        " WHERE (TravelForceCosmos.dbo.FrequentFlyerCards.TFEntityID = " & pCustID & ")  " &
+                                        " AND (TravelForceCosmos.dbo.Airlines.IATACode = '" & pIATACode & "')"
+                    Else
+                        Throw New Exception("AirlinePoints.Collection.Load()" & vbCrLf & "GDS is not selected")
+                    End If
                     ReadFromDB(pCommandText, ConnectionStringACC)
                 Case 2
                     pCommandText = "SELECT pnfAmadeusEntry AS Remarks " &

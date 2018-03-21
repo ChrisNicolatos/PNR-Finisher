@@ -8,6 +8,11 @@ Public Class Config
         ItnSeaChefsWithCode = 3
         ItnFormatEuronav = 4
     End Enum
+    Public Enum GDSCode
+        GDSisUnknown = 0
+        GDSisAmadeus = 1
+        GDSisGalileo = 2
+    End Enum
     Private Structure ClassProps
         Dim PCCId As Integer
         Dim OfficeCityCode As String
@@ -30,20 +35,19 @@ Public Class Config
         Dim AgentName As String
         Dim AgentEmail As String
         Dim AirportName As Integer
-        Dim AirlineLocator As Boolean
-        Dim ClassOfService As Boolean
-        Dim BanElectricalEquipment As Boolean
-        Dim BrazilText As Boolean
-        Dim USAText As Boolean
-        Dim Tickets As Boolean
-        Dim PaxSegPerTkt As Boolean
+        Dim ShowAirlineLocator As Boolean
+        Dim ShowClassOfService As Boolean
+        Dim ShowBanElectricalEquipment As Boolean
+        Dim ShowBrazilText As Boolean
+        Dim ShowUSAText As Boolean
+        Dim ShowTickets As Boolean
+        Dim ShowPaxSegPerTkt As Boolean
         Dim ShowStopovers As Boolean
         Dim ShowTerminal As Boolean
-        Dim FlyingTime As Boolean
-        Dim CostCentre As Boolean
-        Dim Seating As Boolean
-        Dim Vessel As Boolean
-        Dim PlainFormat As Boolean
+        Dim ShowFlyingTime As Boolean
+        Dim ShowCostCentre As Boolean
+        Dim ShowSeating As Boolean
+        Dim ShowVessel As Boolean
         Dim Administrator As String
         Dim FormatStyle As Integer
         Dim OSMVesselGroup As Integer
@@ -52,30 +56,32 @@ Public Class Config
         Dim OSMLoGPath As String
 
     End Structure
+
     Private mudtProps As ClassProps
-    Private mobjAmadeusUser As AmadeusUser
+    Private mobjGDSUser As GDSUser
     Private mflgIsDirtyPCC As Boolean
     Private mflgIsDirtyUser As Boolean
 
-    Dim mAmadeusReferences As New Collections.Generic.Dictionary(Of String, String)
 
-    Public Sub New(mAmadeusUser As AmadeusUser)
+    Dim mGDSReferences As New Config_GDSReferences.Collection
+
+    Public Sub New(mGDSUser As GDSUser)
 
         Try
-            mobjAmadeusUser = mAmadeusUser
+            mobjGDSUser = mGDSUser
 
             mflgIsDirtyPCC = False
             mflgIsDirtyUser = False
-            mAmadeusReferences.Clear()
+            mGDSReferences.Clear()
             DBReadPCC()
             If PCCId = 0 Then
-                Throw New Exception("You are signed in to Amadeus PCC : " & mobjAmadeusUser.PCC & vbCrLf & "This PCC is not registered in the PNR FInisher" & vbCrLf & "Please jump to your own PCC and restart the program")
+                Throw New Exception("You are signed in to Amadeus PCC : " & mobjGDSUser.PCC & vbCrLf & "This PCC is not registered in the PNR FInisher" & vbCrLf & "Please jump to your own PCC and restart the program")
             End If
             DBReadUser()
             If AgentID = 0 Then
-                Throw New Exception("You are signed in to Amadeus PCC : " & mobjAmadeusUser.PCC & " as user : " & mobjAmadeusUser.User & vbCrLf & "This user is not registered in the PNR FInisher" & vbCrLf & "Please jump to your own PCC and restart the program")
+                Throw New Exception("You are signed in to Amadeus PCC : " & mobjGDSUser.PCC & " as user : " & mobjGDSUser.User & vbCrLf & "This user is not registered in the PNR FInisher" & vbCrLf & "Please jump to your own PCC and restart the program")
             End If
-            DBReadReferences()
+            mGDSReferences.Read(PCCBackOffice, mobjGDSUser.GDSCode)
 
         Catch ex As Exception
             Throw New Exception(ex.Message)
@@ -124,81 +130,81 @@ Public Class Config
             IsDirtyUser = mflgIsDirtyUser
         End Get
     End Property
-    Public Property AirlineLocator As Boolean
+    Public Property ShowAirlineLocator As Boolean
         Get
-            AirlineLocator = mudtProps.AirlineLocator
+            ShowAirlineLocator = mudtProps.ShowAirlineLocator
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.AirlineLocator Then
+            If value <> mudtProps.ShowAirlineLocator Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.AirlineLocator = value
+            mudtProps.ShowAirlineLocator = value
         End Set
     End Property
-    Public Property ClassOfService As Boolean
+    Public Property ShowClassOfService As Boolean
         Get
-            ClassOfService = mudtProps.ClassOfService
+            ShowClassOfService = mudtProps.ShowClassOfService
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.ClassOfService Then
+            If value <> mudtProps.ShowClassOfService Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.ClassOfService = value
+            mudtProps.ShowClassOfService = value
         End Set
     End Property
-    Public Property BanElectricalEquipment As Boolean
+    Public Property ShowBanElectricalEquipment As Boolean
         Get
-            BanElectricalEquipment = mudtProps.BanElectricalEquipment
+            ShowBanElectricalEquipment = mudtProps.ShowBanElectricalEquipment
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.BanElectricalEquipment Then
+            If value <> mudtProps.ShowBanElectricalEquipment Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.BanElectricalEquipment = value
+            mudtProps.ShowBanElectricalEquipment = value
         End Set
     End Property
-    Public Property BrazilText As Boolean
+    Public Property ShowBrazilText As Boolean
         Get
-            BrazilText = mudtProps.BrazilText
+            ShowBrazilText = mudtProps.ShowBrazilText
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.BrazilText Then
+            If value <> mudtProps.ShowBrazilText Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.BrazilText = value
+            mudtProps.ShowBrazilText = value
         End Set
     End Property
-    Public Property USAText As Boolean
+    Public Property ShowUSAText As Boolean
         Get
-            USAText = mudtProps.USAText
+            ShowUSAText = mudtProps.ShowUSAText
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.USAText Then
+            If value <> mudtProps.ShowUSAText Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.USAText = value
+            mudtProps.ShowUSAText = value
         End Set
     End Property
-    Public Property Tickets As Boolean
+    Public Property ShowTickets As Boolean
         Get
-            Tickets = mudtProps.Tickets
+            ShowTickets = mudtProps.ShowTickets
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.Tickets Then
+            If value <> mudtProps.ShowTickets Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.Tickets = value
+            mudtProps.ShowTickets = value
         End Set
     End Property
-    Public Property PaxSegPerTkt As Boolean
+    Public Property ShowPaxSegPerTkt As Boolean
         Get
-            PaxSegPerTkt = mudtProps.PaxSegPerTkt
+            ShowPaxSegPerTkt = mudtProps.ShowPaxSegPerTkt
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.PaxSegPerTkt Then
+            If value <> mudtProps.ShowPaxSegPerTkt Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.PaxSegPerTkt = value
+            mudtProps.ShowPaxSegPerTkt = value
         End Set
     End Property
     Public Property ShowStopovers As Boolean
@@ -223,61 +229,61 @@ Public Class Config
             mudtProps.ShowTerminal = value
         End Set
     End Property
-    Public Property FlyingTime As Boolean
+    Public Property ShowFlyingTime As Boolean
         Get
-            FlyingTime = mudtProps.FlyingTime
+            ShowFlyingTime = mudtProps.ShowFlyingTime
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.FlyingTime Then
+            If value <> mudtProps.ShowFlyingTime Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.FlyingTime = value
+            mudtProps.ShowFlyingTime = value
         End Set
     End Property
-    Public Property CostCentre As Boolean
+    Public Property ShowCostCentre As Boolean
         Get
-            CostCentre = mudtProps.CostCentre
+            ShowCostCentre = mudtProps.ShowCostCentre
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.CostCentre Then
+            If value <> mudtProps.ShowCostCentre Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.CostCentre = value
+            mudtProps.ShowCostCentre = value
         End Set
     End Property
-    Public Property Seating As Boolean
+    Public Property ShowSeating As Boolean
         Get
-            Seating = mudtProps.Seating
+            ShowSeating = mudtProps.ShowSeating
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.Seating Then
+            If value <> mudtProps.ShowSeating Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.Seating = value
+            mudtProps.ShowSeating = value
         End Set
     End Property
-    Public Property Vessel As Boolean
+    Public Property ShowVessel As Boolean
         Get
-            Vessel = mudtProps.Vessel
+            ShowVessel = mudtProps.ShowVessel
         End Get
         Set(value As Boolean)
-            If value <> mudtProps.Vessel Then
+            If value <> mudtProps.ShowVessel Then
                 mflgIsDirtyUser = True
             End If
-            mudtProps.Vessel = value
+            mudtProps.ShowVessel = value
         End Set
     End Property
-    Public Property PlainFormat As Boolean
-        Get
-            PlainFormat = mudtProps.PlainFormat
-        End Get
-        Set(value As Boolean)
-            If value <> mudtProps.PlainFormat Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.PlainFormat = value
-        End Set
-    End Property
+    'Public Property UsePlainFormat As Boolean
+    '    Get
+    '        UsePlainFormat = mudtProps.UsePlainFormat
+    '    End Get
+    '    Set(value As Boolean)
+    '        If value <> mudtProps.UsePlainFormat Then
+    '            mflgIsDirtyUser = True
+    '        End If
+    '        mudtProps.UsePlainFormat = value
+    '    End Set
+    'End Property
     Public Property OSMLoGPerPax As Boolean
         Get
             OSMLoGPerPax = mudtProps.OSMLoGPerPax
@@ -505,48 +511,16 @@ Public Class Config
         End Set
     End Property
 
-    Public ReadOnly Property AmadeusPCC As String
+    Public ReadOnly Property GDSPcc As String
         Get
-            AmadeusPCC = mobjAmadeusUser.PCC.ToUpper
+            GDSPcc = mobjGDSUser.PCC.ToUpper
         End Get
     End Property
-    Public ReadOnly Property AmadeusUser As String
+    Public ReadOnly Property GDSUser As String
         Get
-            AmadeusUser = mobjAmadeusUser.User.ToUpper
+            GDSUser = mobjGDSUser.User.ToUpper
         End Get
     End Property
-
-    Private Sub DBReadReferences()
-
-        Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
-        Dim pobjComm As New SqlClient.SqlCommand
-        Dim pobjReader As SqlClient.SqlDataReader
-
-        pobjConn.Open()
-        pobjComm = pobjConn.CreateCommand
-
-        With pobjComm
-            .CommandType = CommandType.Text
-            .CommandText = " SELECT pfrID " &
-                           " ,pfrKey" &
-                           " ,pfrValue " &
-                           " FROM [AmadeusReports].[dbo].[PNRFinisherGDS_BOReferences] " &
-                           " WHERE pfrGDS_fkey = 1 AND pfrBO_fkey = " & PCCBackOffice
-            pobjReader = .ExecuteReader
-        End With
-
-        mAmadeusReferences.Clear()
-
-        With pobjReader
-            While pobjReader.Read
-                mAmadeusReferences.Add(.Item("pfrKey"), .Item("pfrValue"))
-            End While
-            .Close()
-        End With
-        pobjConn.Close()
-
-    End Sub
-
     Private Sub DBReadPCC()
 
         Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
@@ -558,6 +532,7 @@ Public Class Config
 
         With pobjComm
             .CommandType = CommandType.Text
+            .Parameters.Add("@PCC", SqlDbType.NVarChar, 9).Value = mobjGDSUser.PCC
             .CommandText = " SELECT pfpId " &
                            " ,pfpOfficeCityCode " &
                            " ,pfpCountryCode " &
@@ -573,7 +548,7 @@ Public Class Config
                            " ,pfpIATANumber " &
                            " ,pfpFormalOfficeName " &
                            " FROM [AmadeusReports].[dbo].[PNRFinisherPCC] " &
-                           " WHERE pfpPCC = '" & mobjAmadeusUser.PCC & "'"
+                           " WHERE pfpPCC = @PCC"
 
             pobjReader = .ExecuteReader
         End With
@@ -614,7 +589,6 @@ Public Class Config
         pobjConn.Close()
 
     End Sub
-
     Private Sub DBUpdatePCC()
 
         If mudtProps.PCCId > 0 Then
@@ -626,14 +600,21 @@ Public Class Config
 
             With pobjComm
                 .CommandType = CommandType.Text
+                .Parameters.Add("@PCCId", SqlDbType.Int).Value = mudtProps.PCCId
+                .Parameters.Add("@pfpOfficeCityCode", SqlDbType.NChar, 3).Value = OfficeCityCode
+                .Parameters.Add("@pfpCountryCode", SqlDbType.NChar, 2).Value = CountryCode
+                .Parameters.Add("@pfpOfficeName", SqlDbType.NVarChar, 254).Value = OfficeName
+                .Parameters.Add("@pfpCityName", SqlDbType.NVarChar, 254).Value = CityName
+                .Parameters.Add("@pfpOfficePhone", SqlDbType.NVarChar, 254).Value = Phone
+                .Parameters.Add("@pfpAOHPhone", SqlDbType.NVarChar, 254).Value = AOHPhone
                 .CommandText = " UPDATE [AmadeusReports].[dbo].[PNRFinisherPCC]" &
-                               "  SET pfpOfficeCityCode ='" & OfficeCityCode & "'" &
-                               " ,pfpCountryCode ='" & CountryCode & "'" &
-                               " ,pfpOfficeName ='" & OfficeName & "'" &
-                               " ,pfpCityName ='" & CityName & "'" &
-                               " ,pfpOfficePhone ='" & Phone & "'" &
-                               " ,pfpAOHPhone ='" & AOHPhone & "'" &
-                               " WHERE pfpId = " & mudtProps.PCCId
+                               "  SET pfpOfficeCityCode =@pfpOfficeCityCode " &
+                               " ,pfpCountryCode =@pfpCountryCode " &
+                               " ,pfpOfficeName =@pfpOfficeName " &
+                               " ,pfpCityName =@pfpCityName " &
+                               " ,pfpOfficePhone =@pfpOfficePhone " &
+                               " ,pfpAOHPhone =@pfpAOHPhone " &
+                               " WHERE pfpId = @PCCId"
             End With
         Else
             Throw New Exception("Cannot update PCC")
@@ -656,26 +637,26 @@ Public Class Config
                                "     ,pfAgentName ='" & AgentName & "'" &
                                "     ,pfAgentEmail ='" & AgentEmail & "'" &
                                "     ,pfAirportName =" & AirportName &
-                               "     ,pfAirlineLocator =" & If(AirlineLocator, 1, 0) &
-                               "     ,pfClassOfService =" & If(ClassOfService, 1, 0) &
-                               "     ,pfBanElectricalEquipment =" & If(BanElectricalEquipment, 1, 0) &
-                               "     ,pfBrazilText =" & If(BrazilText, 1, 0) &
-                               "     ,pfUSAText =" & If(USAText, 1, 0) &
-                               "     ,pfTickets =" & If(Tickets, 1, 0) &
-                               "     ,pfPaxSegPerTkt =" & If(PaxSegPerTkt, 1, 0) &
+                               "     ,pfAirlineLocator =" & If(ShowAirlineLocator, 1, 0) &
+                               "     ,pfClassOfService =" & If(ShowClassOfService, 1, 0) &
+                               "     ,pfBanElectricalEquipment =" & If(ShowBanElectricalEquipment, 1, 0) &
+                               "     ,pfBrazilText =" & If(ShowBrazilText, 1, 0) &
+                               "     ,pfUSAText =" & If(ShowUSAText, 1, 0) &
+                               "     ,pfTickets =" & If(ShowTickets, 1, 0) &
+                               "     ,pfPaxSegPerTkt =" & If(ShowPaxSegPerTkt, 1, 0) &
                                "     ,pfShowStopovers =" & If(ShowStopovers, 1, 0) &
                                "     ,pfShowTerminal =" & If(ShowTerminal, 1, 0) &
-                               "     ,pfFlyingTime =" & If(FlyingTime, 1, 0) &
-                               "     ,pfCostCentre =" & If(CostCentre, 1, 0) &
-                               "     ,pfSeating =" & If(Seating, 1, 0) &
-                               "     ,pfVessel =" & If(Vessel, 1, 0) &
-                               "     ,pfPlainFormat =" & If(PlainFormat, 1, 0) &
+                               "     ,pfFlyingTime =" & If(ShowFlyingTime, 1, 0) &
+                               "     ,pfCostCentre =" & If(ShowCostCentre, 1, 0) &
+                               "     ,pfSeating =" & If(ShowSeating, 1, 0) &
+                               "     ,pfVessel =" & If(ShowVessel, 1, 0) &
+                               "     ,pfPlainFormat = 0" &
                                "     ,pfFormatStyle =" & FormatStyle &
                                "     ,pfOSMVesselGroup = " & OSMVesselGroup &
                                "     ,pfOSMLOGPerPax = " & If(OSMLoGPerPax, 1, 0) &
                                "     ,pfOSMLOGOnSigner = " & If(OSMLoGOnSigner, 1, 0) &
                                "     ,pfOSMLOGPath = '" & OSMLoGPath & "' " &
-                               "   WHERE pfPCC = '" & mobjAmadeusUser.PCC & "' AND pfUser = '" & mobjAmadeusUser.User & "'"
+                               "   WHERE pfPCC = '" & mobjGDSUser.PCC & "' AND pfUser = '" & mobjGDSUser.User & "'"
                 .ExecuteNonQuery()
             End With
             pobjConn.Close()
@@ -723,7 +704,7 @@ Public Class Config
                            "       ,ISNULL(pfOSMLOGOnSigner,0) AS pfOSMLOGOnSigner " &
                            "       ,ISNULL(pfOSMLOGPath,'') AS pfOSMLOGPath " &
                            "   FROM [AmadeusReports].[dbo].[PNRFinisherUsers] " &
-                           "   WHERE pfPCC = '" & mobjAmadeusUser.PCC & "' AND pfUser = '" & mobjAmadeusUser.User & "'"
+                           "   WHERE pfPCC = '" & mobjGDSUser.PCC & "' AND pfUser = '" & mobjGDSUser.User & "'"
             pobjReader = .ExecuteReader
         End With
         With pobjReader
@@ -734,20 +715,19 @@ Public Class Config
                 mudtProps.AgentName = .Item("pfAgentName")
                 mudtProps.AgentEmail = .Item("pfAgentEmail")
                 mudtProps.AirportName = .Item("pfAirportName")
-                mudtProps.AirlineLocator = .Item("pfAirlineLocator")
-                mudtProps.ClassOfService = .Item("pfClassOfService")
-                mudtProps.BanElectricalEquipment = .Item("pfBanElectricalEquipment")
-                mudtProps.BrazilText = .Item("pfBrazilText")
-                mudtProps.USAText = .Item("pfUSAText")
-                mudtProps.Tickets = .Item("pfTickets")
-                mudtProps.PaxSegPerTkt = .Item("pfPaxSegPerTkt")
+                mudtProps.ShowAirlineLocator = .Item("pfAirlineLocator")
+                mudtProps.ShowClassOfService = .Item("pfClassOfService")
+                mudtProps.ShowBanElectricalEquipment = .Item("pfBanElectricalEquipment")
+                mudtProps.ShowBrazilText = .Item("pfBrazilText")
+                mudtProps.ShowUSAText = .Item("pfUSAText")
+                mudtProps.ShowTickets = .Item("pfTickets")
+                mudtProps.ShowPaxSegPerTkt = .Item("pfPaxSegPerTkt")
                 mudtProps.ShowStopovers = .Item("pfShowStopovers")
                 mudtProps.ShowTerminal = .Item("pfShowTerminal")
-                mudtProps.FlyingTime = .Item("pfFlyingTime")
-                mudtProps.CostCentre = .Item("pfCostCentre")
-                mudtProps.Seating = .Item("pfSeating")
-                mudtProps.Vessel = .Item("pfVessel")
-                mudtProps.PlainFormat = .Item("pfPlainFormat")
+                mudtProps.ShowFlyingTime = .Item("pfFlyingTime")
+                mudtProps.ShowCostCentre = .Item("pfCostCentre")
+                mudtProps.ShowSeating = .Item("pfSeating")
+                mudtProps.ShowVessel = .Item("pfVessel")
                 mudtProps.Administrator = .Item("pfAdministrator")
                 mudtProps.FormatStyle = .Item("pfFormatStyle")
                 mudtProps.OSMVesselGroup = .Item("pfOSMVesselGroup")
@@ -761,20 +741,19 @@ Public Class Config
                 mudtProps.AgentName = ""
                 mudtProps.AgentEmail = ""
                 mudtProps.AirportName = 0
-                mudtProps.AirlineLocator = False
-                mudtProps.ClassOfService = False
-                mudtProps.BanElectricalEquipment = False
-                mudtProps.BrazilText = False
-                mudtProps.USAText = False
-                mudtProps.Tickets = False
-                mudtProps.PaxSegPerTkt = False
+                mudtProps.ShowAirlineLocator = False
+                mudtProps.ShowClassOfService = False
+                mudtProps.ShowBanElectricalEquipment = False
+                mudtProps.ShowBrazilText = False
+                mudtProps.ShowUSAText = False
+                mudtProps.ShowTickets = False
+                mudtProps.ShowPaxSegPerTkt = False
                 mudtProps.ShowStopovers = False
                 mudtProps.ShowTerminal = False
-                mudtProps.FlyingTime = False
-                mudtProps.CostCentre = False
-                mudtProps.Seating = False
-                mudtProps.Vessel = False
-                mudtProps.PlainFormat = False
+                mudtProps.ShowFlyingTime = False
+                mudtProps.ShowCostCentre = False
+                mudtProps.ShowSeating = False
+                mudtProps.ShowVessel = False
                 mudtProps.Administrator = False
                 mudtProps.FormatStyle = 0
                 mudtProps.OSMVesselGroup = 0
@@ -803,11 +782,40 @@ Public Class Config
         End Try
 
     End Sub
-
-    Public ReadOnly Property AmadeusValue(ByVal Key As String) As String
+    Public ReadOnly Property GDSValue(ByVal Key As String) As String
         Get
             Try
-                AmadeusValue = ConvertAmadeusValue(mAmadeusReferences.Item(Key))
+                GDSValue = ConvertGDSValue(mGDSReferences.Item(Key).Value)
+            Catch ex As Exception
+                Throw New Exception("Key:" & Key & " not found in the collection")
+            End Try
+        End Get
+
+    End Property
+    Public ReadOnly Property GDSElement(ByVal Key As String) As String
+        Get
+            Try
+                GDSElement = ConvertGDSValue(mGDSReferences.Item(Key).Element)
+            Catch ex As Exception
+                Throw New Exception("Key:" & Key & " not found in the collection")
+            End Try
+        End Get
+
+    End Property
+    Public ReadOnly Property GDSReferenceID(ByVal Key As String) As String
+        Get
+            Try
+                GDSReferenceID = ConvertGDSValue(mGDSReferences.Item(Key).RefId)
+            Catch ex As Exception
+                Throw New Exception("Key:" & Key & " not found in the collection")
+            End Try
+        End Get
+
+    End Property
+    Public ReadOnly Property GDSReferenceDetail(ByVal Key As String) As String
+        Get
+            Try
+                GDSReferenceDetail = ConvertGDSValue(mGDSReferences.Item(Key).RefDetail)
             Catch ex As Exception
                 Throw New Exception("Key:" & Key & " not found in the collection")
             End Try
@@ -816,60 +824,63 @@ Public Class Config
     End Property
     Public ReadOnly Property CloseOffValue(ByVal CloseOffEntry As String) As String
         Get
-            CloseOffValue = ConvertAmadeusValue(CloseOffEntry)
+            CloseOffValue = ConvertGDSValue(CloseOffEntry)
         End Get
     End Property
-    Public Function ConvertAmadeusValue(ByVal ValueToConvert As String) As String
 
-        ' "CountryCode"    ' %MID%
-        ' "OfficePCC"      ' %PCC%
-        ' "AgentQueue"     ' %AGENTQ%
-        ' "AgentOPQueue"   ' %AGENTOPQ%
-        ' "AgentName"      ' %AGENTNAME%
-        ' "AgentEmail"     ' %AGENTEMAIL%
-        ' "OfficeCityCode" ' %CITYCODE%
-        ' "AOHPhone"       ' %AOHP%
-        ' "Phone"          ' %PHONE%
-        ' "AgentID"        ' %AgentID%
-        ' "CityName"       ' %CITYNAME%
+    Public Function ConvertGDSValue(ByVal ValueToConvert As String) As String
 
-        ConvertAmadeusValue = ValueToConvert
+        ' "CountryCode"           ' %MID%
+        ' "OfficePCC"             ' %PCC%
+        ' "AgentQueue"            ' %AGENTQ%
+        ' "AgentOPQueue"          ' %AGENTOPQ%
+        ' "AgentName"             ' %AGENTNAME%
+        ' "AgentEmail"            ' %AGENTEMAIL%
+        ' "OfficeCityCode"        ' %CITYCODE%
+        ' "AOHPhone"              ' %AOHP%
+        ' "Phone"                 ' %PHONE%
+        ' "AgentID"               ' %AgentID%
+        ' "CityName"              ' %CITYNAME%
+        ' GalileoTrackingCode     ' %GALTRACK%
 
-        If ConvertAmadeusValue.IndexOf("%") >= 0 Then
+        ConvertGDSValue = ValueToConvert
+
+        If ConvertGDSValue.IndexOf("%") >= 0 Then
             If AgentQueue.IndexOf("/") >= 0 Then
-                ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%PCC-AGENTQ%", "/" & AgentQueue)
-                ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AGENTQ%", "/" & AgentQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PCC-AGENTQ%", "/" & AgentQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTQ%", "/" & AgentQueue)
             Else
-                ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%PCC-AGENTQ%", mobjAmadeusUser.PCC & "/" & AgentQueue)
-                ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AGENTQ%", AgentQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PCC-AGENTQ%", mobjGDSUser.PCC & "/" & AgentQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTQ%", AgentQueue)
             End If
             If AgentOPQueue.IndexOf("/") >= 0 Then
-                ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AGENTOPQ%", "/" & AgentOPQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTOPQ%", "/" & AgentOPQueue)
             Else
-                ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AGENTOPQ%", AgentOPQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTOPQ%", AgentOPQueue)
             End If
-            Do While ConvertAmadeusValue.IndexOf("//") >= 0
-                ConvertAmadeusValue.Replace("//", "/")
+            Do While ConvertGDSValue.IndexOf("//") >= 0
+                ConvertGDSValue.Replace("//", "/")
             Loop
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%PCC%", mobjAmadeusUser.PCC)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AgentID%", mobjAmadeusUser.User)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PCC%", mobjGDSUser.PCC)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AgentID%", mobjGDSUser.User)
 
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%MID%", CountryCode)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AGENTNAME%", AgentName)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AGENTEMAIL%", AgentEmail)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%CITYCODE%", OfficeCityCode)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%CITYNAME%", CityName)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%AOHP%", AOHPhone)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%PHONE%", Phone)
-            ConvertAmadeusValue = ReplaceReference(ConvertAmadeusValue, "%OFFICENAME%", OfficeName)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%MID%", CountryCode)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTNAME%", AgentName)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTEMAIL%", AgentEmail)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%CITYCODE%", OfficeCityCode)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%CITYNAME%", CityName)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AOHP%", AOHPhone)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PHONE%", Phone)
+            ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%OFFICENAME%", OfficeName)
+
         End If
 
     End Function
     Public ReadOnly Property isValid As Boolean
         Get
             With mudtProps
-                isValid = mobjAmadeusUser.PCC <> "" And
-                          mobjAmadeusUser.User <> "" And
+                isValid = mobjGDSUser.PCC <> "" And
+                          mobjGDSUser.User <> "" And
                           .AgentQueue <> "" And
                           .AgentOPQueue <> "" And
                           .CountryCode <> "" And

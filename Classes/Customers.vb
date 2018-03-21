@@ -10,6 +10,7 @@ Namespace Customers
             Dim HasVessels As Boolean
             Dim HasDepartments As Boolean
             Dim Alert As String
+            Dim GalileoTrackingCode As String
         End Structure
         Private mudtProps As ClassProps
         Private mobjCustomProperties As New CustomProperties.Collection
@@ -62,6 +63,11 @@ Namespace Customers
                 Alert = mudtProps.Alert
             End Get
         End Property
+        Public ReadOnly Property GalileoTrackingCode As String
+            Get
+                GalileoTrackingCode = mudtProps.GalileoTrackingCode
+            End Get
+        End Property
         Public ReadOnly Property CustomerProperties As CustomProperties.Collection
             Get
                 If Not mflgCustomProperties Then
@@ -72,13 +78,14 @@ Namespace Customers
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCode As String, ByVal pName As String, ByVal pEntityKindLT As Long, ByVal pAlert As String)
+        Friend Sub SetValues(ByVal pID As Long, ByVal pCode As String, ByVal pName As String, ByVal pEntityKindLT As Long, ByVal pAlert As String, ByVal pGalileoTrackingCode As String)
             With mudtProps
                 .ID = pID
                 .Code = pCode
                 .Name = pName
                 .EntityKindLT = pEntityKindLT
                 .Alert = pAlert.Trim
+                .GalileoTrackingCode = pGalileoTrackingCode
                 ' TFEntityKind (from DB table [TravelForceCosmos].[dbo].[LookupTable])
                 ' 404 = Other
                 ' 405 = Individual
@@ -93,7 +100,6 @@ Namespace Customers
                         .HasDepartments = False
                         .HasVessels = False
                 End Select
-
                 mflgCustomProperties = False
             End With
         End Sub
@@ -115,7 +121,7 @@ Namespace Customers
             End With
             With pobjReader
                 If pobjReader.Read Then
-                    SetValues(.Item("Id"), .Item("Code"), .Item("Name"), .Item("TFEntityKindLT"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")))
+                    SetValues(.Item("Id"), .Item("Code"), .Item("Name"), .Item("TFEntityKindLT"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")), .Item("GalileoTrackingCode"))
                     .Close()
                 End If
             End With
@@ -131,9 +137,12 @@ Namespace Customers
                                " ,TFEntities.Code" &
                                " ,TFEntities.Name " &
                                " ,TFEntityCategories.TFEntityKindLT " &
+                               " ,ISNULL(DealCodes.Code, '') AS GalileoTrackingCode " &
                                " FROM [TravelForceCosmos].[dbo].[TFEntities] " &
                                " LEFT JOIN [TravelForceCosmos].[dbo].[TFEntityCategories] " &
                                " ON TFEntities.CategoryID = TFEntityCategories.Id " &
+                               " LEFT JOIN TravelForceCosmos.dbo.DealCodes " &
+                               " ON DealCodes.ClientID=TFEntities.Id And DealCodes.AirlineID=3352 " &
                                " WHERE TFEntities.IsClient = 1  " &
                                " AND TFEntities.CanHaveCT = 1 " &
                                " AND TFEntities.IsActive = 1 " &
@@ -142,7 +151,8 @@ Namespace Customers
                     PrepareClientSelectCommand = " Select [Account_Id] As Id " &
                                                 " ,[Account_Abbriviation] AS Code " &
                                                 " ,[Account_Name] AS Name " &
-                                                " ,526 AS TFEntityKindLT" &
+                                                " ,526 AS TFEntityKindLT " &
+                                                " ,'' AS GalileoTrackingCode " &
                                                 " From [Disco_Instone_EU].[dbo].[Company] " &
                                                 " Where Account_Abbriviation = '" & pCode & "' "
                 Case Else
@@ -182,6 +192,7 @@ Namespace Customers
 
     End Class
     Public Class AllCustomer
+
         Inherits Collections.Generic.Dictionary(Of String, CustomerItem)
 
         Dim mobjAlerts As New Alerts.Collection
@@ -216,9 +227,12 @@ Namespace Customers
                                " ,TFEntities.Code" &
                                " ,TFEntities.Name " &
                                " ,TFEntityCategories.TFEntityKindLT " &
+                               " ,ISNULL(DealCodes.Code, '') AS GalileoTrackingCode " &
                                " FROM [TravelForceCosmos].[dbo].[TFEntities] " &
                                " LEFT JOIN [TravelForceCosmos].[dbo].[TFEntityCategories] " &
                                " ON TFEntities.CategoryID = TFEntityCategories.Id " &
+                               " LEFT JOIN TravelForceCosmos.dbo.DealCodes " &
+                               " ON DealCodes.ClientID=TFEntities.Id and DealCodes.AirlineID=3352 " &
                                " WHERE TFEntities.IsClient = 1  " &
                                " AND TFEntities.CanHaveCT = 1 " &
                                " AND TFEntities.IsActive = 1 " &
@@ -228,6 +242,7 @@ Namespace Customers
                                                  " ,[Account_Abbriviation] AS Code " &
                                                  " ,[Account_Name] AS Name " &
                                                  " ,526 AS TFEntityKindLT" &
+                                                 " ,'' AS GalileoTrackingCode " &
                                                  " From [Disco_Instone_EU].[dbo].[Company] " &
                                                  " Left Join Disco_Instone_EU.dbo.CompProfile " &
                                                  " On Company.Account_Id = CompProfile.Account_Id " &
@@ -258,7 +273,7 @@ Namespace Customers
             With pobjReader
                 Do While .Read
                     pobjClass = New CustomerItem
-                    pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"), .Item("TFEntityKindLT"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")))
+                    pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"), .Item("TFEntityKindLT"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")), .Item("GalileoTrackingCode"))
                     MyBase.Add(pobjClass.ID, pobjClass)
                 Loop
                 .Close()

@@ -1,17 +1,19 @@
 ﻿Option Strict Off
 Option Explicit On
-Namespace AmadeusExisting
+Namespace GDSExisting
     Public Class Item
         Private Structure ExistingItemClass
 
             Dim Exists As Boolean
             Dim LineNumber As Integer
+            Dim Category As String
             Dim RawText As String
             Dim Key As String
 
             Friend Sub Clear()
                 Exists = False
                 LineNumber = 0
+                Category = ""
                 RawText = ""
                 Key = ""
             End Sub
@@ -30,6 +32,11 @@ Namespace AmadeusExisting
                 LineNumber = mudtProps.LineNumber
             End Get
         End Property
+        Public ReadOnly Property Category As String
+            Get
+                Category = mudtProps.Category
+            End Get
+        End Property
         Public ReadOnly Property RawText As String
             Get
                 RawText = mudtProps.RawText
@@ -40,10 +47,11 @@ Namespace AmadeusExisting
                 Key = mudtProps.Key
             End Get
         End Property
-        Public Sub SetValues(ByVal pExists As Boolean, ByVal pLineNumber As Integer, ByVal pRawText As String, ByVal pKey As String)
+        Public Sub SetValues(ByVal pExists As Boolean, ByVal pLineNumber As Integer, ByVal pCategory As String, ByVal pRawText As String, ByVal pKey As String)
             With mudtProps
                 .Exists = pExists
                 .LineNumber = pLineNumber
+                .Category = pCategory
                 .RawText = pRawText
                 .Key = pKey
             End With

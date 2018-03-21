@@ -445,10 +445,11 @@ Namespace osmVessels
 
             With pobjComm
                 .CommandType = CommandType.Text
+                .Parameters.Add("@VesselgroupId", SqlDbType.BigInt).Value = pVesselGroupID
                 .CommandText = "SELECT osmvrId " &
                                "      ,osmvrGroupName " &
                                "  FROM AmadeusReports.dbo.osmVesselGroup " &
-                               "  WHERE osmvrId = " & pVesselGroupID & " " &
+                               "  WHERE osmvrId = @VesselgroupId " &
                                "  ORDER BY osmvrGroupName"
                 pobjReader = .ExecuteReader
             End With

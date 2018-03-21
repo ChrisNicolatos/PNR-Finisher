@@ -8,7 +8,7 @@ Namespace CloseOffEntries
 
         Public ReadOnly Property CloseOffEntry As String
             Get
-                CloseOffEntry = MySettings.ConvertAmadeusValue(mEntry)
+                CloseOffEntry = MySettings.ConvertGDSValue(mEntry)
             End Get
         End Property
         Friend Sub SetValues(ByVal CloseOffEntry As String)
@@ -18,7 +18,7 @@ Namespace CloseOffEntries
     Public Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
 
-        Public Sub Load(ByVal AmadeusPCC As String, ByVal OwnPCC As Boolean)
+        Public Sub Load(ByVal GDSPcc As String, ByVal OwnPCC As Boolean)
 
             Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
@@ -29,7 +29,7 @@ Namespace CloseOffEntries
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .Parameters.Add("@PCC", SqlDbType.NChar, 9).Value = AmadeusPCC
+                .Parameters.Add("@PCC", SqlDbType.NChar, 9).Value = GDSPcc
                 .Parameters.Add("@OwnPCC", SqlDbType.Bit).Value = IIf(OwnPCC, 1, 0)
                 .CommandText = "SELECT pfcEntry " &
                 "  FROM AmadeusReports.dbo.PNRFinisherCloseOff " &
