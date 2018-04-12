@@ -1,15 +1,9 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace GDSTickets
-    Public Class Item
-        Public Enum TicketDocType
-            NONE = 0
-            ETKT = 1
-            VCHR = 2
-            INTR = 3
-        End Enum
+    Friend Class GDSTicketItem
         Private Structure ClassProps
-            Dim DocType As TicketDocType ' 1=ETKT 2= VCHR 3=Interoffice ticket
+            Dim DocType As Utilities.EnumTicketDocType ' 1=ETKT 2= VCHR 3=Interoffice ticket
             Dim ID As String
             Dim PaxType As String
             Dim TicketNumber As String
@@ -25,10 +19,21 @@ Namespace GDSTickets
             Dim ClassCust As String
             Dim RawText As String
             Dim SellingPrice As Decimal
+
+            Dim GDSLine As String
+            Dim StockType As Short
+            Dim Document As Decimal
+            Dim Books As Short
+            Dim AirlineCode As String
+            Dim eTicket As Boolean
+            Dim Segs As String
+            Dim Pax As String
+            Dim TicketType As String
+
         End Structure
         Private mudtProps As ClassProps
 
-        Public ReadOnly Property DocType As TicketDocType
+        Public ReadOnly Property DocType As Utilities.EnumTicketDocType
             Get
                 DocType = mudtProps.DocType
             End Get
@@ -39,7 +44,54 @@ Namespace GDSTickets
                 TicketNumber = mudtProps.TicketNumber
             End Get
         End Property
+        Public ReadOnly Property Document() As Decimal
+            Get
+                Document = mudtProps.Document
+            End Get
+        End Property
+        Public ReadOnly Property AirlineCode As String
+            Get
+                AirlineCode = Trim(mudtProps.AirlineCode)
+            End Get
+        End Property
+        Public ReadOnly Property eTicket() As Boolean
+            Get
 
+                eTicket = mudtProps.eTicket
+
+            End Get
+        End Property
+        Public ReadOnly Property Segs As String
+            Get
+                Segs = mudtProps.Segs
+            End Get
+        End Property
+        Public ReadOnly Property Pax As String
+            Get
+                Pax = mudtProps.Pax
+            End Get
+        End Property
+        Public ReadOnly Property TicketType As String
+            Get
+                TicketType = mudtProps.TicketType
+            End Get
+        End Property
+        Friend Sub SetValues(ByRef pGDSLine As String, ByRef pStockType As Short, ByRef pDocument As Decimal, ByRef pBooks As Short, ByRef pIssuingAirline As String, ByVal AirlineCode As String, ByRef peTicket As Boolean, pSegs As String, pPax As String, pTicketType As String)
+
+            With mudtProps
+                .GDSLine = pGDSLine
+                .StockType = pStockType
+                .Document = pDocument
+                .Books = pBooks
+                .IssuingAirline = pIssuingAirline
+                .AirlineCode = AirlineCode
+                .eTicket = peTicket
+                .Segs = pSegs
+                .Pax = pPax
+                .TicketType = pTicketType
+            End With
+
+        End Sub
         Public ReadOnly Property ID As String
             Get
                 ID = mudtProps.ID
@@ -125,7 +177,7 @@ Namespace GDSTickets
                 mudtProps.SellingPrice = value
             End Set
         End Property
-        Public Sub SetElement(ByVal RawText As String, ByVal DocType As TicketDocType, ByVal PaxID As String, ByVal SegsElementNo As String) ', ByVal SegsDescription As String) ', ByVal ClassAir As String)
+        Public Sub SetElement(ByVal RawText As String, ByVal DocType As Utilities.EnumTicketDocType, ByVal PaxID As String, ByVal SegsElementNo As String) ', ByVal SegsDescription As String) ', ByVal ClassAir As String)
 
             With mudtProps
                 ' 2 examples of RawText
@@ -174,7 +226,7 @@ Namespace GDSTickets
                     .ClassAir = ""
                 End If
 
-                If DocType = TicketDocType.VCHR Then
+                If DocType = Utilities.EnumTicketDocType.VCHR Then
                     Dim iVchrFrom As Integer = -1
                     Dim iALFrom As Integer = -1
                     Dim iSGFrom As Integer = -1
@@ -245,52 +297,62 @@ Namespace GDSTickets
         End Sub
     End Class
 
-    Public Class Collection
+    Friend Class GDSTicketCollection
+        Inherits Collections.Generic.Dictionary(Of String, GDSTicketItem)
 
-        Private mobjTickets() As Item
+        Private mintCount As Short
+
+        Private mobjTickets() As GDSTicketItem
         Private mobjPNR As s1aPNR.PNR
-
-        'Private MySettings As New References
-
+        Public Sub New()
+            MyBase.Clear()
+        End Sub
         Public Sub New(ByVal pPnr As s1aPNR.PNR)
             mobjPNR = pPnr
             ReadTickets()
         End Sub
+        Public Sub addTicket(ByVal pGDSLine As String, ByVal pTicketType As Short, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Short, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String)
+
+            Dim pobjTicket As GDSTicketItem
+
+            Try
+                If pTicketNumber > 0 Then
+                    pobjTicket = New GDSTicketItem
+
+                mintCount = mintCount + 1
+                pobjTicket.SetValues(pGDSLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType)
+                    MyBase.Add(Format(mintCount), pobjTicket)
+                End If
+            Catch ex As Exception
+                Throw New Exception("addTicket()" & vbCrLf & Err.Description)
+            End Try
+
+        End Sub
 
         Private Sub ReadTickets()
-
-            Dim FAOwnTkt As String = ""
-            Dim FAInterofficeTkt As String = ""
             ' example : 12 OSI YY ATH VCHR 97893469 AL.M/SG2-3   
-
             ReDim mobjTickets(0)
-
             For Each objOSI As s1aPNR.OtherServiceElement In mobjPNR.OtherServiceElements
                 If objOSI.Text.IndexOf("ATH VCHR") > 0 Then
-                    FAOwnTkt &= objOSI.Text & vbCrLf
                     ReDim Preserve mobjTickets(mobjTickets.GetUpperBound(0) + 1)
-                    mobjTickets(mobjTickets.GetUpperBound(0)) = New Item
-                    mobjTickets(mobjTickets.GetUpperBound(0)).SetElement(objOSI.Text, Item.TicketDocType.VCHR, "", "") ', "") ', "")
+                    mobjTickets(mobjTickets.GetUpperBound(0)) = New GDSTicketItem
+                    mobjTickets(mobjTickets.GetUpperBound(0)).SetElement(objOSI.Text, Utilities.EnumTicketDocType.VCHR, "", "") ', "") ', "")
                 End If
             Next
             For Each objFA As s1aPNR.FareAutoTktElement In mobjPNR.FareAutoTktElements
                 If objFA.Text.Replace(" ", "").Contains(MySettings.GDSPcc) Then
-                    FAOwnTkt &= objFA.Text & vbCrLf
                     ReDim Preserve mobjTickets(mobjTickets.GetUpperBound(0) + 1)
-                    mobjTickets(mobjTickets.GetUpperBound(0)) = New Item
-                    mobjTickets(mobjTickets.GetUpperBound(0)).SetElement(objFA.Text, Item.TicketDocType.ETKT, BuildPaxname(objFA.Associations.Passengers), BuildSegments(objFA.Associations.Segments)) ', "") ', "")
-                    FAOwnTkt &= "-----------------------------------------" & vbCrLf
+                    mobjTickets(mobjTickets.GetUpperBound(0)) = New GDSTicketItem
+                    mobjTickets(mobjTickets.GetUpperBound(0)).SetElement(objFA.Text, Utilities.EnumTicketDocType.ETKT, BuildPaxname(objFA.Associations.Passengers), BuildSegments(objFA.Associations.Segments)) ', "") ', "")
                 Else
-                    FAInterofficeTkt &= objFA.Text & vbCrLf
                     ReDim Preserve mobjTickets(mobjTickets.GetUpperBound(0) + 1)
-                    mobjTickets(mobjTickets.GetUpperBound(0)) = New Item
-                    mobjTickets(mobjTickets.GetUpperBound(0)).SetElement(objFA.Text, Item.TicketDocType.INTR, BuildPaxname(objFA.Associations.Passengers), BuildSegments(objFA.Associations.Segments)) ', "") ', "")
-                    FAInterofficeTkt &= "-----------------------------------------" & vbCrLf
+                    mobjTickets(mobjTickets.GetUpperBound(0)) = New GDSTicketItem
+                    mobjTickets(mobjTickets.GetUpperBound(0)).SetElement(objFA.Text, Utilities.EnumTicketDocType.INTR, BuildPaxname(objFA.Associations.Passengers), BuildSegments(objFA.Associations.Segments)) ', "") ', "")
                 End If
             Next
 
             For i As Integer = 1 To mobjTickets.GetUpperBound(0)
-                If mobjTickets(i).DocType = Item.TicketDocType.VCHR Then
+                If mobjTickets(i).DocType = Utilities.EnumTicketDocType.VCHR Then
                     For j = i + 1 To mobjTickets.GetUpperBound(0)
                         If mobjTickets(j).SegsElementNo.StartsWith(mobjTickets(i).SegsElementNo) Then
                             mobjTickets(i).SegsElementNo = mobjTickets(j).SegsElementNo
@@ -301,14 +363,12 @@ Namespace GDSTickets
             Next
 
         End Sub
-
         Public ReadOnly Property GetUpperBound As Integer
             Get
                 GetUpperBound = mobjTickets.GetUpperBound(0)
             End Get
         End Property
-
-        Public ReadOnly Property Tickets(ByVal Index As Integer) As Item
+        Public ReadOnly Property Tickets(ByVal Index As Integer) As GDSTicketItem
             Get
                 If Index >= 1 And Index <= mobjTickets.GetUpperBound(0) Then
                     Tickets = mobjTickets(Index)
@@ -427,21 +487,6 @@ Namespace GDSTickets
             End Try
 
         End Function
-
-        'Private Function MakeSegString(ByVal Seg As Object) As String
-
-        '    Try
-        '        MakeSegString = Seg.ElementNo & " " & Seg.BoardPoint & "-" & Seg.OffPoint & vbCrLf
-        '    Catch ex As Exception
-        '        MakeSegString = "??"
-        '    End Try
-
-
-        'End Function
-
-        'Public Sub UpdatePrices()
-
-        'End Sub
 
     End Class
 

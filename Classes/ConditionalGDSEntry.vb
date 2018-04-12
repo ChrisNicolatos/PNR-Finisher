@@ -1,5 +1,5 @@
 ﻿Namespace ConditionalGDSEntry
-    Public Class Item
+    Friend Class Item
 
         Dim m1AEntry As String
         Dim m1GEntry As String
@@ -18,11 +18,11 @@
             m1GEntry = p1GEntry
         End Sub
     End Class
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
         Public Sub Load(ByVal BOFkey As Integer, ByVal ClientId As Integer, ByVal Vesselname As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 

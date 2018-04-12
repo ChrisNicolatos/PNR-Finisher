@@ -1,5 +1,5 @@
 ﻿Namespace Config_GDSReferences
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim Id As Integer
             Dim Key As String
@@ -64,11 +64,11 @@
             End With
         End Sub
     End Class
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
-        Public Sub Read(ByVal BackOffice As Integer, ByVal GDSCode As Config.GDSCode)
+        Public Sub Read(ByVal BackOffice As Integer, ByVal GDSCode As Utilities.EnumGDSCode)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 

@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace Alerts
-    Public Class AlertItem
+    Friend Class AlertItem
         Private Structure ClassProps
             Dim BackOfficeId As Integer
             Dim ClientCode As String
@@ -32,10 +32,10 @@ Namespace Alerts
         End Sub
     End Class
 
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, AlertItem)
         Public Sub Load()
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As AlertItem

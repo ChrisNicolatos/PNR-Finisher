@@ -2,16 +2,10 @@
 Option Explicit On
 Imports System.Xml
 Namespace CustomProperties
-    Public Enum CustomPropertyIDValue As Integer
-        BookedBy = 1
-        Department = 2
-        ReasonFortravel = 4
-        CostCentre = 5
-    End Enum
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim ID As Long
-            Dim CustomPropertyID As CustomPropertyIDValue
+            Dim CustomPropertyID As Utilities.EnumCustomPropertyID
             Dim LookUpValues As String
             Dim LimitToLookup As Boolean
             Dim Label As String
@@ -26,7 +20,7 @@ Namespace CustomProperties
             End Get
         End Property
 
-        Public ReadOnly Property CustomPropertyID() As CustomPropertyIDValue
+        Public ReadOnly Property CustomPropertyID() As Utilities.EnumCustomPropertyID
             Get
                 CustomPropertyID = mudtProps.CustomPropertyID
             End Get
@@ -72,7 +66,7 @@ Namespace CustomProperties
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCustomPropertyID As CustomPropertyIDValue, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pLabel As String, ByVal pTFEntityID As Long)
+        Friend Sub SetValues(ByVal pID As Long, ByVal pCustomPropertyID As Utilities.EnumCustomPropertyID, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pLabel As String, ByVal pTFEntityID As Long)
             With mudtProps
                 .ID = pID
                 .CustomPropertyID = pCustomPropertyID
@@ -99,7 +93,7 @@ Namespace CustomProperties
 
         Private Sub ReadLookUpValues()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 
@@ -108,10 +102,10 @@ Namespace CustomProperties
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = "SELECT [Value] " & _
-                               " FROM [TravelForceCosmos].[dbo].[CustomPropertyValues] " & _
-                               " WHERE CustomPropertyID = " & mudtProps.CustomPropertyID & " And TFEntityID = " & mudtProps.TFEntityID & _
-                               " GROUP BY Value " & _
+                .CommandText = "SELECT [Value] " &
+                               " FROM [TravelForceCosmos].[dbo].[CustomPropertyValues] " &
+                               " WHERE CustomPropertyID = " & mudtProps.CustomPropertyID & " And TFEntityID = " & mudtProps.TFEntityID &
+                               " GROUP BY Value " &
                                " ORDER BY Value"
                 pobjReader = .ExecuteReader
             End With
@@ -130,7 +124,7 @@ Namespace CustomProperties
 
     End Class
 
-    Public Class XMLValues
+    Friend Class XMLValues
 
         Inherits Collections.Generic.List(Of String)
 
@@ -138,7 +132,7 @@ Namespace CustomProperties
 
         Public Sub ReadValues(ByVal pCustomPropertyID As Long, ByVal pTfEntityID As Long)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 
@@ -240,7 +234,7 @@ Namespace CustomProperties
         End Sub
 
     End Class
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
 
         Private Const MyXMLString As String = "<?xml version='1.0' encoding='utf-8'?><LookUpValues xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema'><CustomPropertyLookupValue Description='Crew' Value='Crew' IsDefault='false' /><CustomPropertyLookupValue Description='Technical' Value='Technical' IsDefault='false' /><CustomPropertyLookupValue Description='Marine' Value='Marine' IsDefault='false' /><CustomPropertyLookupValue Description='HSQE' Value='HSQE' IsDefault='false' /><CustomPropertyLookupValue Description='Finance' Value='Finance' IsDefault='false' /></LookUpValues>"
@@ -252,7 +246,7 @@ Namespace CustomProperties
         Public Sub Load(ByVal pEntityID As Long)
 
             If MySettings.PCCBackOffice = 1 Then
-                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
                 Dim pobjComm As New SqlClient.SqlCommand
                 Dim pobjReader As SqlClient.SqlDataReader
                 Dim pobjClass As Item
@@ -285,13 +279,13 @@ Namespace CustomProperties
                         pobjClass = New Item
                         pobjClass.SetValues(.Item("Id"), .Item("CustomPropertyID"), .Item("LookUpValues"), .Item("LimitToLookUp"), .Item("Label"), .Item("TFEntityID"))
                         MyBase.Add(pobjClass.ID, pobjClass)
-                        If pobjClass.CustomPropertyID = CustomPropertyIDValue.BookedBy Then
+                        If pobjClass.CustomPropertyID = Utilities.EnumCustomPropertyID.BookedBy Then
                             mflgBookedBy = True
-                        ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.Department Then
+                        ElseIf pobjClass.CustomPropertyID = Utilities.EnumCustomPropertyID.Department Then
                             mflgDepartment = True
-                        ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.ReasonFortravel Then
+                        ElseIf pobjClass.CustomPropertyID = Utilities.EnumCustomPropertyID.ReasonFortravel Then
                             mflgReasonForTravel = True
-                        ElseIf pobjClass.CustomPropertyID = CustomPropertyIDValue.CostCentre Then
+                        ElseIf pobjClass.CustomPropertyID = Utilities.EnumCustomPropertyID.CostCentre Then
                             mflgCostCentre = True
                         End If
                     Loop
@@ -301,7 +295,7 @@ Namespace CustomProperties
             Else
                 Dim pobjClass As Item
                 pobjClass = New Item
-                pobjClass.SetValues(1, CustomPropertyIDValue.BookedBy, "", True, "BookedBy", pEntityID)
+                pobjClass.SetValues(1, Utilities.EnumCustomPropertyID.BookedBy, "", True, "BookedBy", pEntityID)
                 If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
                     mflgBookedBy = True
@@ -309,7 +303,7 @@ Namespace CustomProperties
                     mflgBookedBy = False
                 End If
                 pobjClass = New Item
-                pobjClass.SetValues(2, CustomPropertyIDValue.ReasonFortravel, "", True, "ReasonFortravel", pEntityID)
+                pobjClass.SetValues(2, Utilities.EnumCustomPropertyID.ReasonFortravel, "", True, "ReasonFortravel", pEntityID)
                 If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
                     mflgReasonForTravel = True
@@ -345,7 +339,7 @@ Namespace CustomProperties
 
     End Class
 
-    Public Class CostCentreLookupItem
+    Friend Class CostCentreLookupItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim Code As String
@@ -406,7 +400,7 @@ Namespace CustomProperties
         End Property
     End Class
 
-    Public Class CostCentreLookupCollection
+    Friend Class CostCentreLookupCollection
         Inherits Collections.Generic.Dictionary(Of String, CostCentreLookupItem)
 
         Public Sub LoadCustomerGroup(ByVal CustomerGroup As Integer)
@@ -420,7 +414,7 @@ Namespace CustomProperties
 
             If MySettings.PCCBackOffice = 1 Then
 
-                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
                 Dim pobjComm As New SqlClient.SqlCommand
                 Dim pobjReader As SqlClient.SqlDataReader
                 Dim pobjClass As CostCentreLookupItem

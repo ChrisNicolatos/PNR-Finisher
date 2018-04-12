@@ -1,40 +1,40 @@
 Option Strict Off
 Option Explicit On
-Friend Class Airports
+Friend Class Airport
 
-    Private mCode As String = ""
-    Private mCityName As String
-    Private mCityAirportName As String
-    Private mAirportShortname As String
-    Private mCountryName As String
+    Private Shared mCode As String = ""
+    Private Shared mCityName As String
+    Private Shared mCityAirportName As String
+    Private Shared mAirportShortname As String
+    Private Shared mCountryName As String
 
-    Public ReadOnly Property CityAirportName(ByVal CityCode As String) As String
+    Public Shared ReadOnly Property CityAirportName(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
             CityAirportName = mCityAirportName
         End Get
     End Property
-    Public ReadOnly Property CityName(ByVal CityCode As String) As String
+    Public Shared ReadOnly Property CityName(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
             CityName = mCityName
         End Get
     End Property
-    Public ReadOnly Property AirportShortname(ByVal CityCode As String) As String
+    Public Shared ReadOnly Property AirportShortname(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
             AirportShortname = mAirportShortname
         End Get
     End Property
-    Public ReadOnly Property CountryName(ByVal CityCode As String) As String
+    Public Shared ReadOnly Property CountryName(ByVal CityCode As String) As String
         Get
             CountryName = mCountryName
         End Get
     End Property
-    Private Sub ReadCityName(ByVal airportCode As String)
+    Private Shared Sub ReadCityName(ByVal airportCode As String)
 
         If airportCode <> mCode Then
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 

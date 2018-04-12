@@ -1,5 +1,5 @@
-﻿Module mod1A
-    Public Function airStatus1A(ByRef pSegment As Object) As String
+﻿Friend Class Utilities1A
+    Public Shared Function airStatus1A(ByRef pSegment As Object) As String
 
         Try
             airStatus1A = pSegment.text.substring(27, 2)
@@ -8,8 +8,7 @@
         End Try
 
     End Function
-
-    Public Function airAirline1A(ByRef pSegment As Object) As String
+    Public Shared Function airAirline1A(ByRef pSegment As Object) As String
 
         Try
             airAirline1A = pSegment.Airline
@@ -19,7 +18,7 @@
 
     End Function
 
-    Public Function airBoardPoint1A(ByRef pSegment As Object) As String
+    Public Shared Function airBoardPoint1A(ByRef pSegment As Object) As String
 
         Try
             airBoardPoint1A = pSegment.BoardPoint
@@ -29,7 +28,7 @@
 
     End Function
 
-    Public Function airClass1A(ByRef pSegment As Object) As String
+    Public Shared Function airClass1A(ByRef pSegment As Object) As String
 
         Try
             airClass1A = pSegment.Class
@@ -39,7 +38,7 @@
 
     End Function
 
-    Public Function airDepartureDate1A(ByRef pSegment As Object) As Date
+    Public Shared Function airDepartureDate1A(ByRef pSegment As Object) As Date
 
         Dim pdteDate As Date
 
@@ -59,7 +58,7 @@
 
     End Function
 
-    Public Function airArrivalDate1A(ByRef pSegment As Object) As Date
+    Public Shared Function airArrivalDate1A(ByRef pSegment As Object) As Date
 
         Dim pdteDate As Date
 
@@ -78,7 +77,7 @@
         End Try
 
     End Function
-    Public Function airElementNo1A(ByRef pSegment As Object) As Short
+    Public Shared Function airElementNo1A(ByRef pSegment As Object) As Short
 
         Try
             airElementNo1A = pSegment.ElementNo
@@ -88,7 +87,7 @@
 
     End Function
 
-    Public Function airFlightNo1A(ByRef pSegment As Object) As String
+    Public Shared Function airFlightNo1A(ByRef pSegment As Object) As String
 
         Try
             airFlightNo1A = pSegment.FlightNo
@@ -98,7 +97,7 @@
 
     End Function
 
-    Public Function airOffPoint1A(ByRef pSegment As Object) As String
+    Public Shared Function airOffPoint1A(ByRef pSegment As Object) As String
 
         Try
             airOffPoint1A = pSegment.OffPoint
@@ -107,7 +106,7 @@
         End Try
 
     End Function
-    Public Function airDepartTime1A(ByRef pSegment As Object) As Date
+    Public Shared Function airDepartTime1A(ByRef pSegment As Object) As Date
 
         Try
             airDepartTime1A = pSegment.DepartureTime
@@ -117,7 +116,7 @@
 
     End Function
 
-    Public Function airArriveTime1A(ByRef pSegment As Object) As Date
+    Public Shared Function airArriveTime1A(ByRef pSegment As Object) As Date
 
         Try
             airArriveTime1A = pSegment.ArrivalTime
@@ -127,7 +126,7 @@
 
     End Function
 
-    Public Function airText1A(ByRef pSegment As Object) As String
+    Public Shared Function airText1A(ByRef pSegment As Object) As String
 
         Try
             airText1A = pSegment.Text
@@ -136,10 +135,11 @@
         End Try
 
     End Function
-    Public Sub PrepareLineNumbers1A(ByVal ExistingItem As GDSExisting.Item, ByRef pLineNumbers() As Integer)
+    Public Shared Sub PrepareLineNumbers1A(ByVal ExistingItem As GDSExisting.Item, ByRef pLineNumbers() As Integer)
         If ExistingItem.Exists Then
             ReDim Preserve pLineNumbers(pLineNumbers.GetUpperBound(0) + 1)
             pLineNumbers(pLineNumbers.GetUpperBound(0)) = ExistingItem.LineNumber
         End If
     End Sub
-End Module
+
+End Class

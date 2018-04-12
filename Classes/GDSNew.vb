@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace GDSNew
-    Public Class Item
+    Friend Class Item
         Private Structure NewItemClass
             Dim GDSCommand As String
             Dim TextRequested As String
@@ -38,7 +38,7 @@ Namespace GDSNew
         End Sub
 
     End Class
-    Public Class Collection
+    Friend Class Collection
         Private mobjOpenSegment As New Item
         Private mobjPhoneElement As New Item
         Private mobjEmailElement As New Item
@@ -74,16 +74,21 @@ Namespace GDSNew
         Private mstrOfficeOfResponsibility As String
         Private mdteDepartureDate As Date
         Private mintNumberOfPax As Integer
-        Private mGDSCode As Config.GDSCode
+        Private mGDSCode As Utilities.EnumGDSCode
 
-        Public Sub New(ByVal pOfficeOfResponsibility As String, ByVal pDepartureDate As Date, ByVal pNumberOfPax As Integer, ByVal pGDSCode As Config.GDSCode)
+        Public Sub New(ByVal pOfficeOfResponsibility As String, ByVal pDepartureDate As Date, ByVal pNumberOfPax As Integer, ByVal pGDSCode As Utilities.EnumGDSCode)
             mstrOfficeOfResponsibility = pOfficeOfResponsibility
             mdteDepartureDate = pDepartureDate
             mintNumberOfPax = pNumberOfPax
             mGDSCode = pGDSCode
             PrepareCommands()
         End Sub
-
+        Public Sub New()
+            mstrOfficeOfResponsibility = ""
+            mdteDepartureDate = Date.MinValue
+            mintNumberOfPax = 0
+            mGDSCode = Utilities.EnumGDSCode.Unknown
+        End Sub
         Public ReadOnly Property OpenSegment As Item
             Get
                 OpenSegment = mobjOpenSegment
@@ -369,7 +374,7 @@ Namespace GDSNew
             mobjEmailElement.SetText("", MySettings.GDSValue("TextAPE"))
             mobjAgentID.SetText("", MySettings.GDSValue("TextAGT"))
 
-            If mGDSCode = Config.GDSCode.GDSisAmadeus Then
+            If mGDSCode = Utilities.EnumGDSCode.Amadeus Then
                 Dim pTTLString As String
                 If mstrOfficeOfResponsibility <> MySettings.GDSPcc Then
                     pTTLString = MySettings.GDSValue("TextTTL") & pDateTimeLimit.IATA & "/" & MySettings.GDSPcc
@@ -383,7 +388,7 @@ Namespace GDSNew
                                     MySettings.OfficeCityCode & " " &
                                     pDateRetain.IATA & "-" & MySettings.GDSValue("TextMISSegmentText"))
                 mobjOptionQueueElement.SetText("", MySettings.GDSValue("TextOP") & MySettings.GDSPcc & "/" & pDateReminder.IATA & "/" & MySettings.AgentOPQueue)
-            ElseIf mGDSCode = Config.GDSCode.GDSisGalileo Then
+            ElseIf mGDSCode = Utilities.EnumGDSCode.Galileo Then
                 mobjTicketElement.SetText("", MySettings.GDSValue("TextTTL") & pDateTimeLimit.IATA)
                 mobjOpenSegment.SetText("", MySettings.GDSValue("TextMISSegmentCommand") & pDateRetain.IATA & "*" & MySettings.GDSValue("TextMISSegmentText"))
                 mobjOptionQueueElement.SetText("", MySettings.GDSValue("TextOP") & "/" & pDateReminder.IATA & "/0001/Q" & MySettings.AgentOPQueue)

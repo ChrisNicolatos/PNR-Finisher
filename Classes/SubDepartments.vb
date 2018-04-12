@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace SubDepartments
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim ID As Long
             Dim Code As String
@@ -39,7 +39,7 @@ Namespace SubDepartments
         Public Sub Load(ByVal pSubID As Long)
             If MySettings.PCCBackOffice = 1 Then
 
-                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
                 Dim pobjComm As New SqlClient.SqlCommand
                 Dim pobjReader As SqlClient.SqlDataReader
 
@@ -69,7 +69,7 @@ Namespace SubDepartments
             End If
         End Sub
     End Class
-    Public Class Collection
+    Friend Class Collection
 
         Inherits Collections.Generic.Dictionary(Of String, Item)
         Private mlngEntityID As Long
@@ -77,7 +77,7 @@ Namespace SubDepartments
         Public Sub Load(ByVal pEntityID As Long)
             If MySettings.PCCBackOffice = 1 Then
 
-                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
                 Dim pobjComm As New SqlClient.SqlCommand
                 Dim pobjReader As SqlClient.SqlDataReader
                 Dim pobjClass As Item

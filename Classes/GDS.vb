@@ -1,5 +1,5 @@
 ﻿Namespace GDS
-    Public Class GDSItem
+    Friend Class GDSItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim GDSName As String
@@ -29,10 +29,10 @@
             End With
         End Sub
     End Class
-    Public Class GDSCollection
+    Friend Class GDSCollection
         Inherits Collections.Generic.Dictionary(Of String, GDSItem)
         Public Sub Load()
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As GDSItem

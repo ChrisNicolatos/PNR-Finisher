@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace osmVessels
-    Public Class VesselItem
+    Friend Class VesselItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim VesselName As String
@@ -98,7 +98,7 @@ Namespace osmVessels
             Try
                 If mudtProps.isValid Then
 
-                    Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+                    Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
                     Dim pobjComm As New SqlClient.SqlCommand
 
                     pobjConn.Open()
@@ -142,7 +142,7 @@ Namespace osmVessels
 
     End Class
 
-    Public Class VesselCollection
+    Friend Class VesselCollection
         Inherits Collections.Generic.Dictionary(Of String, VesselItem)
 
         Public Sub Load()
@@ -172,7 +172,7 @@ Namespace osmVessels
         End Sub
         Private Sub ExecuteLoad(ByVal pText As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As VesselItem
@@ -197,7 +197,7 @@ Namespace osmVessels
             pobjConn.Close()
         End Sub
     End Class
-    Public Class Vessel_VesselGroupItem
+    Friend Class Vessel_VesselGroupItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim VesselId As Integer
@@ -270,12 +270,12 @@ Namespace osmVessels
             End With
         End Sub
     End Class
-    Public Class Vessel_VesselGroupCollection
+    Friend Class Vessel_VesselGroupCollection
         Inherits Collections.Generic.Dictionary(Of String, Vessel_VesselGroupItem)
 
         Public Sub Load(ByVal pVesselId As Integer)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As Vessel_VesselGroupItem
@@ -313,7 +313,7 @@ Namespace osmVessels
         End Sub
         Public Sub Update()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjClass As Vessel_VesselGroupItem
 
@@ -332,7 +332,7 @@ Namespace osmVessels
             Next
         End Sub
     End Class
-    Public Class VesselGroupItem
+    Friend Class VesselGroupItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim GroupName As String
@@ -396,7 +396,7 @@ Namespace osmVessels
         End Sub
         Public Sub Update()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -414,7 +414,7 @@ Namespace osmVessels
             End With
         End Sub
         Public Sub Delete()
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -430,12 +430,12 @@ Namespace osmVessels
             End With
         End Sub
     End Class
-    Public Class VesselGroupCollection
+    Friend Class VesselGroupCollection
         Inherits Collections.Generic.Dictionary(Of String, VesselGroupItem)
 
         Public Sub Load(ByVal pVesselGroupID As Integer)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As VesselGroupItem
@@ -468,7 +468,7 @@ Namespace osmVessels
         End Sub
         Public Sub Load()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As VesselGroupItem
@@ -498,7 +498,7 @@ Namespace osmVessels
 
         End Sub
     End Class
-    Public Class emailItem
+    Friend Class emailItem
 
         Private Structure Classprops
             Dim Id As Integer
@@ -642,7 +642,7 @@ Namespace osmVessels
         End Sub
         Public Sub Update()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -679,7 +679,7 @@ Namespace osmVessels
             End With
         End Sub
         Public Sub Delete()
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -695,12 +695,12 @@ Namespace osmVessels
             End With
         End Sub
     End Class
-    Public Class EmailCollection
+    Friend Class EmailCollection
         Inherits Collections.Generic.Dictionary(Of String, emailItem)
 
         Public Sub Load(ByVal pVesselID As Integer)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As emailItem
@@ -739,7 +739,7 @@ Namespace osmVessels
         End Sub
         Public Sub Load()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As emailItem

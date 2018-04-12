@@ -1,6 +1,6 @@
 ﻿Option Strict Off
 Option Explicit On
-Public Class ExportDataGrid
+Friend Class ExportDataGrid
     Public Sub Export(ByVal dGrid As DataGridView)
 
         Try

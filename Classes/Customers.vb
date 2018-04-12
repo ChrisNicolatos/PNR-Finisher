@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace Customers
-    Public Class CustomerItem
+    Friend Class CustomerItem
         Private Structure ClassProps
             Dim ID As Long
             Dim Code As String
@@ -107,7 +107,7 @@ Namespace Customers
 
             mobjAlerts.Load()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 
@@ -161,7 +161,7 @@ Namespace Customers
         End Function
     End Class
 
-    Public Class CustomerCollection
+    Friend Class CustomerCollection
         Inherits Collections.Generic.Dictionary(Of String, CustomerItem)
         Private mAllCustomer As New AllCustomer
         Public Sub Load(ByVal SearchString As String)
@@ -191,7 +191,7 @@ Namespace Customers
 
 
     End Class
-    Public Class AllCustomer
+    Friend Class AllCustomer
 
         Inherits Collections.Generic.Dictionary(Of String, CustomerItem)
 
@@ -254,7 +254,7 @@ Namespace Customers
         End Function
         Private Sub ReadCustomers(ByVal CommandText As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As CustomerItem
@@ -284,7 +284,7 @@ Namespace Customers
 
     End Class
 
-    Public Class CustomerGroupItem
+    Friend Class CustomerGroupItem
         Private Structure ClassProps
             Dim ID As Long
             Dim Name As String
@@ -312,7 +312,7 @@ Namespace Customers
             End With
         End Sub
     End Class
-    Public Class AllCustomerGroups
+    Friend Class AllCustomerGroups
         Inherits Collections.Generic.Dictionary(Of String, CustomerGroupItem)
         Public Sub Load()
 
@@ -333,7 +333,7 @@ Namespace Customers
         End Sub
         Private Sub ReadCustomerGroups(ByVal CommandText As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As CustomerGroupItem
@@ -359,7 +359,7 @@ Namespace Customers
 
         End Sub
     End Class
-    Public Class CustomerGroupCollection
+    Friend Class CustomerGroupCollection
         Inherits Collections.Generic.Dictionary(Of String, CustomerGroupItem)
         Private mAllCustomer As New AllCustomerGroups
 

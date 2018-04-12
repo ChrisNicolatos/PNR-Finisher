@@ -2,7 +2,7 @@
 Option Explicit On
 Namespace Vessels
 
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim Name As String
             Dim Flag As String
@@ -42,7 +42,7 @@ Namespace Vessels
         End Sub
 
         Public Function Load(ByVal pCustCode As String, ByVal pVesselName As String) As Boolean
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 
@@ -92,12 +92,12 @@ Namespace Vessels
         End Function
     End Class
 
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
         Private mlngEntityID As Long
 
         Public Sub Load(ByVal pEntityID As Long)
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As Item

@@ -2,7 +2,7 @@
 
 Namespace AirlinePoints1G
 
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim CustomerID As Integer
             Dim CustomerCode As String
@@ -57,7 +57,7 @@ Namespace AirlinePoints1G
         End Sub
     End Class
 
-    Public Class Collection
+    Friend Class Collection
         Inherits Dictionary(Of Integer, Item)
 
         Public Sub Load(ByVal pCustID As Integer, ByVal pIATACode As String)
@@ -100,7 +100,7 @@ Namespace AirlinePoints1G
 
         Private Sub ReadFromDB(ByVal CommandText As String)
 
-            Dim pobjConn As New SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlCommand
             Dim pobjReader As SqlDataReader
             Dim pobjClass As Item
@@ -131,7 +131,7 @@ Namespace AirlinePoints1G
             pobjConn.Close()
         End Sub
         Private Function Get1GRemark(ByVal p1ARemark As String) As String
-            Dim pobjConn As New SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlCommand
             Dim pobjReader As SqlDataReader
 

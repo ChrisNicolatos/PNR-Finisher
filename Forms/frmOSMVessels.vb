@@ -5,7 +5,7 @@
 
     Private Sub frmOSMVessels_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        OSMRefreshVessels(lstOSMEditVessels)
+        UtilitiesOSM.OSMRefreshVessels(lstOSMEditVessels)
         CheckValid()
 
     End Sub
@@ -35,7 +35,7 @@
 
     Private Sub lstOSMEditVessels_DrawItem(sender As Object, e As DrawItemEventArgs) Handles lstOSMEditVessels.DrawItem
 
-        ListBox_DrawItem(sender, e)
+        UtilitiesOSM.ListBox_DrawItem(sender, e)
 
     End Sub
 
@@ -45,8 +45,8 @@
             mOSMSelectedVessel = lstOSMEditVessels.SelectedItem
             txtOSMEditVessel.Text = mOSMSelectedVessel.ToString
             chkOSMVesselInUse.Checked = mOSMSelectedVessel.InUse
-            OSMDisplayVesselGroups(lstVesselGroup, mOSMSelectedVessel.Vessel_VesselGroup)
-            OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
+            UtilitiesOSM.OSMDisplayVesselGroups(lstVesselGroup, mOSMSelectedVessel.Vessel_VesselGroup)
+            UtilitiesOSM.OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
         End If
 
     End Sub
@@ -63,7 +63,7 @@
     Private Sub cmdOSMEditUpdateEmail_Click(sender As Object, e As EventArgs) Handles cmdOSMEditUpdateEmail.Click
 
         mOSMSelectedEmail.Update()
-        OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
+        UtilitiesOSM.OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
         mOSMSelectedEmail = Nothing
         DisplaySelectedEmail()
         CheckValid()
@@ -73,7 +73,7 @@
     Private Sub cmdOSMEditDeleteEmail_Click(sender As Object, e As EventArgs) Handles cmdOSMEditDeleteEmail.Click
 
         mOSMSelectedEmail.Delete()
-        OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
+        UtilitiesOSM.OSMDisplayEmails(mOSMSelectedVessel.Id, lstOSMEditToEmail, lstOSMEditCCEmail)
         mOSMSelectedEmail = Nothing
         DisplaySelectedEmail()
         CheckValid()
@@ -146,7 +146,7 @@
         Try
             mOSMSelectedVessel.Update()
 
-            OSMRefreshVessels(lstOSMEditVessels)
+            UtilitiesOSM.OSMRefreshVessels(lstOSMEditVessels)
             CheckValid()
 
         Catch ex As Exception
@@ -167,7 +167,7 @@
         Dim pFrm As New frmOSMAddVessel
 
         If pFrm.ShowDialog(Me) = Windows.Forms.DialogResult.OK Then
-            OSMRefreshVessels(lstOSMEditVessels)
+            UtilitiesOSM.OSMRefreshVessels(lstOSMEditVessels)
             CheckValid()
         End If
 

@@ -1,37 +1,37 @@
 ﻿Option Strict Off
 Option Explicit On
-Public Class GDSUser
-
+Friend Class GDSUser
     Private Structure ClassProps
-        Dim GDSCode As Config.GDSCode
+        Dim GDSCode As Utilities.EnumGDSCode
         Dim PCC As String
         Dim User As String
         Private Sub New(ByVal pGDS As String)
-            GDSCode = Config.GDSCode.GDSisUnknown
+            GDSCode = Utilities.EnumGDSCode.Unknown
             PCC = ""
             User = ""
         End Sub
     End Structure
-    Private WithEvents mobjSession As k1aHostToolKit.HostSession
+    Private WithEvents mobjSession1A As k1aHostToolKit.HostSession
+    Private mobjSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
     Private mudtProps As New ClassProps
     Private mstrResponse As String
 
-    Public Sub New(ByVal pGDSCode As Config.GDSCode)
+    Public Sub New(ByVal pGDSCode As Utilities.EnumGDSCode)
 
         Try
             mudtProps.GDSCode = pGDSCode
             mudtProps.PCC = ""
             mudtProps.User = ""
-            If pGDSCode = Config.GDSCode.GDSisAmadeus Then
+            If pGDSCode = Utilities.EnumGDSCode.Amadeus Then
                 Read1AUser()
-            ElseIf pGDSCode = Config.GDSCode.GDSisGalileo Then
+            ElseIf pGDSCode = Utilities.EnumGDSCode.Galileo Then
                 Read1GUser()
             Else
                 Throw New Exception("GDS not available")
             End If
 
             If mudtProps.PCC = "" Or mudtProps.User = "" Then
-                Throw New Exception("Please start " & If(mudtProps.GDSCode = Config.GDSCode.GDSisAmadeus, "Amadeus", "Galileo"))
+                Throw New Exception("Please start " & If(mudtProps.GDSCode = Utilities.EnumGDSCode.Amadeus, "Amadeus", "Galileo"))
             End If
         Catch ex As Exception
             Throw New Exception("GDS Error" & vbCrLf & ex.Message)
@@ -46,8 +46,9 @@ Public Class GDSUser
         If Sessions.Count > 0 Then
             ' There is at least one session opened.                    '
             ' We link our application to the active session of the FOS '
-            mobjSession = Sessions.UIActiveSession
-            mobjSession.Send("JGD/C")
+            mobjSession1A = Sessions.UIActiveSession
+            mobjSession1A.SendSpecialKey(512 + 282) '(k1aHostConstantsLib.AmaKeyValues.keySHIFT + k1aHostConstantsLib.AmaKeyValues.keyPause)
+            mobjSession1A.Send("JGD/C")
             Dim pLines() As String = mstrResponse.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
             For i As Integer = 0 To pLines.GetUpperBound(0)
                 If pLines(i).Trim.StartsWith("OFFICE") Then
@@ -60,8 +61,7 @@ Public Class GDSUser
     End Sub
     Private Sub Read1GUser()
         Try
-            Dim Session As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
-            Dim response() As String = Session.SendTerminalCommand("OP/W*").ToArray
+            Dim response() As String = mobjSession1G.SendTerminalCommand("OP/W*").ToArray
             For i As Integer = 0 To response.GetUpperBound(0)
                 If response(i).Length > 45 AndAlso response(i).Substring(31, 6) = "ACTIVE" Then
                     mudtProps.User = response(i).Substring(12, 6)
@@ -73,13 +73,13 @@ Public Class GDSUser
                 Throw New Exception(response(0))
             End If
         Catch ex As Travelport.TravelData.DesktopUserNotSignedOnException
-            Throw New Exception("Please sign in to Galileo/Smartpoint")
+            Throw New Exception("Please start Galileo/Smartpoint")
         Catch ex As Exception
             Throw New Exception(ex.Message)
         End Try
 
     End Sub
-    Public ReadOnly Property GDSCode As Config.GDSCode
+    Public ReadOnly Property GDSCode As Utilities.EnumGDSCode
         Get
             GDSCode = mudtProps.GDSCode
         End Get
@@ -94,7 +94,7 @@ Public Class GDSUser
             User = mudtProps.User.ToUpper
         End Get
     End Property
-    Private Sub mobjSession_ReceivedResponse(ByRef newResponse As k1aHostToolKit.CHostResponse) Handles mobjSession.ReceivedResponse
+    Private Sub mobjSession_ReceivedResponse(ByRef newResponse As k1aHostToolKit.CHostResponse) Handles mobjSession1A.ReceivedResponse
 
         mstrResponse = newResponse.Text
 

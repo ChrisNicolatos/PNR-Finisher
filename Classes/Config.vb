@@ -1,18 +1,6 @@
 ﻿Option Strict Off
 Option Explicit On
-Public Class Config
-    Public Enum OPTItinFormat
-        ItnFormatDefault = 0
-        ItnFormatPlain = 1
-        ItnFormatSeaChefs = 2
-        ItnSeaChefsWithCode = 3
-        ItnFormatEuronav = 4
-    End Enum
-    Public Enum GDSCode
-        GDSisUnknown = 0
-        GDSisAmadeus = 1
-        GDSisGalileo = 2
-    End Enum
+Friend Class Config
     Private Structure ClassProps
         Dim PCCId As Integer
         Dim OfficeCityCode As String
@@ -61,15 +49,10 @@ Public Class Config
     Private mobjGDSUser As GDSUser
     Private mflgIsDirtyPCC As Boolean
     Private mflgIsDirtyUser As Boolean
-
-
-    Dim mGDSReferences As New Config_GDSReferences.Collection
-
+    Private mGDSReferences As New Config_GDSReferences.Collection
     Public Sub New(mGDSUser As GDSUser)
-
         Try
             mobjGDSUser = mGDSUser
-
             mflgIsDirtyPCC = False
             mflgIsDirtyUser = False
             mGDSReferences.Clear()
@@ -93,11 +76,11 @@ Public Class Config
             Administrator = mudtProps.Administrator
         End Get
     End Property
-    Public Property FormatStyle As OPTItinFormat
+    Public Property FormatStyle As Utilities.EnumItnFormat
         Get
             FormatStyle = mudtProps.FormatStyle
         End Get
-        Set(value As OPTItinFormat)
+        Set(value As Utilities.EnumItnFormat)
             If value <> mudtProps.FormatStyle Then
                 mflgIsDirtyUser = True
             End If
@@ -273,17 +256,6 @@ Public Class Config
             mudtProps.ShowVessel = value
         End Set
     End Property
-    'Public Property UsePlainFormat As Boolean
-    '    Get
-    '        UsePlainFormat = mudtProps.UsePlainFormat
-    '    End Get
-    '    Set(value As Boolean)
-    '        If value <> mudtProps.UsePlainFormat Then
-    '            mflgIsDirtyUser = True
-    '        End If
-    '        mudtProps.UsePlainFormat = value
-    '    End Set
-    'End Property
     Public Property OSMLoGPerPax As Boolean
         Get
             OSMLoGPerPax = mudtProps.OSMLoGPerPax
@@ -523,7 +495,7 @@ Public Class Config
     End Property
     Private Sub DBReadPCC()
 
-        Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+        Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
         Dim pobjComm As New SqlClient.SqlCommand
         Dim pobjReader As SqlClient.SqlDataReader
 
@@ -592,7 +564,7 @@ Public Class Config
     Private Sub DBUpdatePCC()
 
         If mudtProps.PCCId > 0 Then
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -623,7 +595,7 @@ Public Class Config
     Private Sub DBUpdateUser()
 
         If mudtProps.AgentId > 0 Then
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
 
             pobjConn.Open()
@@ -666,7 +638,7 @@ Public Class Config
     End Sub
     Private Sub DBReadUser()
 
-        Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+        Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
         Dim pobjComm As New SqlClient.SqlCommand
         Dim pobjReader As SqlClient.SqlDataReader
 

@@ -2,11 +2,11 @@
 Imports iTextSharp.text
 Imports System.IO
 Friend Class OsmLOG
-    Private mobjPNR As GDSPnr
+    Private mobjPNR As GDSReadPNR
     Private mobjPortAgent As osmVessels.emailItem
     Private mflgNoPortAgent As Boolean
     Private mstrSignedBy As String
-    Public Sub CreatePDF(ByRef pPNR As GDSPnr)
+    Public Sub CreatePDF(ByRef pPNR As GDSReadPNR)
 
         mobjPNR = pPNR
         ReadOptions()
@@ -37,7 +37,7 @@ Friend Class OsmLOG
     End Function
     Private Sub MakePDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
 
-        Dim pLogoFile As String = System.IO.Path.Combine(MyConfigPath, "OSM Maritime logo.png")
+        Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
         Dim pDoc As New Document(PageSize.A4, 36, 36, 36, 36)
         Dim pArial11 As Font = FontFactory.GetFont("arial", 11, FontStyle.Regular)

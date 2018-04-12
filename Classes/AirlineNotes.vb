@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace AirlineNotes
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim ID As Integer
             Dim AirlineCode As String
@@ -63,13 +63,13 @@ Namespace AirlineNotes
         End Sub
     End Class
 
-    Public Class Collection
+    Friend Class Collection
         Inherits System.Collections.Generic.Dictionary(Of Integer, Item)
 
-        Public Sub Load(ByVal pAirlineCode As String, ByVal GDSCode As Config.GDSCode)
+        Public Sub Load(ByVal pAirlineCode As String, ByVal GDSCode As Utilities.EnumGDSCode)
 
             Dim pCommandText As String
-            If GDSCode = Config.GDSCode.GDSisAmadeus Then
+            If GDSCode = Utilities.EnumGDSCode.Amadeus Then
                 pCommandText = "SELECT anID, " &
                             " anAirlineCode, " &
                             " anFlightType, " &
@@ -80,7 +80,7 @@ Namespace AirlineNotes
                             " FROM AmadeusReports.dbo.AirlineNotes " &
                             " WHERE anAirlineCode = @AirlineCode " &
                             " ORDER BY anSeqNo"
-            ElseIf GDSCode = Config.GDSCode.GDSisGalileo Then
+            ElseIf GDSCode = Utilities.EnumGDSCode.Galileo Then
                 pCommandText = "SELECT anID, " &
                             " anAirlineCode, " &
                             " anFlightType, " &
@@ -99,7 +99,7 @@ Namespace AirlineNotes
         End Sub
         Private Sub ReadFromDB(ByVal CommandText As String, ByVal pAirlineCode As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As Item

@@ -2,7 +2,7 @@
 Option Explicit On
 Namespace CloseOffEntries
 
-    Public Class Item
+    Friend Class Item
 
         Dim mEntry As String
 
@@ -15,12 +15,12 @@ Namespace CloseOffEntries
             mEntry = CloseOffEntry
         End Sub
     End Class
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
 
         Public Sub Load(ByVal GDSPcc As String, ByVal OwnPCC As Boolean)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 

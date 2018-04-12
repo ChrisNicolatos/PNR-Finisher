@@ -170,12 +170,12 @@ Friend Class GDSNumberParser
                 End If
 
                 If pintAirlineFrom > 0 And pintAirlineTo > pintAirlineFrom Then
-                    .AirlineNumber = Format(myCurr(Mid(.TicketNumberText, pintAirlineFrom, pintAirlineTo - pintAirlineFrom + 1)), "000")
+                    .AirlineNumber = Format(Utilities.myCurr(Mid(.TicketNumberText, pintAirlineFrom, pintAirlineTo - pintAirlineFrom + 1)), "000")
                 End If
 
                 If pintTicketFrom > 0 And pintTicketTo > pintTicketFrom Then
                     pstrTicket = Mid(.TicketNumberText, pintTicketFrom, pintTicketTo - pintTicketFrom + 1)
-                    .DocumentNumber = myCurr(pstrTicket)
+                    .DocumentNumber = Utilities.myCurr(pstrTicket)
                     .Books = 1
                 End If
 
@@ -184,7 +184,7 @@ Friend Class GDSNumberParser
                     pstrTemp2 = pstrTicket
                     If Len(pstrTemp) <= Len(pstrTemp2) Then
                         Mid(pstrTemp2, Len(pstrTemp2) - Len(pstrTemp) + 1, Len(pstrTemp)) = pstrTemp
-                        pcurrDoc2 = myCurr(pstrTemp2)
+                        pcurrDoc2 = Utilities.myCurr(pstrTemp2)
                         If pcurrDoc2 > .DocumentNumber Then
                             .Books = pcurrDoc2 - .DocumentNumber + 1
                         End If

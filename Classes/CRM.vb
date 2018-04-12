@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace CRM
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim ID As Long
             Dim Code As String
@@ -46,7 +46,7 @@ Namespace CRM
 
         Public Sub Load(ByVal pSubCode As String)
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
 
@@ -77,7 +77,7 @@ Namespace CRM
             pobjConn.Close()
         End Sub
     End Class
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
         Private mlngEntityID As Long
         Private mobjAlerts As New Alerts.Collection
@@ -86,7 +86,7 @@ Namespace CRM
             mobjAlerts.Load()
 
             If MySettings.PCCBackOffice = 1 Then
-                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
                 Dim pobjComm As New SqlClient.SqlCommand
                 Dim pobjReader As SqlClient.SqlDataReader
                 Dim pobjClass As Item

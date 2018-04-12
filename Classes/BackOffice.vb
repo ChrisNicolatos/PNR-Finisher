@@ -1,5 +1,5 @@
 ﻿Namespace BackOffice
-    Public Class BackOfficeItem
+    Friend Class BackOfficeItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim BackOfficeName As String
@@ -23,12 +23,12 @@
             End With
         End Sub
     End Class
-    Public Class BackOfficeCollection
+    Friend Class BackOfficeCollection
         Inherits Collections.Generic.Dictionary(Of String, BackOfficeItem)
 
         Public Sub Load()
 
-            Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringPNR)
+            Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
             Dim pobjClass As BackOfficeItem

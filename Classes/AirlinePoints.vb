@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace AirlinePoints
-    Public Class Item
+    Friend Class Item
         Private Structure ClassProps
             Dim PointsCommand As String
         End Structure
@@ -19,22 +19,22 @@ Namespace AirlinePoints
         End Sub
     End Class
 
-    Public Class Collection
+    Friend Class Collection
         Inherits System.Collections.Generic.Dictionary(Of Integer, Item)
 
-        Public Sub Load(ByVal pCustID As Integer, ByVal pIATACode As String, ByVal GDSCode As Config.GDSCode)
+        Public Sub Load(ByVal pCustID As Integer, ByVal pIATACode As String, ByVal GDSCode As Utilities.EnumGDSCode)
 
             Dim pCommandText As String
             Select Case MySettings.PCCBackOffice
                 Case 1
-                    If GDSCode = Config.GDSCode.GDSisAmadeus Then
+                    If GDSCode = Utilities.EnumGDSCode.Amadeus Then
                         pCommandText = "SELECT TravelForceCosmos.dbo.FrequentFlyerCards.Remarks " &
                                    " FROM TravelForceCosmos.dbo.FrequentFlyerCards  " &
                                    " 	LEFT OUTER JOIN TravelForceCosmos.dbo.Airlines  " &
                                    " 		ON TravelForceCosmos.dbo.FrequentFlyerCards.AirlineID = TravelForceCosmos.dbo.Airlines.Id " &
                                    " WHERE (TravelForceCosmos.dbo.FrequentFlyerCards.TFEntityID = " & pCustID & ")  " &
                                    " 			AND (TravelForceCosmos.dbo.Airlines.IATACode = '" & pIATACode & "')"
-                    ElseIf GDSCode = Config.GDSCode.GDSisGalileo Then
+                    ElseIf GDSCode = Utilities.EnumGDSCode.Galileo Then
                         pCommandText = "SELECT FrequentFlyerCards_1G.ff1GRemark  AS Remarks " &
                                         " FROM TravelForceCosmos.dbo.FrequentFlyerCards " &
                                         " LEFT OUTER JOIN TravelForceCosmos.dbo.Airlines " &
@@ -46,12 +46,12 @@ Namespace AirlinePoints
                     Else
                         Throw New Exception("AirlinePoints.Collection.Load()" & vbCrLf & "GDS is not selected")
                     End If
-                    ReadFromDB(pCommandText, ConnectionStringACC)
+                    ReadFromDB(pCommandText, UtilitiesDB.ConnectionStringACC)
                 Case 2
                     pCommandText = "SELECT pnfAmadeusEntry AS Remarks " &
                                    "  FROM AmadeusReports.dbo.PNRFinisherCorporateDeals " &
                                    "  WHERE pnfClientId_fkey = " & pCustID & " AND pnfAirlineCode = '" & pIATACode & "' "
-                    ReadFromDB(pCommandText, ConnectionStringPNR)
+                    ReadFromDB(pCommandText, UtilitiesDB.ConnectionStringPNR)
             End Select
 
         End Sub

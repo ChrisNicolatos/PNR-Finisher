@@ -1,9 +1,9 @@
-﻿Public Class frmOSMLoG
+﻿Friend Class frmOSMLoG
     Private mflgLoading As Boolean
     Private mobjAgent As osmVessels.emailItem
-    Private mobjPNR As GDSPnr
+    Private mobjPNR As GDSReadPNR
 
-    Friend Sub New(ByRef pPNR As GDSPnr)
+    Friend Sub New(ByRef pPNR As GDSReadPNR)
 
         ' This call is required by the designer.
         InitializeComponent()

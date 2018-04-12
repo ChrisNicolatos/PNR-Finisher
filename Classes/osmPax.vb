@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace osmPax
-    Public Class Pax
+    Friend Class Pax
         Private Structure ClassProps
             Dim Id As Integer
             Dim LastName As String
@@ -75,7 +75,7 @@ Namespace osmPax
         End Sub
     End Class
 
-    Public Class PaxCollection
+    Friend Class PaxCollection
         Inherits Collections.Generic.Dictionary(Of Integer, Pax)
         Public Sub Load(ByVal pText As String)
 

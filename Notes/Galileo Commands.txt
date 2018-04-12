@@ -1,0 +1,82 @@
+﻿Display Entries
+
+*ALL Display All Booking File Data
+*AA Display Delivery Address and Written Address
+*AD Display Delivery Address
+*AW Display Written Address
+*CD Display Customer Data
+*CI Customer Identifier Data (only used with Selective Access)
+*DI Display Document Itinerary Remarks Data
+*EM Email address and comments
+*FF Display Filed Fares (see also FARES chapter)
+*FOP Display Form Of Payment data
+*I Display Itinerary
+*IA Display Air Segments of Itinerary
+*IC Display Car Segments of Itinerary
+*IH Display Hotel Segments of Itinerary
+*IN Display Non-air Itinerary
+*IS Display Surface Segments of Itinerary
+*IT Display Tour Segments of Itinerary
+*IX Display Air Taxi Segments of Itinerary
+*MM Display Mileage Membership Data
+
+*NP Display Notepad
+*NPX Display Notepad with qualifier letter X
+*P Display Phone Fields
+*P1 Display first 2 Phone fields
+*R Display BF
+*RB Display Review Booking File field
+*RI Display Itinerary Remarks
+*RIA Display Associated Itinerary Remarks
+*RIU Display Unassociated Itinerary Remarks
+*RI/S1 Display Itinerary Remark related to segment 1
+*RI3 Display Itinerary Remark 3
+*RQ Display Enhanced Booking File Servicing field
+*RV Display Received field data
+*SD Display Seat Data
+*SI Display all SSRs and OSIs
+*SO Display OSI information
+*SR Display SSR information
+*SVC Display Services for all booked segments
+*SVC2 Display Services for segment 2
+*TD Display Ticketing Data
+*VI Display Incoming Vendor Remarks
+*VL Display Vendor Locator data
+*VO Display Outgoing Vendor Remarks
+*VR Display Incoming and Outgoing Vendor Remarks
+*XSD Display Seat Data Cancelled during this transaction
+*XRI Display Cancelled Itinerary Remark during this transaction
+----------------------------------------------------------------
+*N Display Name(s)
+
+
+*SI
+>
+*** SPECIAL SERVICE REQUIREMENT ***
+SEGMENT/PASSENGER RELATED
+S 1. QR  0208 N  15SEP ATHDOH
+   P 1. NICOLATOS/CHRISMR VGML NN 1  
+*** MANUAL SSR DATA ***
+   M 3. SSRPCTCYY HK  /JANE SMITH/GB 44 181 555 6662
+*** OTHER SUPPLEMENTARY INFORMATION ***
+CARRIER RELATED
+  1. YY  OTHSABC
+  2. QR  SEMNVESSEL
+>
+--------------------------------------------------------------------------------------------------------------------------------
+>
+*** SPECIAL SERVICE REQUIREMENT ***
+SEGMENT/PASSENGER RELATED
+S 1. QR  0208 N  15SEP ATHDOH
+   P 1. NICOLATOS/CHRISMR VGML NN 1  
+*** MANUAL SSR DATA ***
+   M 6. SSRDOCSQR HK  P/GR/S12345678/GR/13OCT53/M/31DEC22/NICOLATOS/CHRIS -1NICOLATOS/CHRISMR
+   M 7. SSRPCTCYY HK  /JANE SMITH/GB 44 181 555 6662 ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890123456789012345678901234567890
+*** OTHER SUPPLEMENTARY INFORMATION ***
+CARRIER RELATED
+  1. QR  12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+  2. QR  123456789012345678901234567890123456789012345678901234 7890123456
+  3. QR  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
+  4. QR  1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
+  5. QR   1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6
+>

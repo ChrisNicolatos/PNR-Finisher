@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Namespace GDSExisting
-    Public Class Item
+    Friend Class Item
         Private Structure ExistingItemClass
 
             Dim Exists As Boolean
@@ -61,7 +61,7 @@ Namespace GDSExisting
         End Sub
     End Class
 
-    Public Class Collection
+    Friend Class Collection
         Private mobjOpenSegment As New Item
         Private mobjPhoneElement As New Item
         Private mobjAgentElement As New Item

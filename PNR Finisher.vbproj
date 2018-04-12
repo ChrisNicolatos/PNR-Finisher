@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>15</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -123,8 +123,10 @@
     <Compile Include="Classes\Alerts.vb" />
     <Compile Include="Classes\ConditionalGDSEntry.vb" />
     <Compile Include="Classes\Config_GDSReferences.vb" />
+    <Compile Include="Classes\GDS1G_ReadRaw.vb" />
     <Compile Include="Classes\GDSExisting.vb" />
     <Compile Include="Classes\GDSNew.vb" />
+    <Compile Include="Classes\GDSReadPNR.vb" />
     <Compile Include="Classes\GDSTickets.vb" />
     <Compile Include="Classes\GDSUser.vb" />
     <Compile Include="Classes\BackOffice.vb" />
@@ -137,18 +139,17 @@
     <Compile Include="Classes\FrequentFlyer.vb" />
     <Compile Include="Classes\GDS.vb" />
     <Compile Include="Classes\GreekToLatin.vb" />
-    <Compile Include="Classes\Airlines.vb" />
-    <Compile Include="Classes\Airports.vb" />
+    <Compile Include="Classes\TQT.vb" />
+    <Compile Include="Shared Classes\Airlines.vb" />
+    <Compile Include="Shared Classes\Airport.vb" />
     <Compile Include="Classes\GDSNumberParser.vb" />
     <Compile Include="Classes\GDSPax.vb" />
-    <Compile Include="Classes\GDSPnr.vb" />
     <Compile Include="Classes\GDSSeg.vb" />
     <Compile Include="Classes\ItnRTBDoc.vb" />
     <Compile Include="Classes\OsmLOG.vb" />
     <Compile Include="Classes\Ticket.vb" />
     <Compile Include="Classes\osmVessels.vb" />
-    <Compile Include="Classes\PriceLookup.vb" />
-    <Compile Include="Classes\ReadPNR.vb" />
+    <Compile Include="Classes\AveragePrice.vb" />
     <Compile Include="Classes\SubDepartments.vb" />
     <Compile Include="Classes\Vessels.vb" />
     <Compile Include="Forms\frmAdmin.Designer.vb">
@@ -161,6 +162,12 @@
       <DependentUpon>frmAPISPax.vb</DependentUpon>
     </Compile>
     <Compile Include="Forms\frmAPISPax.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmAPISPaxSelect.Designer.vb">
+      <DependentUpon>frmAPISPaxSelect.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmAPISPaxSelect.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\frmCostCentre.Designer.vb">
@@ -219,8 +226,8 @@
     </Compile>
     <Compile Include="Classes\PaxApisDB.vb" />
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="Modules\mod1A.vb" />
-    <Compile Include="Modules\modPNR.vb" />
+    <Compile Include="Shared Classes\Utilities.vb" />
+    <Compile Include="Shared Classes\modPNR.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -237,6 +244,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Classes\osmPax.vb" />
+    <Compile Include="Shared Classes\Utilities1A.vb" />
+    <Compile Include="Shared Classes\UtilitiesAPIS.vb" />
+    <Compile Include="Shared Classes\UtilitiesDB.vb" />
+    <Compile Include="Shared Classes\UtilitiesOSM.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\frmAdmin.resx">
@@ -244,6 +255,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmAPISPax.resx">
       <DependentUpon>frmAPISPax.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmAPISPaxSelect.resx">
+      <DependentUpon>frmAPISPaxSelect.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmCostCentre.resx">
       <DependentUpon>frmCostCentre.vb</DependentUpon>
@@ -299,6 +313,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="My Project\download.png" />
+    <Content Include="Notes\Galileo Commands.txt" />
     <Content Include="Notes\PNRFinisher.txt">
       <SubType>Designer</SubType>
     </Content>
@@ -386,78 +401,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <PublishFile Include="Notes\Airline Points Commands.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-    <PublishFile Include="Notes\GDS Commands.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-    <PublishFile Include="Notes\My Notes.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-    <PublishFile Include="Notes\PARTIAL PNR DISPLAY ELEMENT CODES.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-    <PublishFile Include="Notes\PNR History Display Codes.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-    <PublishFile Include="Notes\PNRFinisher.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-    <PublishFile Include="Notes\SSR Docs.txt">
-      <Visible>False</Visible>
-      <Group>
-      </Group>
-      <TargetPath>
-      </TargetPath>
-      <PublishState>Exclude</PublishState>
-      <IncludeHash>True</IncludeHash>
-      <FileType>File</FileType>
-    </PublishFile>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

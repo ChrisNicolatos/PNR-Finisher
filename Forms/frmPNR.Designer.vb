@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmPNR
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class frmPNR
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPNR))
@@ -57,6 +57,7 @@ Partial Class frmPNR
         Me.lblCostCentreHighlight = New System.Windows.Forms.Label()
         Me.tabPNR = New System.Windows.Forms.TabControl()
         Me.tabPageFinisher = New System.Windows.Forms.TabPage()
+        Me.txtPNRApis = New System.Windows.Forms.TextBox()
         Me.cmdAPISEditPax = New System.Windows.Forms.Button()
         Me.cmdPNRRead1GPNR = New System.Windows.Forms.Button()
         Me.cmdAdmin = New System.Windows.Forms.Button()
@@ -152,6 +153,8 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.lblPNRAmadeus = New System.Windows.Forms.Label()
+        Me.lblPNRGalileo = New System.Windows.Forms.Label()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -168,7 +171,7 @@ Partial Class frmPNR
         '
         'cmdExit
         '
-        Me.cmdExit.Location = New System.Drawing.Point(996, 6)
+        Me.cmdExit.Location = New System.Drawing.Point(1032, 6)
         Me.cmdExit.Name = "cmdExit"
         Me.cmdExit.Size = New System.Drawing.Size(154, 29)
         Me.cmdExit.TabIndex = 37
@@ -177,7 +180,7 @@ Partial Class frmPNR
         '
         'cmdPNRRead1APNR
         '
-        Me.cmdPNRRead1APNR.Location = New System.Drawing.Point(16, 6)
+        Me.cmdPNRRead1APNR.Location = New System.Drawing.Point(217, 6)
         Me.cmdPNRRead1APNR.Name = "cmdPNRRead1APNR"
         Me.cmdPNRRead1APNR.Size = New System.Drawing.Size(133, 35)
         Me.cmdPNRRead1APNR.TabIndex = 0
@@ -288,9 +291,9 @@ Partial Class frmPNR
         '
         'cmdOneTimeVessel
         '
-        Me.cmdOneTimeVessel.Location = New System.Drawing.Point(345, 6)
+        Me.cmdOneTimeVessel.Location = New System.Drawing.Point(363, 47)
         Me.cmdOneTimeVessel.Name = "cmdOneTimeVessel"
-        Me.cmdOneTimeVessel.Size = New System.Drawing.Size(138, 35)
+        Me.cmdOneTimeVessel.Size = New System.Drawing.Size(133, 35)
         Me.cmdOneTimeVessel.TabIndex = 14
         Me.cmdOneTimeVessel.Text = "One time Vessel for PNR"
         Me.cmdOneTimeVessel.UseVisualStyleBackColor = True
@@ -387,7 +390,7 @@ Partial Class frmPNR
         'cmdPNRWrite
         '
         Me.cmdPNRWrite.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.cmdPNRWrite.Location = New System.Drawing.Point(491, 6)
+        Me.cmdPNRWrite.Location = New System.Drawing.Point(527, 6)
         Me.cmdPNRWrite.Name = "cmdPNRWrite"
         Me.cmdPNRWrite.Size = New System.Drawing.Size(141, 35)
         Me.cmdPNRWrite.TabIndex = 35
@@ -479,6 +482,9 @@ Partial Class frmPNR
         '
         'tabPageFinisher
         '
+        Me.tabPageFinisher.Controls.Add(Me.lblPNRGalileo)
+        Me.tabPageFinisher.Controls.Add(Me.lblPNRAmadeus)
+        Me.tabPageFinisher.Controls.Add(Me.txtPNRApis)
         Me.tabPageFinisher.Controls.Add(Me.cmdAPISEditPax)
         Me.tabPageFinisher.Controls.Add(Me.cmdPNRRead1GPNR)
         Me.tabPageFinisher.Controls.Add(Me.cmdAdmin)
@@ -531,6 +537,17 @@ Partial Class frmPNR
         Me.tabPageFinisher.Text = "PNR Finisher"
         Me.tabPageFinisher.UseVisualStyleBackColor = True
         '
+        'txtPNRApis
+        '
+        Me.txtPNRApis.Location = New System.Drawing.Point(3, 396)
+        Me.txtPNRApis.Multiline = True
+        Me.txtPNRApis.Name = "txtPNRApis"
+        Me.txtPNRApis.ReadOnly = True
+        Me.txtPNRApis.ScrollBars = System.Windows.Forms.ScrollBars.Both
+        Me.txtPNRApis.Size = New System.Drawing.Size(28, 18)
+        Me.txtPNRApis.TabIndex = 48
+        Me.txtPNRApis.Visible = False
+        '
         'cmdAPISEditPax
         '
         Me.cmdAPISEditPax.Location = New System.Drawing.Point(13, 414)
@@ -542,7 +559,7 @@ Partial Class frmPNR
         '
         'cmdPNRRead1GPNR
         '
-        Me.cmdPNRRead1GPNR.Location = New System.Drawing.Point(16, 47)
+        Me.cmdPNRRead1GPNR.Location = New System.Drawing.Point(217, 47)
         Me.cmdPNRRead1GPNR.Name = "cmdPNRRead1GPNR"
         Me.cmdPNRRead1GPNR.Size = New System.Drawing.Size(133, 35)
         Me.cmdPNRRead1GPNR.TabIndex = 46
@@ -561,7 +578,7 @@ Partial Class frmPNR
         'cmdPNROnlyDocs
         '
         Me.cmdPNROnlyDocs.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.cmdPNROnlyDocs.Location = New System.Drawing.Point(873, 6)
+        Me.cmdPNROnlyDocs.Location = New System.Drawing.Point(909, 6)
         Me.cmdPNROnlyDocs.Name = "cmdPNROnlyDocs"
         Me.cmdPNROnlyDocs.Size = New System.Drawing.Size(115, 35)
         Me.cmdPNROnlyDocs.TabIndex = 44
@@ -571,7 +588,7 @@ Partial Class frmPNR
         'cmdPNRWriteWithDocs
         '
         Me.cmdPNRWriteWithDocs.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.cmdPNRWriteWithDocs.Location = New System.Drawing.Point(640, 6)
+        Me.cmdPNRWriteWithDocs.Location = New System.Drawing.Point(676, 6)
         Me.cmdPNRWriteWithDocs.Name = "cmdPNRWriteWithDocs"
         Me.cmdPNRWriteWithDocs.Size = New System.Drawing.Size(225, 35)
         Me.cmdPNRWriteWithDocs.TabIndex = 43
@@ -644,9 +661,9 @@ Partial Class frmPNR
         '
         'cmdCostCentre
         '
-        Me.cmdCostCentre.Location = New System.Drawing.Point(157, 6)
+        Me.cmdCostCentre.Location = New System.Drawing.Point(363, 6)
         Me.cmdCostCentre.Name = "cmdCostCentre"
-        Me.cmdCostCentre.Size = New System.Drawing.Size(180, 35)
+        Me.cmdCostCentre.Size = New System.Drawing.Size(133, 35)
         Me.cmdCostCentre.TabIndex = 36
         Me.cmdCostCentre.Text = "Client Group Cost Centre Lookup"
         Me.cmdCostCentre.UseVisualStyleBackColor = True
@@ -1575,6 +1592,24 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
         '
+        'lblPNRAmadeus
+        '
+        Me.lblPNRAmadeus.AutoSize = True
+        Me.lblPNRAmadeus.Location = New System.Drawing.Point(13, 17)
+        Me.lblPNRAmadeus.Name = "lblPNRAmadeus"
+        Me.lblPNRAmadeus.Size = New System.Drawing.Size(10, 13)
+        Me.lblPNRAmadeus.TabIndex = 49
+        Me.lblPNRAmadeus.Text = "."
+        '
+        'lblPNRGalileo
+        '
+        Me.lblPNRGalileo.AutoSize = True
+        Me.lblPNRGalileo.Location = New System.Drawing.Point(13, 58)
+        Me.lblPNRGalileo.Name = "lblPNRGalileo"
+        Me.lblPNRGalileo.Size = New System.Drawing.Size(10, 13)
+        Me.lblPNRGalileo.TabIndex = 50
+        Me.lblPNRGalileo.Text = "."
+        '
         'frmPNR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1733,4 +1768,7 @@ Partial Class frmPNR
     Friend WithEvents cmdItn1GReadQueue As Button
     Friend WithEvents cmdPNRRead1GPNR As Button
     Friend WithEvents cmdAPISEditPax As Button
+    Friend WithEvents txtPNRApis As TextBox
+    Friend WithEvents lblPNRGalileo As Label
+    Friend WithEvents lblPNRAmadeus As Label
 End Class

@@ -22,8 +22,8 @@
             txtAgentName.Text = .AgentName
             txtAgentEmail.Text = .AgentEmail
 
-            txtDBConnectionFile.Text = DBConnectionsFile
-            txtSQLServer.Text = "DataSource:" & PNRDataSource & " DataCatalog:" & PNRDataCatalog & " UserName:" & PNRUserName
+            txtDBConnectionFile.Text = UtilitiesDB.DBConnectionsFile
+            txtSQLServer.Text = "DataSource:" & UtilitiesDB.PNRDataSource & " DataCatalog:" & UtilitiesDB.PNRDataCatalog & " UserName:" & UtilitiesDB.PNRUserName
         End With
 
     End Sub

@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
-Namespace PriceLookup
-    Public Class Item
+Namespace AveragePrice
+    Friend Class Item
         Private Structure ClassProps
             Dim Id As Integer
             Dim CustomerName As String
@@ -96,7 +96,7 @@ Namespace PriceLookup
             End With
         End Sub
     End Class
-    Public Class Collection
+    Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of Integer, Item)
 
         Private mTicketCount As Integer
@@ -135,7 +135,7 @@ Namespace PriceLookup
 
             If MySettings.PCCBackOffice = 1 Then
 
-                Dim pobjConn As New SqlClient.SqlConnection(ConnectionStringACC) ' ActiveConnection)
+                Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
                 Dim pobjComm As New SqlClient.SqlCommand
                 Dim pobjReader As SqlClient.SqlDataReader
                 Dim pobjClass As Item

@@ -4,7 +4,7 @@
 
     Private Sub frmOSMVessels_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        OSMDisplayEmails(lstOSMEditAgents)
+        UtilitiesOSM.OSMDisplayEmails(lstOSMEditAgents)
         CheckValid()
 
     End Sub
@@ -37,7 +37,7 @@
     Private Sub cmdOSMEditUpdateEmail_Click(sender As Object, e As EventArgs) Handles cmdOSMEditUpdateAgent.Click
 
         mOSMSelectedEmail.Update()
-        OSMDisplayEmails(lstOSMEditAgents)
+        UtilitiesOSM.OSMDisplayEmails(lstOSMEditAgents)
         mOSMSelectedEmail = Nothing
         DisplaySelectedEmail()
         CheckValid()
@@ -47,7 +47,7 @@
     Private Sub cmdOSMEditDeleteEmail_Click(sender As Object, e As EventArgs) Handles cmdOSMEditDeleteAgent.Click
 
         mOSMSelectedEmail.Delete()
-        OSMDisplayEmails(lstOSMEditAgents)
+        UtilitiesOSM.OSMDisplayEmails(lstOSMEditAgents)
         mOSMSelectedEmail = Nothing
         DisplaySelectedEmail()
         CheckValid()

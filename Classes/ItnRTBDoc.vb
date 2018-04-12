@@ -1,9 +1,9 @@
 ﻿Friend Class ItnRTBDoc
-    Private mobjPNR As GDSPnr
+    Private mobjPNR As GDSReadPNR
     Private mintMaxString As Integer
     Private mstrRemarks As String
     Private mintHeaderLength As Integer = 0
-    Public Sub New(ByRef pPNR As GDSPnr, ByVal pMaxString As Integer, ByRef pItnRemarks As CheckedListBox)
+    Public Sub New(ByRef pPNR As GDSReadPNR, ByVal pMaxString As Integer, ByRef pItnRemarks As CheckedListBox)
         mobjPNR = pPNR
         mintMaxString = pMaxString
         mstrRemarks = ""
@@ -17,11 +17,11 @@
             Dim pString As New System.Text.StringBuilder
             With mobjPNR
                 If .Passengers.Count > 0 Then
-                    If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                    If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                         pString.AppendLine("FOR PASSENGER" & If(.Passengers.Count > 1, "(S)", ""))
                     End If
                     For Each pobjPax In .Passengers.Values
-                        If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                        If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                             pString.AppendLine(pobjPax.PaxName)
                         Else
                             pString.AppendLine(pobjPax.ElementNo & " " & pobjPax.PaxName & " " & pobjPax.PaxID)
@@ -47,7 +47,7 @@
                 'TODO - Fix length of output line total 78 characters including spaces
                 pString.Append(MakeRTBDocPart1)
                 pString.Append(MakeRTBDocTickets)
-                If Not (MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode) And mintMaxString > 0 Then
+                If Not (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode) And mintMaxString > 0 Then
                     pString.AppendLine(StrDup(mintHeaderLength, "-"))
                 End If
                 pString.AppendLine()
@@ -101,10 +101,10 @@
 
                     pString.Clear()
                     Dim pTemp As String = ""
-                    If Not (MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode) And MySettings.ShowVessel And .VesselName <> "" Then
+                    If Not (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode) And MySettings.ShowVessel And .VesselName <> "" Then
                         pTemp &= "VESSEL     : " & .VesselName
                     End If
-                    If Not (MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode) And MySettings.ShowCostCentre And .CostCentre <> "" Then
+                    If Not (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode) And MySettings.ShowCostCentre And .CostCentre <> "" Then
                         If pTemp <> "" Then
                             pTemp &= vbCrLf
                         End If
@@ -117,7 +117,7 @@
                     End If
                     Dim pHeader As New System.Text.StringBuilder
 
-                    If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatDefault Then
+                    If MySettings.FormatStyle = Utilities.EnumItnFormat.DefaultFormat Then
                         pHeader.Append("Flight ")
                         If MySettings.ShowClassOfService Then
                             pHeader.Append("C ")
@@ -149,10 +149,10 @@
                         pString.AppendLine(StrDup(mintHeaderLength, "-"))
                         pString.AppendLine(pHeader.ToString)
                         pString.AppendLine(StrDup(mintHeaderLength, "-"))
-                    ElseIf MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                    ElseIf MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                         pHeader.Append("Flight ")
                         pHeader.Append("Date  ")
-                        If MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                        If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                             pHeader.Append("Org    " & StrDup(.MaxAirportShortNameLength - 1, " ") & "Dest       " & StrDup(.MaxAirportShortNameLength - 5, " "))
                         Else
                             pHeader.Append("Org    " & StrDup(.MaxAirportShortNameLength - 5, " ") & "Dest       " & StrDup(.MaxAirportShortNameLength - 9, " "))
@@ -174,10 +174,10 @@
                         iSegCount = iSegCount + 1
                         Dim pSeg As New System.Text.StringBuilder
 
-                        If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                        If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                             pSeg.Append(pobjSeg.Airline & pobjSeg.FlightNo.PadLeft(4) & " ")
                             pSeg.Append(pobjSeg.DepartureDateIATA & " ")
-                            If MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                            If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                                 pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
                                 pSeg.Append(pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
                             Else
@@ -264,11 +264,11 @@
 
                         pString.AppendLine(pSeg.ToString)
 
-                        If Not MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatPlain Then
+                        If Not MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
                             If pobjSeg.OperatedBy <> "" Then
                                 pString.AppendLine(StrDup(13, " ") & pobjSeg.OperatedBy)
                             End If
-                            If (MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Or MySettings.ShowStopovers) And pobjSeg.Stopovers <> "" Then
+                            If (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Or MySettings.ShowStopovers) And pobjSeg.Stopovers <> "" Then
                                 pString.AppendLine("             *INTERMEDIATE STOP*  " & pobjSeg.Stopovers)
                             End If
                         End If
@@ -284,13 +284,14 @@
 
                     If .RequestedPNR <> "" Then
                         pString.AppendLine(" ")
-                        If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
-                            pString.AppendLine("ATPI REF: " & .RequestedPNR)
+                        If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
+                            pString.AppendLine("ATPI REF   : " & .GDSAbbreviation & "/" & .RequestedPNR)
                             If pAirlineLocator <> "" Then
                                 pString.AppendLine("AIRLINE REF: " & pAirlineLocator)
                             End If
                         Else
-                            pString.AppendLine("ATPI Booking Reference: " & .RequestedPNR)
+
+                            pString.AppendLine("ATPI Booking Reference: " & .GDSAbbreviation & "/" & .RequestedPNR)
                         End If
                     End If
 
@@ -308,48 +309,59 @@
                 Dim pString As New System.Text.StringBuilder
                 pString.Clear()
                 With mobjPNR
-                    If (MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Or MySettings.ShowTickets) And .Tickets.Count >= 1 Then
-                        If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatDefault Then
+                    If (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs _
+                            Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode _
+                            Or MySettings.ShowTickets) _
+                            And .Tickets.Count >= 1 Then
+                        If MySettings.FormatStyle = Utilities.EnumItnFormat.DefaultFormat Then
                             pString.AppendLine(StrDup(mintHeaderLength, "-"))
-                        ElseIf MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatPlain Then
+                        ElseIf MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
                             pString.AppendLine()
                         End If
-                        If Not (MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode) Then
+                        If Not (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs _
+                                Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode) Then
                             Dim pHeader As String = "Ticket Number   "
                             If MySettings.ShowPaxSegPerTkt Then
                                 pHeader &= "Routing      Passenger"
                             End If
                             pString.AppendLine(pHeader)
-                            If Not MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatPlain Then
+                            If Not MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
                                 pString.AppendLine(StrDup(mintHeaderLength, "-"))
                             End If
                         End If
 
-                        If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Then
+                        If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs _
+                            Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                             For Each pobjPax In .Passengers.Values
                                 pString.AppendLine()
                                 pString.AppendLine(pobjPax.PaxName)
-                                For Each tkt As Ticket.TicketItem In .Tickets.Values
+                                For Each tkt As GDSTickets.GDSTicketItem In .Tickets.Values
                                     If tkt.Pax.Trim = pobjPax.PaxName.Trim Then
                                         Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.Substring(0, tkt.Pax.Length - 2).Trim)
                                         If pFF <> "" Then
                                             pFF = "Frequent Flyer Number: " & pFF
                                         End If
-                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "ETICKET NUMBER: ") & tkt.IssuingAirline & "-" & tkt.Document & " " & tkt.AirlineCode & " " & pFF)
+                                        If tkt.Document > 0 Then
+                                            pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "ETICKET NUMBER: ") _
+                                                           & tkt.IssuingAirline & "-" & tkt.Document & " " & tkt.AirlineCode & " " & pFF)
+                                        Else
+                                            pString.AppendLine(pFF)
+
+                                        End If
                                     End If
                                 Next
                             Next
                         Else
-                            For Each tkt As Ticket.TicketItem In .Tickets.Values
+                            For Each tkt As GDSTickets.GDSTicketItem In .Tickets.Values
                                 If tkt.eTicket Then
                                     If MySettings.ShowPaxSegPerTkt Then
 
                                         'todo - Issuing airline is code, we need airline 2 letter code for frequent flyer or maybe ff element has airline number code?
-                                        Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.Substring(0, tkt.Pax.Length - 2).Trim)
+                                        Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2).Trim)
                                         If pFF <> "" Then
                                             pFF = "Frequent Flyer Number: " & pFF
                                         End If
-                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & "  " & tkt.Segs.Substring(0, 10) & "   " & tkt.Pax.Substring(0, tkt.Pax.Length - 2) & "  " & pFF)
+                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & "  " & tkt.Segs.PadRight(10).Substring(0, 10) & "   " & tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2) & "  " & pFF)
                                         For i As Integer = 12 To tkt.Segs.Length - 10 Step 12
                                             pString.AppendLine(If(tkt.TicketType <> "PAX", "    ", "") & StrDup(16, " ") & tkt.Segs.Substring(i, 10))
                                         Next
@@ -362,13 +374,13 @@
 
                     End If
 
-                    If MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatSeaChefs Or MySettings.FormatStyle = Config.OPTItinFormat.ItnSeaChefsWithCode Or MySettings.ShowSeating Then
+                    If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Or MySettings.ShowSeating Then
                         If .Seats <> "" Then
-                            If Not MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatPlain Then
+                            If Not MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
                                 pString.AppendLine(StrDup(mintHeaderLength, "-"))
                             End If
                             pString.AppendLine("Seat Assignment")
-                            If Not MySettings.FormatStyle = Config.OPTItinFormat.ItnFormatPlain Then
+                            If Not MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
                                 pString.AppendLine(StrDup(mintHeaderLength, "-"))
                             End If
                             pString.AppendLine(.Seats & vbCrLf)
