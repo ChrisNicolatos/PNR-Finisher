@@ -558,6 +558,7 @@
                             End If
                         End If
                     Next
+
                     For i1 As Integer = 1 To pPax(0).PaxNumber
                         Dim pTktSeg As String = ""
                         For j1 As Integer = 1 To pSeg(0).SegNo

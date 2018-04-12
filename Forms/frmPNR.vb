@@ -1072,7 +1072,6 @@
     End Function
 
     Private Function UpdatePNR(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean) As String
-
         Try
             Dim pPNR As New GDSReadPNR
 
