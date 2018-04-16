@@ -1,5 +1,5 @@
 ﻿Public Class frmPNR
-
+    Private Const VersionText As String = "Athens PNR Finisher (16/04/2018 10:09) "
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
@@ -442,6 +442,7 @@
     Private Sub frmPNR_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             mflgLoading = True
+            Text = VersionText
             dgvApis.VirtualMode = False
             'Dim mGDSUser As New GDSUser(Config.GDSCode.GDSisAmadeus)
             'InitSettings(mGDSUser)
@@ -459,7 +460,7 @@
 
             mflgLoading = True
             Dim pText As String = ""
-            Text = "Athens PNR Finisher (11/04/2018 16:30) "
+            Text = VersionText
             If MySettings.GDSPcc <> "" And MySettings.GDSUser <> "" Then
                 pText &= MySettings.GDSPcc & " " & MySettings.GDSUser
                 If mSelectedPNRGDSCode = Utilities.EnumGDSCode.Amadeus Then
@@ -1073,17 +1074,17 @@
 
     Private Function UpdatePNR(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean) As String
         Try
-            Dim pPNR As New GDSReadPNR
+            '    Dim pPNR As New GDSReadPNR
 
-            pPNR.Read(mobjPNR.GDSCode)
+            '    pPNR.Read(mobjPNR.GDSCode)
 
-            If pPNR.PnrNumber = mobjPNR.PnrNumber And
-        pPNR.Itinerary = mobjPNR.Itinerary And
-        ((pPNR.IsGroup And mobjPNR.IsGroup) Or (pPNR.PaxLeadName = mobjPNR.PaxLeadName)) Then
-                UpdatePNR = mobjPNR.SendAllGDSEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, txtAirlineEntries)
-            Else
-                Throw New Exception("PNR has been changed since read" & vbCrLf & "Please read again and re-enter data", New Exception("DifferentPNR"))
-            End If
+            '    If pPNR.PnrNumber = mobjPNR.PnrNumber And
+            'pPNR.Itinerary = mobjPNR.Itinerary And
+            '((pPNR.IsGroup And mobjPNR.IsGroup) Or (pPNR.PaxLeadName = mobjPNR.PaxLeadName)) Then
+            UpdatePNR = mobjPNR.SendAllGDSEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, txtAirlineEntries)
+            'Else
+            '    Throw New Exception("PNR has been changed since read" & vbCrLf & "Please read again and re-enter data", New Exception("DifferentPNR"))
+            'End If
         Catch ex As Exception
             Throw New Exception("UpdatePNR()" & vbCrLf & ex.Message)
         End Try
