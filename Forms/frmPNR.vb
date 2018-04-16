@@ -1243,7 +1243,10 @@
             End If
             Cursor = System.Windows.Forms.Cursors.WaitCursor
             txtItnPNR.Text = mobjPNR.RetrievePNRsFromQueue(txtItnPNR.Text)
-
+            mSelectedItnGDSCode = Utilities.EnumGDSCode.Amadeus
+            Dim mGDSUser As New GDSUser(mSelectedItnGDSCode)
+            InitSettings(mGDSUser)
+            SetupPCCOptions()
             ProcessRequestedPNRs(txtItnPNR)
             CopyItinToClipboard()
             cmdItnRefresh.Enabled = False
@@ -2716,8 +2719,8 @@ td {
     End Sub
     Private Sub cmdAdmin_Click(sender As Object, e As EventArgs) Handles cmdAdmin.Click
         Try
-            Dim pfrmAdmin As New frmAdmin
-            pfrmAdmin.ShowDialog(Me)
+            Dim pfrmAdmin As New frmUser(Utilities.EnumGDSCode.Amadeus, "ATHG42100", "9044CN")
+            MessageBox.Show(pfrmAdmin.ShowDialog(Me))
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try

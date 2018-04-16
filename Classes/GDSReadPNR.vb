@@ -402,7 +402,7 @@ Friend Class GDSReadPNR
                     mobjSession1A.Send("IG")
                 End If
                 pQV &= mobjSession1A.Send("QV/" & Queue).Text
-                Do While pQV.IndexOf(")>") = pQV.Length - 4
+                Do While pQV.LastIndexOf(")>") = pQV.Length - 4
                     pQV &= mobjSession1A.Send("MDR").Text
                 Loop
                 Dim pLines() As String = pQV.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
@@ -558,7 +558,6 @@ Friend Class GDSReadPNR
     End Function
     Private Sub ReadPNR1G(ByVal PNR As String, ByVal ForReportOnly As Boolean)
         Try
-
             If PNR <> "" Then
                 mobjSession1G.SendTerminalCommand("QXI+I")
             End If
@@ -569,11 +568,16 @@ Friend Class GDSReadPNR
         End Try
     End Sub
     Private Function Read1G() As String
-
         mobjPNR1GRaw = New GDS1G_ReadRaw.ReadRaw
         Dim pResponse = mobjSession1G.SendTerminalCommand("*R")
-        If pResponse(0).Substring(6, 1) = "/" Then
+        Dim pX = mobjSession1G.GetSessionInformation.ActiveArea.CurrentPnrHaveData
+        If pResponse(0).Length > 0 Then
+
+        End If
+        If pResponse(0).Length > 5 AndAlso pResponse(0).Substring(6, 1) = "/" Then
             mudtProps.RequestedPNR = pResponse(0).Substring(0, 6)
+        ElseIf pResponse(1).Length > 5 AndAlso pResponse(1).Substring(6, 1) = "/" Then
+            mudtProps.RequestedPNR = pResponse(1).Substring(0, 6)
         ElseIf Not pResponse(0).StartsWith(" ") Then
             Throw New Exception(pResponse(0))
         Else
@@ -1109,7 +1113,7 @@ Friend Class GDSReadPNR
             Throw New Exception("ReadPNR.SendGDSAirlineItems1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
-        If pItemToSend.StartsWith("OS ") Then
+        If pItemToSend.Length > 3 AndAlso pItemToSend.StartsWith("OS ") Then
             If mobjPNR1A.RawResponse.Replace(vbCrLf, "").Replace(" ", "").IndexOf(("OSI " & pItemToSend.Substring(3)).Replace(" ", "")) = -1 Then
                 mobjSession1A.Send(pItemToSend)
             End If
@@ -2111,7 +2115,7 @@ Friend Class GDSReadPNR
         Next
         If iSeg > 0 Then
             For i As Integer = iSeg To pTQT.GetUpperBound(0)
-                If IsNumeric(pTQT(i).Substring(1, 1)) Then
+                If pTQT(i).Length > 1 AndAlso IsNumeric(pTQT(i).Substring(1, 1)) Then
                     If pTQT(i).Length > 60 Then
                         ReDim Preserve mudtAllowance(mudtAllowance.GetUpperBound(0) + 1)
                         mudtAllowance(mudtAllowance.GetUpperBound(0)) = New TQT With {

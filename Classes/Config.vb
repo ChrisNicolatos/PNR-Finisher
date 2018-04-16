@@ -58,11 +58,31 @@ Friend Class Config
             mGDSReferences.Clear()
             DBReadPCC()
             If PCCId = 0 Then
-                Throw New Exception("You are signed in to Amadeus PCC : " & mobjGDSUser.PCC & vbCrLf & "This PCC is not registered in the PNR FInisher" & vbCrLf & "Please jump to your own PCC and restart the program")
+                If mobjGDSUser.GDSCode = Utilities.EnumGDSCode.Amadeus Then
+                    Throw New Exception("You are signed in to Amadeus PCC : " & mobjGDSUser.PCC & vbCrLf & "This PCC is not registered in the PNR FInisher" & vbCrLf & "Please contact your system administrator")
+                ElseIf mobjGDSUser.GDSCode = Utilities.EnumGDSCode.Galileo Then
+                    Throw New Exception("You are signed in to Galileo PCC : " & mobjGDSUser.PCC & vbCrLf & "This PCC is not registered in the PNR FInisher" & vbCrLf & "Please contact your system administrator")
+                Else
+                    Throw New Exception("You are signed in to PCC : " & mobjGDSUser.PCC & vbCrLf & "This PCC is not registered in the PNR FInisher" & vbCrLf & "Please contact your system administrator")
+                End If
             End If
-            DBReadUser()
+            Dim pReadUser As DialogResult = DialogResult.OK
+            Do While pReadUser = DialogResult.OK
+                pReadUser = DialogResult.Cancel
+                DBReadUser()
+                If AgentID = 0 Then
+                    Dim pfrm As New frmUser(mGDSUser.GDSCode, mobjGDSUser.PCC, mobjGDSUser.User)
+                    pReadUser = pfrm.ShowDialog()
+                End If
+            Loop
             If AgentID = 0 Then
-                Throw New Exception("You are signed in to Amadeus PCC : " & mobjGDSUser.PCC & " as user : " & mobjGDSUser.User & vbCrLf & "This user is not registered in the PNR FInisher" & vbCrLf & "Please jump to your own PCC and restart the program")
+                If mobjGDSUser.GDSCode = Utilities.EnumGDSCode.Amadeus Then
+                    Throw New Exception("You are signed in to Amadeus PCC : " & mobjGDSUser.PCC & " as user : " & mobjGDSUser.User & vbCrLf & "This user is not registered in the PNR FInisher" & vbCrLf & "Please contact your system administrator")
+                ElseIf mobjGDSUser.GDSCode = Utilities.EnumGDSCode.Galileo Then
+                    Throw New Exception("You are signed in to Galileo PCC : " & mobjGDSUser.PCC & " as user : " & mobjGDSUser.User & vbCrLf & "This user is not registered in the PNR FInisher" & vbCrLf & "Please contact your system administrator")
+                Else
+                    Throw New Exception("You are signed in to PCC : " & mobjGDSUser.PCC & " as user : " & mobjGDSUser.User & vbCrLf & "This user is not registered in the PNR FInisher" & vbCrLf & "Please contact your system administrator")
+                End If
             End If
             mGDSReferences.Read(PCCBackOffice, mobjGDSUser.GDSCode)
 
@@ -679,6 +699,7 @@ Friend Class Config
                            "   WHERE pfPCC = '" & mobjGDSUser.PCC & "' AND pfUser = '" & mobjGDSUser.User & "'"
             pobjReader = .ExecuteReader
         End With
+
         With pobjReader
             If pobjReader.Read Then
                 mudtProps.AgentId = .Item("pfID")

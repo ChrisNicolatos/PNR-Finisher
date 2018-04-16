@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>15</ApplicationRevision>
+    <ApplicationRevision>16</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -82,8 +82,9 @@
     <TargetZone>Custom</TargetZone>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="itextsharp">
-      <HintPath>..\..\..\..\Visual Studio 2017\Projects\ATPIPDFMerge\ATPIPDFMerge\bin\itextsharp.dll</HintPath>
+    <Reference Include="itextsharp, Version=4.1.2.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Classes\itextsharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -123,6 +124,7 @@
     <Compile Include="Classes\Alerts.vb" />
     <Compile Include="Classes\ConditionalGDSEntry.vb" />
     <Compile Include="Classes\Config_GDSReferences.vb" />
+    <Compile Include="Classes\DBUser.vb" />
     <Compile Include="Classes\GDS1G_ReadRaw.vb" />
     <Compile Include="Classes\GDSExisting.vb" />
     <Compile Include="Classes\GDSNew.vb" />
@@ -140,6 +142,12 @@
     <Compile Include="Classes\GDS.vb" />
     <Compile Include="Classes\GreekToLatin.vb" />
     <Compile Include="Classes\TQT.vb" />
+    <Compile Include="Forms\frmUser.Designer.vb">
+      <DependentUpon>frmUser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmUser.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Shared Classes\Airlines.vb" />
     <Compile Include="Shared Classes\Airport.vb" />
     <Compile Include="Classes\GDSNumberParser.vb" />
@@ -284,6 +292,9 @@
     <EmbeddedResource Include="Forms\frmPNR.resx">
       <DependentUpon>frmPNR.vb</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmUser.resx">
+      <DependentUpon>frmUser.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmVesselForPNR.resx">
       <DependentUpon>frmVesselForPNR.vb</DependentUpon>

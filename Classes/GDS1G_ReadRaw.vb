@@ -255,14 +255,15 @@
                         pStatus = .Substring(pStart + 26, 2).Trim
                         pDepartureTime = TimeSerial(.Substring(pStart + 31, 2), .Substring(pStart + 33, 2), 0)
                         pArrivalTime = TimeSerial(.Substring(pStart + 38, 2), .Substring(pStart + 40, 2), 0)
-                        If .Substring(pStart + 37, 1) = "#" Then
-                            pArrivalDays = +1
-                        ElseIf .Substring(pStart + 37, 1) = "*" Then
-                            pArrivalDays = +2
-                        ElseIf .Substring(pStart + 37, 1) = "-" Then
-                            pArrivalDays = -1
-                        Else
-                            pArrivalDays = 0
+                        pArrivalDays = 0
+                        If .Length > pStart + 37 Then
+                            If .Substring(pStart + 37, 1) = "#" Then
+                                pArrivalDays = +1
+                            ElseIf .Substring(pStart + 37, 1) = "*" Then
+                                pArrivalDays = +2
+                            ElseIf .Substring(pStart + 37, 1) = "-" Then
+                                pArrivalDays = -1
+                            End If
                         End If
                         pArrivalDate = DateAdd(DateInterval.Day, pArrivalDays, pDepartureDate)
                         pOperatedBy = ""
@@ -478,7 +479,7 @@
             Dim pFF() As String = SendTerminalCommand("*MM")
 
             For i As Integer = 0 To pFF.Count - 1
-                If pFF(i).StartsWith("P") And pFF(i).Substring(4, 1) = "." Then
+                If pFF(i).Length > 4 AndAlso pFF(i).StartsWith("P") AndAlso pFF(i).Substring(4, 1) = "." Then
                     pAirline = pFF(i).Substring(24, 2).Trim
                     pPaxName = pFF(i).Substring(6, 18).Trim
                     pMembershipNo = pFF(i).Substring(28).Trim
@@ -625,7 +626,7 @@
             For i = 2 To pSSR.GetUpperBound(0)
                 If pSSR(i) <> "" Then
                     pElementNo = pSSR(i).Substring(0, 3).Trim
-                    If pSSR(i).Substring(5, 3) = "SSR" Then
+                    If pSSR(i).Length > 8 AndAlso pSSR(i).Substring(5, 3) = "SSR" Then
                         pSSRType = "MANUAL SSR"
                         pSSRCode = pSSR(i).Substring(8, 4)
                         pCarrierCode = pSSR(i).Substring(12, 2)

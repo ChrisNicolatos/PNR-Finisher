@@ -1,0 +1,5 @@
+[user]
+ email = Chris.Nicolatos@atpi.com
+ name = Chris Nicolatos
+[url "git@github.com:"]
+ insteadOf = https://github.com
