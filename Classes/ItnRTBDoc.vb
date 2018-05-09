@@ -336,7 +336,7 @@
                                 pString.AppendLine()
                                 pString.AppendLine(pobjPax.PaxName)
                                 For Each tkt As GDSTickets.GDSTicketItem In .Tickets.Values
-                                    If tkt.Pax.Trim = pobjPax.PaxName.Trim Then
+                                    If tkt.Pax.Trim = pobjPax.PaxName.Trim Or tkt.Pax.Trim.StartsWith(pobjPax.PaxName.Trim) Or pobjPax.PaxName.Trim.StartsWith(tkt.Pax.Trim) Then
                                         Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.Substring(0, tkt.Pax.Length - 2).Trim)
                                         If pFF <> "" Then
                                             pFF = "Frequent Flyer Number: " & pFF

@@ -56,7 +56,11 @@
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         dgvRow.Cells(5).Value = Nationality ' Nationality
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-        dgvRow.Cells(6).Value = Utilities.DateToIATA(Birthdate) ' Birth date
+        If Birthdate = Date.MinValue Then
+            dgvRow.Cells(6).Value = "" ' Birth date
+        Else
+            dgvRow.Cells(6).Value = Utilities.DateToIATA(Birthdate) ' Birth date
+        End If
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         dgvRow.Cells(7).Value = Gender ' Gender
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)

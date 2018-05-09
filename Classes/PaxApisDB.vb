@@ -60,6 +60,36 @@ Namespace PaxApisDB
             End With
             SetValid()
         End Sub
+        Public Sub New(ByVal pId As Integer, ByVal pSSRDocs As String)
+            Dim pItems() As String = pSSRDocs.Split("/")
+            If pItems.GetUpperBound(0) = 8 Then
+                With mudtProps
+                    .Id = pId
+                    .Surname = pItems(7)
+                    .FirstName = pItems(8)
+                    .Birthdate = pItems(4)
+                    .Gender = pItems(5)
+                    .IssuingCountry = pItems(1)
+                    .PassportNumber = pItems(2)
+                    .ExpiryDate = pItems(6)
+                    .Nationality = pItems(3)
+                End With
+            Else
+                With mudtProps
+                    .Id = 0
+                    .Surname = ""
+                    .FirstName = ""
+                    .Birthdate = Date.MinValue
+                    .Gender = "M"
+                    .IssuingCountry = ""
+                    .PassportNumber = ""
+                    .ExpiryDate = Date.MinValue
+                    .Nationality = ""
+                End With
+            End If
+
+            SetValid()
+        End Sub
         Private Sub SetValid()
 
             mudtProps.IsValid = (Surname <> "" And FirstName <> "" And Gender <> "" And BirthDate > Date.MinValue)
@@ -251,6 +281,10 @@ Namespace PaxApisDB
                 .Close()
             End With
             pobjConn.Close()
+        End Sub
+        Public Sub AddSSRDocsItem(ByVal Id As Integer, ByVal pSSRDocs As String)
+            Dim pItem As New Item(Id, pSSRDocs)
+            MyBase.Add(pItem.Id, pItem)
         End Sub
     End Class
     Friend Class ReferenceItem

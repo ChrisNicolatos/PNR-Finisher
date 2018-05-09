@@ -32,6 +32,21 @@
         VCHR = 2
         INTR = 3
     End Enum
+    Public Enum EnumLoGLanguage
+        English = 0
+        Brazil = 1
+    End Enum
+    Public Shared Function MyMonthName(ByVal pDate As Date, ByVal Language As EnumLoGLanguage) As String
+        Static Dim pNamesLang1() As String = {"janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"}
+
+
+        If Language = EnumLoGLanguage.Brazil Then
+            Return pDate.Day & " de " & pNamesLang1(pDate.Month - 1) & " de " & pDate.Year
+        Else
+            Return pDate.Day & " " & MonthName(pDate.Month) & " " & pDate.Year
+        End If
+
+    End Function
     Public Shared Function myCurr(ByVal StringToParse As String) As Decimal
 
         Dim i As Integer

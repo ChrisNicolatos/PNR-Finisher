@@ -21,7 +21,7 @@ Friend Class OsmLOG
         If MySettings.OSMLoGPerPax Then
             For Each pPax As GDSPax.GDSPaxItem In mobjPNR.Passengers.Values
                 pFileName = GetPDFFileName(mobjPNR.RequestedPNR & "-" & pPax.ElementNo & pPax.LastName)
-                MakePDFDocument(pFileName, pstrTextCrewMembers, pPax)
+                MakePDFDocument(MySettings.OSMLoGLanguage, pFileName, pstrTextCrewMembers, pPax)
                 CreateDocs &= pFileName & vbCrLf
             Next pPax
         Else
@@ -29,13 +29,21 @@ Friend Class OsmLOG
                 pstrTextCrewMembers = "crew members listed below are scheduled"
             End If
             pFileName = GetPDFFileName(mobjPNR.RequestedPNR)
-            MakePDFDocument(pFileName, pstrTextCrewMembers)
+            MakePDFDocument(MySettings.OSMLoGLanguage, pFileName, pstrTextCrewMembers)
             CreateDocs = pFileName
         End If
 
-
     End Function
-    Private Sub MakePDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+    Private Sub MakePDFDocument(ByVal LoGLanguage As Utilities.EnumLoGLanguage, ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+
+        Select Case LoGLanguage
+            Case Utilities.EnumLoGLanguage.Brazil
+                PDFDocumentLangBrazil(pFileName, CrewMembersText, pPax)
+            Case Else
+                PDFDocument(pFileName, CrewMembersText, pPax)
+        End Select
+    End Sub
+    Private Sub PDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
 
         Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
@@ -81,6 +89,55 @@ Friend Class OsmLOG
         pDoc.Add(AddParagraph("We confirm that " & mobjPNR.ClientName & " will cover all expenses that may occur in connection with our employee's travel.", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph("If you need any further information, please contact our employer as stated below.", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph("Sincerely,", pArial11, 0, 14, "Left"))
+        pDoc.Add(AddParagraph(mstrSignedBy, pArial11, 0, 0, "Left"))
+        pDoc.Add(AddParagraph("Crewing", pArial11, 0, 14, "Left"))
+        pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
+        pDoc.Add(AddParagraph("OSM Crew Management Limited", pArial11b, 0, 0, "Left"))
+        pDoc.Add(AddParagraph("Address: OSM HOUSE, 22 Amathountos Avenue Agios Tychonas 4532 Limassol, Cyprus", pArial11, 0, 0, "Left"))
+        pDoc.Add(AddParagraph("Phone: +357 25 33 55 01", pArial11, 0, 0, "Left"))
+
+        pDoc.Close()
+
+    End Sub
+    Private Sub PDFDocumentLangBrazil(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+
+        Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
+        Dim gif As Image = Image.GetInstance(pLogoFile)
+        Dim pDoc As New Document(PageSize.A4, 36, 36, 36, 36)
+        Dim pArial11 As Font = FontFactory.GetFont("arial", 11, FontStyle.Regular)
+        Dim pArial11b As Font = FontFactory.GetFont("arial", 11, FontStyle.Bold)
+        Dim pArial12 As Font = FontFactory.GetFont("arial", 12, FontStyle.Regular)
+        Dim pArial16b As Font = FontFactory.GetFont("arial", 16, FontStyle.Bold)
+
+        PdfWriter.GetInstance(pDoc, New FileStream(pFileName, FileMode.Create))
+        pDoc.Open()
+        gif.ScalePercent(40)
+        pDoc.Add(gif)
+
+        pDoc.Add(AddParagraph("A QUEM POSSA INTERESSAR", pArial11, 0, 14, "Left"))
+        pDoc.Add(AddParagraph(mobjPNR.VesselName, pArial11, 0, 14, "Left"))
+        pDoc.Add(AddParagraph("Atenas," & Utilities.MyMonthName(Now, Utilities.EnumLoGLanguage.Brazil), pArial12, 0, 14, "Right"))
+
+        pDoc.Add(AddParagraph("Isso é para aconselhá-lo, que o representante do escritório o seguinte vai velejar com o navio legenda em " & mobjPNR.LastSegment.OffPointCityName & If(mobjPNR.LastSegment.OffPointCountryName <> "", ", " & mobjPNR.LastSegment.OffPointCountryName, ""), pArial11, 0, 6, "Left"))
+
+        If pPax Is Nothing Then
+            pDoc.Add(MakePaxTableLangBrazil(mobjPNR.Passengers, pArial11, pArial11b))
+        Else
+            pDoc.Add(MakePaxTableLangBrazil(pPax, pArial11, pArial11b))
+        End If
+
+        pDoc.Add(AddParagraph("Detalhes do vôo :", pArial11b, 7, 0, "Left"))
+        pDoc.Add(MakeSegTable(mobjPNR.Segments, pArial11))
+
+        If Not mflgNoPortAgent And Not mobjPortAgent Is Nothing Then
+            pDoc.Add(AddParagraph("Agente Portuário", pArial11b, 7, 0, "Left"))
+            pDoc.Add(AddParagraph(mobjPortAgent.Name, pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph(mobjPortAgent.Details, pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph(mobjPortAgent.Email, pArial11, 0, 7, "Left"))
+        End If
+        pDoc.Add(AddParagraph("Por favor, dê-lhe toda a assistência possível, a fim de que ele deve chegar ao seu destino com o mínimo de atraso possível. Nós garantir que, no entanto, que será responsável para pagar todas as suas despesas de repatriamento, se as Autoridades Portuárias recusar a sua entrada no " & mobjPNR.VesselName & " por qualquer motivo.", pArial11, 0, 0, "Left"))
+        pDoc.Add(AddParagraph("Agradecendo antecipadamente.", pArial11, 0, 14, "Left"))
+        pDoc.Add(AddParagraph("Com os melhores cumprimentos.", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph(mstrSignedBy, pArial11, 0, 0, "Left"))
         pDoc.Add(AddParagraph("Crewing", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
@@ -155,8 +212,10 @@ Friend Class OsmLOG
         }
 
         'relative col widths in proportions - 2/3 And 1/3
-        Dim widths() As Single = {2, 1}
+        Dim widths() As Single = {1, 1}
         Table.SetWidths(widths)
+
+
         Table.AddCell(AddCell("Name", pHeaderFont))
         If pPax.IdNo = "" Then
             Table.AddCell(AddCell(" ", pHeaderFont))
@@ -164,11 +223,101 @@ Friend Class OsmLOG
             Table.AddCell(AddCell("Position", pHeaderFont))
         End If
 
-        Table.AddCell(AddCell(pPax.PaxName, pFont))
-        Table.AddCell(AddCell(pPax.IdNo, pFont))
-
 
         MakePaxTable = Table
+
+    End Function
+    Private Function MakePaxTableLangBrazil(ByRef pPassengers As GDSPax.GDSPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+
+        Dim Table As New PdfPTable(2) With {
+            .LockedWidth = False,
+            .HorizontalAlignment = 0,
+            .SpacingBefore = 14,
+            .SpacingAfter = 14
+        }
+        Dim pobjPaxApis As New PaxApisDB.Collection
+        Dim pPosition As Boolean = False
+        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
+            If pPax.IdNo <> "" Then
+                pPosition = True
+                Exit For
+            End If
+        Next pPax
+        'relative col widths in proportions - 1/2 And 1/2
+        Dim widths() As Single = {1, 1}
+        Table.SetWidths(widths)
+
+        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
+            'Sobrenome: Carlos Naia
+            Table.AddCell(AddCell("Sobrenome:", pFont))
+            Table.AddCell(AddCell(pPax.LastName, pFont))
+            'Nome:   Hugo Miguel
+            Table.AddCell(AddCell("Nome:", pFont))
+            Table.AddCell(AddCell(pPax.Initial, pFont))
+            If mobjPNR.SSRDocsExists Then
+                For Each pDocs As PaxApisDB.Item In mobjPNR.SSRDocsCollection.Values
+                    If pDocs.Surname.Replace(" ", "") = pPax.LastName.Replace(" ", "") And pPax.Initial.Replace(" ", "").StartsWith(pDocs.FirstName.Replace(" ", "")) Then
+                        'Nacionalidade: Portuguese
+                        Table.AddCell(AddCell("Nacionalidade:", pFont))
+                        Table.AddCell(AddCell(pDocs.Nationality, pFont))
+                        'DOB:  18/03/1988
+                        Table.AddCell(AddCell("DOB:", pFont))
+                        Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.BirthDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                        'Número do passaporte:  P876285
+                        Table.AddCell(AddCell("Número do passaporte:", pFont))
+                        Table.AddCell(AddCell(pDocs.PassportNumber, pFont))
+                        'Data de validade:   06/07/2022 
+                        Table.AddCell(AddCell("Data de validade:", pFont))
+                        Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.ExpiryDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                    End If
+                Next
+            End If
+
+            Table.AddCell(AddCell(" ", pFont))
+            Table.AddCell(AddCell(" ", pFont))
+        Next pPax
+
+        MakePaxTableLangBrazil = Table
+
+    End Function
+    Private Function MakePaxTableLangBrazil(ByRef pPax As GDSPax.GDSPaxItem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+
+        Dim Table As New PdfPTable(2) With {
+            .LockedWidth = False,
+            .HorizontalAlignment = 0,
+            .SpacingBefore = 14,
+            .SpacingAfter = 14
+        }
+
+        'relative col widths in proportions - 1/2 And 1/2
+        Dim widths() As Single = {1, 1}
+        Table.SetWidths(widths)
+
+        'Sobrenome: Carlos Naia
+        Table.AddCell(AddCell("Sobrenome:", pFont))
+        Table.AddCell(AddCell(pPax.LastName, pFont))
+        'Nome:   Hugo Miguel
+        Table.AddCell(AddCell("Nome:", pFont))
+        Table.AddCell(AddCell(pPax.Initial, pFont))
+        If mobjPNR.SSRDocsExists Then
+            For Each pDocs As PaxApisDB.Item In mobjPNR.SSRDocsCollection.Values
+                If pDocs.Surname = pPax.LastName And pDocs.FirstName = pPax.Initial Then
+                    'Nacionalidade: Portuguese
+                    Table.AddCell(AddCell("Nacionalidade:", pFont))
+                    Table.AddCell(AddCell(pDocs.Nationality, pFont))
+                    'DOB:  18/03/1988
+                    Table.AddCell(AddCell("DOB:", pFont))
+                    Table.AddCell(AddCell(pDocs.BirthDate, pFont))
+                    'Número do passaporte:  P876285
+                    Table.AddCell(AddCell("Número do passaporte:", pFont))
+                    Table.AddCell(AddCell(pDocs.PassportNumber, pFont))
+                    'Data de validade:   06/07/2022 
+                    Table.AddCell(AddCell("Data de validade:", pFont))
+                    Table.AddCell(AddCell(pDocs.ExpiryDate, pFont))
+                End If
+            Next
+        End If
+        MakePaxTableLangBrazil = Table
 
     End Function
     Private Function MakeSegTable(ByRef pSegs As GDSSeg.GDSSegColl, ByVal pFont As Font) As PdfPTable
@@ -215,6 +364,7 @@ Friend Class OsmLOG
         MakeSegTable = Table
 
     End Function
+
     Private Function AddCell(ByVal pText As String, ByVal pFont As Font) As PdfPCell
         Dim c1 As New PdfPCell(New Phrase(pText, pFont)) With {
                     .Border = Rectangle.NO_BORDER

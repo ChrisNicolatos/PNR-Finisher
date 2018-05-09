@@ -42,6 +42,7 @@ Friend Class Config
         Dim OSMLoGPerPax As Boolean
         Dim OSMLoGOnsigner As Boolean
         Dim OSMLoGPath As String
+        Dim OSMLoGLanguage As Utilities.EnumLoGLanguage
 
     End Structure
 
@@ -307,6 +308,14 @@ Friend Class Config
                 mflgIsDirtyUser = True
             End If
             mudtProps.OSMLoGPath = value
+        End Set
+    End Property
+    Public Property OSMLoGLanguage As Utilities.EnumLoGLanguage
+        Get
+            OSMLoGLanguage = mudtProps.OSMLoGLanguage
+        End Get
+        Set(value As Utilities.EnumLoGLanguage)
+            mudtProps.OSMLoGLanguage = value
         End Set
     End Property
     Public ReadOnly Property PCCId As Integer
@@ -727,6 +736,7 @@ Friend Class Config
                 mudtProps.OSMLoGPerPax = .Item("pfOSMLOGPerPax")
                 mudtProps.OSMLoGOnsigner = .Item("pfOSMLOGOnSigner")
                 mudtProps.OSMLoGPath = .Item("pfOSMLOGPath")
+                mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
             Else
                 mudtProps.AgentId = 0
                 mudtProps.AgentQueue = ""
@@ -753,6 +763,7 @@ Friend Class Config
                 mudtProps.OSMLoGPerPax = False
                 mudtProps.OSMLoGOnsigner = False
                 mudtProps.OSMLoGPath = ""
+                mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
             End If
             .Close()
         End With
@@ -842,6 +853,10 @@ Friend Class Config
             If AgentQueue.IndexOf("/") >= 0 Then
                 ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PCC-AGENTQ%", "/" & AgentQueue)
                 ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTQ%", "/" & AgentQueue)
+            ElseIf AgentQueue.IndexOf("*") > 0 Then
+                Dim pQueue As String = AgentQueue.Substring(0, AgentQueue.IndexOf("*"))
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PCC-AGENTQ%", mobjGDSUser.PCC & "/" & pQueue)
+                ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTQ%", pQueue)
             Else
                 ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%PCC-AGENTQ%", mobjGDSUser.PCC & "/" & AgentQueue)
                 ConvertGDSValue = ReplaceReference(ConvertGDSValue, "%AGENTQ%", AgentQueue)

@@ -26,6 +26,7 @@ Partial Class frmOSMLoG
         Me.optPerPNR = New System.Windows.Forms.RadioButton()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.optOnSignersBrazil = New System.Windows.Forms.RadioButton()
         Me.optOnSigners = New System.Windows.Forms.RadioButton()
         Me.optOffSigners = New System.Windows.Forms.RadioButton()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
@@ -41,6 +42,8 @@ Partial Class frmOSMLoG
         Me.lblSegs = New System.Windows.Forms.Label()
         Me.txtSignedBy = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
+        Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
+        Me.txtOSMAgentsFilter = New System.Windows.Forms.TextBox()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -81,19 +84,31 @@ Partial Class frmOSMLoG
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.optOnSignersBrazil)
         Me.GroupBox2.Controls.Add(Me.optOnSigners)
         Me.GroupBox2.Controls.Add(Me.optOffSigners)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 104)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(216, 86)
+        Me.GroupBox2.Size = New System.Drawing.Size(216, 98)
         Me.GroupBox2.TabIndex = 3
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Reason for travel"
         '
+        'optOnSignersBrazil
+        '
+        Me.optOnSignersBrazil.AutoSize = True
+        Me.optOnSignersBrazil.Location = New System.Drawing.Point(15, 69)
+        Me.optOnSignersBrazil.Name = "optOnSignersBrazil"
+        Me.optOnSignersBrazil.Size = New System.Drawing.Size(118, 17)
+        Me.optOnSignersBrazil.TabIndex = 2
+        Me.optOnSignersBrazil.TabStop = True
+        Me.optOnSignersBrazil.Text = "On signers for Brazil"
+        Me.optOnSignersBrazil.UseVisualStyleBackColor = True
+        '
         'optOnSigners
         '
         Me.optOnSigners.AutoSize = True
-        Me.optOnSigners.Location = New System.Drawing.Point(15, 29)
+        Me.optOnSigners.Location = New System.Drawing.Point(15, 19)
         Me.optOnSigners.Name = "optOnSigners"
         Me.optOnSigners.Size = New System.Drawing.Size(75, 17)
         Me.optOnSigners.TabIndex = 0
@@ -104,7 +119,7 @@ Partial Class frmOSMLoG
         'optOffSigners
         '
         Me.optOffSigners.AutoSize = True
-        Me.optOffSigners.Location = New System.Drawing.Point(15, 52)
+        Me.optOffSigners.Location = New System.Drawing.Point(15, 44)
         Me.optOffSigners.Name = "optOffSigners"
         Me.optOffSigners.Size = New System.Drawing.Size(75, 17)
         Me.optOffSigners.TabIndex = 1
@@ -114,6 +129,8 @@ Partial Class frmOSMLoG
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.lblOSMMultipleSearchSeparator)
+        Me.GroupBox3.Controls.Add(Me.txtOSMAgentsFilter)
         Me.GroupBox3.Controls.Add(Me.chkNoPortAgent)
         Me.GroupBox3.Controls.Add(Me.lstPortAgent)
         Me.GroupBox3.Location = New System.Drawing.Point(248, 19)
@@ -136,9 +153,9 @@ Partial Class frmOSMLoG
         'lstPortAgent
         '
         Me.lstPortAgent.FormattingEnabled = True
-        Me.lstPortAgent.Location = New System.Drawing.Point(15, 25)
+        Me.lstPortAgent.Location = New System.Drawing.Point(15, 51)
         Me.lstPortAgent.Name = "lstPortAgent"
-        Me.lstPortAgent.Size = New System.Drawing.Size(391, 108)
+        Me.lstPortAgent.Size = New System.Drawing.Size(391, 82)
         Me.lstPortAgent.TabIndex = 0
         '
         'Label1
@@ -222,6 +239,23 @@ Partial Class frmOSMLoG
         Me.Label2.TabIndex = 12
         Me.Label2.Text = "Signed by"
         '
+        'lblOSMMultipleSearchSeparator
+        '
+        Me.lblOSMMultipleSearchSeparator.AutoSize = True
+        Me.lblOSMMultipleSearchSeparator.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblOSMMultipleSearchSeparator.Location = New System.Drawing.Point(15, 42)
+        Me.lblOSMMultipleSearchSeparator.Name = "lblOSMMultipleSearchSeparator"
+        Me.lblOSMMultipleSearchSeparator.Size = New System.Drawing.Size(112, 9)
+        Me.lblOSMMultipleSearchSeparator.TabIndex = 25
+        Me.lblOSMMultipleSearchSeparator.Text = "Multiple search separated with |"
+        '
+        'txtOSMAgentsFilter
+        '
+        Me.txtOSMAgentsFilter.Location = New System.Drawing.Point(15, 19)
+        Me.txtOSMAgentsFilter.Name = "txtOSMAgentsFilter"
+        Me.txtOSMAgentsFilter.Size = New System.Drawing.Size(166, 20)
+        Me.txtOSMAgentsFilter.TabIndex = 24
+        '
         'frmOSMLoG
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -273,4 +307,7 @@ Partial Class frmOSMLoG
     Friend WithEvents chkNoPortAgent As CheckBox
     Friend WithEvents txtSignedBy As TextBox
     Friend WithEvents Label2 As Label
+    Friend WithEvents optOnSignersBrazil As RadioButton
+    Friend WithEvents lblOSMMultipleSearchSeparator As Label
+    Friend WithEvents txtOSMAgentsFilter As TextBox
 End Class

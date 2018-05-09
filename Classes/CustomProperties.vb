@@ -75,7 +75,7 @@ Namespace CustomProperties
                 .Label = pLabel
                 .TFEntityID = pTFEntityID
                 ReDim .Values(0)
-                If .LimitToLookup Then
+                If .LookUpValues.IndexOf("<") >= 0 Or MySettings.PCCBackOffice = 2 Then
                     ReadXML(pCustomPropertyID, pTFEntityID)
                 Else
                     ReadLookUpValues()

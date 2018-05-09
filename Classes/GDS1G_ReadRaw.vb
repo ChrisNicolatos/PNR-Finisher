@@ -99,7 +99,7 @@
 
         End Sub
         Private Function SendTerminalCommand(ByVal TerminalEntry As String) As String()
-            Dim mstrPNR = mobjSession1G.SendTerminalCommand(TerminalEntry)
+            Dim mstrPNR As ObjectModel.ReadOnlyCollection(Of String) = mobjSession1G.SendTerminalCommand(TerminalEntry)
             RaiseEvent TerminalCommandSent(TerminalEntry)
             Dim pRawIndex As Integer = -1
             Dim pSendTerminalCommand(0) As String
@@ -167,6 +167,12 @@
                 mflgNewPNR = True
             Else
                 mstrPNRNumber = pPax(0).Substring(0, 6)
+                For i As Integer = 0 To pPax.GetUpperBound(0)
+                    If pPax(i).IndexOf("/") = 6 Then
+                        mstrPNRNumber = pPax(i).Substring(0, 6)
+                        Exit For
+                    End If
+                Next
                 mflgNewPNR = False
             End If
             For i As Integer = 0 To pPax.GetUpperBound(0)
@@ -267,10 +273,10 @@
                         End If
                         pArrivalDate = DateAdd(DateInterval.Day, pArrivalDays, pDepartureDate)
                         pOperatedBy = ""
-                        If i < pSegs.GetUpperBound(0) AndAlso .IndexOf(".") < 3 Then
+                        If i < pSegs.GetUpperBound(0) AndAlso pSegs(i + 1).StartsWith(Space(4)) Then
                             pOperatedBy = pSegs(i + 1).Trim
                         End If
-                        pobjSeg = mobjSegments.AddItem(pCarrier, pOrigin, pClassOfService, pDepartureDate, pArrivalDate, pElementNo, pFlightNumber, pDestination, pStatus, pDepartureTime, pArrivalTime, pVL, pSegs(i), ReadSVC(pElementNo))
+                        pobjSeg = mobjSegments.AddItem(pCarrier, pOrigin, pClassOfService, pDepartureDate, pArrivalDate, pElementNo, pFlightNumber, pDestination, pStatus, pDepartureTime, pArrivalTime, pVL, pSegs(i), pOperatedBy, ReadSVC(pElementNo))
                         If mSegsFirstElement = -1 Then
                             mSegsFirstElement = pElementNo
                         End If
@@ -535,7 +541,7 @@
                             Else
                                 pPax(pPax(0).PaxNumber).TicketNumber = ""
                             End If
-                        ElseIf pFFx(iPFF).Length > 13 AndAlso pFFx(iPFF).StartsWith(" S") AndAlso IsNumeric(pFFx(iPFF).Substring(2, 1)) Then
+                        ElseIf pFFx(iPFF).Length > 7 AndAlso pFFx(iPFF).StartsWith(" S") AndAlso pFFx(iPFF).Substring(3, 3) = Space(3) AndAlso IsNumeric(pFFx(iPFF).Substring(2, 1)) Then
                             pSegNo = pFFx(iPFF).Substring(2, pFFx(iPFF).IndexOf(" ", 2))
                             pBaggageAllowance = ""
                             For ipff1 = iPFF To pFFx.GetUpperBound(0)
@@ -625,6 +631,14 @@
 
             For i = 2 To pSSR.GetUpperBound(0)
                 If pSSR(i) <> "" Then
+                    For j = i + 1 To pSSR.GetUpperBound(0)
+                        If pSSR(j).StartsWith(Space(20)) Then
+                            pSSR(i) &= pSSR(j).Substring(20)
+                            pSSR(j) = ""
+                        Else
+                            Exit For
+                        End If
+                    Next
                     pElementNo = pSSR(i).Substring(0, 3).Trim
                     If pSSR(i).Length > 8 AndAlso pSSR(i).Substring(5, 3) = "SSR" Then
                         pSSRType = "MANUAL SSR"
@@ -638,27 +652,28 @@
                         pCarrierCode = pSSR(i).Substring(5, 2)
                         pSpaces = 9
                     End If
-
-                    For i1 As Integer = i + 1 To pSSR.GetUpperBound(0)
-                        If pSSR(i1).StartsWith(Space(pSpaces)) Then
-                            If pSSR(i).EndsWith("-") Then
-                                pSSR(i) = pSSR(i).Substring(0, pSSR(i).Length - 1)
+                    If pSpaces > 0 Then
+                        For i1 As Integer = i + 1 To pSSR.GetUpperBound(0)
+                            If pSSR(i1).StartsWith(Space(pSpaces)) Then
+                                If pSSR(i).EndsWith("-") Then
+                                    pSSR(i) = pSSR(i).Substring(0, pSSR(i).Length - 1)
+                                End If
+                                pSSR(i) &= pSSR(i1).Substring(pSpaces)
+                                pSSR(i1) = ""
+                            Else
+                                Exit For
                             End If
-                            pSSR(i) &= pSSR(i1).Substring(pSpaces)
-                            pSSR(i1) = ""
-                        Else
-                            Exit For
+                        Next
+                        pText = pSSR(i).Substring(pSpaces).TrimEnd
+                        If pSSRCode = "DOCS" Then
+                            Dim pTextItems() As String = pText.Split("/")
+                            pPassportNumber = pTextItems(3)
+                            pDateOfBirth = Utilities.DateFromIATA(pTextItems(5))
+                            pLastName = pTextItems(8)
+                            pFirstName = pTextItems(9).Split("-")(0)
                         End If
-                    Next
-                    pText = pSSR(i).Substring(pSpaces).TrimEnd
-                    If pSSRCode = "DOCS" Then
-                        Dim pTextItems() As String = pText.Split("/")
-                        pPassportNumber = pTextItems(3)
-                        pDateOfBirth = Utilities.DateFromIATA(pTextItems(5))
-                        pLastName = pTextItems(8)
-                        pFirstName = pTextItems(9).Split("-")(0)
+                        mobjSSR.AddItem(pElementNo, pSSRType, pSSRCode, pCarrierCode, pStatusCode, pText, pLastName, pFirstName, pDateOfBirth, pPassportNumber)
                     End If
-                    mobjSSR.AddItem(pElementNo, pSSRType, pSSRCode, pCarrierCode, pStatusCode, pText, pLastName, pFirstName, pDateOfBirth, pPassportNumber)
                 End If
             Next
         End Sub
@@ -722,9 +737,15 @@
                         Else
                             pElement = pDI(i).Substring(0, 3)
                         End If
-                        pCategory = pDI(i).Substring(5, pDI(i).IndexOf("-", 5) - 5)
-                        pRemark = pDI(i).Substring(pDI(i).IndexOf("-", 5) + 1)
-                        mobjDI.AddItem(pElement, pCategory, pRemark)
+                        If pDI(i).IndexOf("-", 5) > 5 Then
+                            pCategory = pDI(i).Substring(5, pDI(i).IndexOf("-", 5) - 5)
+                            pRemark = pDI(i).Substring(pDI(i).IndexOf("-", 5) + 1)
+                            mobjDI.AddItem(pElement, pCategory, pRemark)
+                        ElseIf pDI(i).IndexOf("*") > 4 Then
+                            pCategory = pDI(i).Substring(5, pDI(i).IndexOf("*") - 4)
+                            pRemark = pDI(i).Substring(pDI(i).IndexOf("*") + 1)
+                            mobjDI.AddItem(pElement, pCategory, pRemark)
+                        End If
                     End If
                 Next
             End If

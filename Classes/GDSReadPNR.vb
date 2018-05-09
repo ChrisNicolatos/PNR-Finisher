@@ -69,6 +69,7 @@ Friend Class GDSReadPNR
     Private mflgExistsSegments As Boolean
     Private mflgExistsSSRDocs As Boolean
     Private mstrSSRDocs As String
+    Private mobjSSRDocs As New PaxApisDB.Collection
 
     Private mSegsFirstElement As Integer
     Private mSegsLastElement As Integer
@@ -202,6 +203,11 @@ Friend Class GDSReadPNR
     Public ReadOnly Property PaxLeadName As String
         Get
             PaxLeadName = mobjPassengers.LeadName
+        End Get
+    End Property
+    Public ReadOnly Property SSRDocsCollection As PaxApisDB.Collection
+        Get
+            SSRDocsCollection = mobjSSRDocs
         End Get
     End Property
     Public ReadOnly Property IsGroup As Boolean
@@ -569,7 +575,7 @@ Friend Class GDSReadPNR
     End Sub
     Private Function Read1G() As String
         mobjPNR1GRaw = New GDS1G_ReadRaw.ReadRaw
-        Dim pResponse = mobjSession1G.SendTerminalCommand("*R")
+        Dim pResponse As ObjectModel.ReadOnlyCollection(Of String) = mobjSession1G.SendTerminalCommand("*R")
         Dim pX = mobjSession1G.GetSessionInformation.ActiveArea.CurrentPnrHaveData
         If pResponse(0).Length > 0 Then
 
@@ -762,7 +768,7 @@ Friend Class GDSReadPNR
                         pFound = True
                     End If
                 Next
-                Dim pResponse
+                Dim pResponse As ObjectModel.ReadOnlyCollection(Of String)
                 If pMaxIndex > -1 Then
                     If pCategory = "Segment." Then
                         pResponse = mobjSession1G.SendTerminalCommand("X" & pMax)
@@ -880,7 +886,7 @@ Friend Class GDSReadPNR
                 For i As Integer = 0 To pAirlineEntries.GetUpperBound(0)
                     pAirlineEntries(i) = pAirlineEntries(i).Replace(">", "").Trim
                     If pAirlineEntries(i).Trim <> "" Then
-                        SendGDSAirlineItems1A(pAirlineEntries(i).Replace("> ", ""))
+                        SendGDSItemsNoDuplicate1A(pAirlineEntries(i).Replace("> ", ""))
                     End If
                 Next
             End If
@@ -1037,7 +1043,7 @@ Friend Class GDSReadPNR
         pCloseOffEntries.Load(MySettings.GDSPcc, mstrOfficeOfResponsibility = MySettings.GDSPcc)
 
         For Each pCommand As CloseOffEntries.Item In pCloseOffEntries.Values
-            mobjSession1A.Send(pCommand.CloseOffEntry)
+            SendGDSItemsNoDuplicate1A(pCommand.CloseOffEntry)
         Next
         If mstrPNRResponse.Contains("WARNING: SECURE FLT PASSENGER DATA REQUIRED") Then
             MessageBox.Show(mstrPNRResponse)
@@ -1052,10 +1058,13 @@ Friend Class GDSReadPNR
         CloseOffPNR1G = ""
         pCloseOffEntries.Load(MySettings.GDSPcc, mstrOfficeOfResponsibility = MySettings.GDSPcc)
 
-        Dim pResponse
+        Dim pResponse As ObjectModel.ReadOnlyCollection(Of String)
         Dim pPNR As String
         pResponse = mobjSession1G.SendTerminalCommand("R.CN")
         pResponse = mobjSession1G.SendTerminalCommand("ER")
+        If pResponse(0).ToString.IndexOf("CHECK") >= 0 AndAlso pResponse(0).ToString.IndexOf("CONTINUITY") >= 0 Then
+            pResponse = mobjSession1G.SendTerminalCommand("ER")
+        End If
         If pResponse(0).ToString.Length > 9 AndAlso pResponse(0).ToString.Substring(6, 1) = "/" Then
 
 
@@ -1073,9 +1082,9 @@ Friend Class GDSReadPNR
             pResponse = mobjSession1G.SendTerminalCommand("IR")
             CloseOffPNR1G = pPNR
         Else
-            MessageBox.Show(pResponse(0) & vbCrLf & pResponse(1), "ERROR IN PNR UPDATE", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            mobjSession1G.SendTerminalCommand("IR")
-            Throw New Exception("Error in PNR Update")
+            'MessageBox.Show(pResponse(0) & vbCrLf & pResponse(1), "ERROR IN PNR UPDATE", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            'mobjSession1G.SendTerminalCommand("IR")
+            Throw New Exception("Error in PNR Update. Please check your PNR and try again")
         End If
     End Function
     Private Sub SendGDSElement1A(ByVal pElement As GDSNew.Item)
@@ -1093,12 +1102,12 @@ Friend Class GDSReadPNR
             Throw New Exception("ReadPNR.SendGDSElement1G()" & vbCrLf & "Selected GDS is not Galileo")
         End If
         SendGDSElement1G = ""
-        Dim pResponse
+        Dim pResponse As ObjectModel.ReadOnlyCollection(Of String)
         If pElement.GDSCommand <> "" Then
             pResponse = mobjSession1G.SendTerminalCommand(pElement.GDSCommand)
-            If pResponse(0) & pResponse(1) <> " *>" Then
+            If pResponse.Count >= 2 AndAlso pResponse(0) & pResponse(1) <> " *>" AndAlso pResponse(pResponse.Count - 2).ToString.IndexOf(" T ") <> 3 Then
                 SendGDSElement1G = vbCrLf & pElement.GDSCommand
-                For i As Integer = 0 To pResponse.count - 1
+                For i As Integer = 0 To pResponse.Count - 1
                     SendGDSElement1G &= vbCrLf & pResponse(i)
                 Next
                 If ShowResponse Then
@@ -1108,7 +1117,7 @@ Friend Class GDSReadPNR
         End If
 
     End Function
-    Private Sub SendGDSAirlineItems1A(ByVal pItemToSend As String)
+    Private Sub SendGDSItemsNoDuplicate1A(ByVal pItemToSend As String)
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
             Throw New Exception("ReadPNR.SendGDSAirlineItems1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
@@ -1123,7 +1132,7 @@ Friend Class GDSReadPNR
             End If
         ElseIf pItemToSend.StartsWith("S") Then
             Dim pString As String
-            pString = pItemToSend.Replace(" ", "").Replace("SRCKIN-", "")
+            pString = pItemToSend.Replace(" ", "").Replace("SR", "SSR ")
             If mobjPNR1A.RawResponse.Replace(vbCrLf, "").Replace(" ", "").IndexOf(pString) = -1 Then
                 mobjSession1A.Send(pItemToSend)
             End If
@@ -1156,12 +1165,14 @@ Friend Class GDSReadPNR
             End If
             If pItemToSend <> "" Then
                 pResponse = mobjSession1G.SendTerminalCommand(pItemToSend)
-                SendGDSAirlineItems1G = vbCrLf & pItemToSend
-                For i As Integer = 0 To pResponse.count - 1
-                    SendGDSAirlineItems1G &= vbCrLf & pResponse(i)
-                Next
-                If pResponse(0) & pResponse(1) <> " *>" Then
-                    MessageBox.Show(pItemToSend & vbCrLf & pResponse(0) & pResponse(1))
+                If pResponse(0) <> "DUPLICATE SSRS MUST BE COMBINED" And pResponse(0) & pResponse(1) <> " *>" Then
+                    SendGDSAirlineItems1G = vbCrLf & pItemToSend
+                    For i As Integer = 0 To pResponse.count - 1
+                        SendGDSAirlineItems1G &= vbCrLf & pResponse(i)
+                    Next
+                    If pResponse(0) & pResponse(1) <> " *>" Then
+                        MessageBox.Show(pItemToSend & vbCrLf & pResponse(0) & pResponse(1))
+                    End If
                 End If
             End If
         End If
@@ -1204,6 +1215,7 @@ Friend Class GDSReadPNR
                     GetAutoTickets1A()
                     GetOtherServiceElements1A()
                     GetSSRElements1A()
+                    GetSSR1A()
                     GetRMElements1A()
                 End If
                 RetrievePNR1A = True
@@ -1558,9 +1570,12 @@ Friend Class GDSReadPNR
     Private Sub GetSSR1A()
         mflgExistsSSRDocs = False
         mstrSSRDocs = ""
+        mobjSSRDocs.Clear()
+
         For Each pSSR As s1aPNR.SSRElement In mobjPNR1A.SSRElements
             If pSSR.Text.IndexOf("SSR DOCS") > 0 And pSSR.Text.IndexOf("SSR DOCS") < 10 Then
                 mstrSSRDocs &= pSSR.Text & vbCrLf
+                mobjSSRDocs.AddSSRDocsItem(pSSR.ElementNo, pSSR.FreeFlow)
                 mflgExistsSSRDocs = True
             End If
         Next
@@ -1602,24 +1617,42 @@ Friend Class GDSReadPNR
         pintLen = Len(pstrText)
         pstrSplit = Split(Left(pstrText, pintLen), "/")
         ' TODO - make necessary changes for Cyprus Discovery remarks
+
         If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
-            If pstrSplit(1) = "CC" Then
-                mstrCC = pstrSplit(2)
-            ElseIf pstrSplit(1) = "CLN" Then
-                mstrCLN = pstrSplit(2)
-            ElseIf pstrSplit(1) = "CLA" Then
+            If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
                 mstrCLA = pstrSplit(2)
-            ElseIf pstrSplit(1) = "BBY" Then
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCC")) Then
+                mstrCC = pstrSplit(2)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCLN")) Then
+                mstrCLN = pstrSplit(2)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextBBY")) Then
                 mstrBookedBy = pstrSplit(2)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
+                mstrVesselName = pstrSplit(2)
             End If
+            'If pstrSplit(1) = "CC" Then
+            'ElseIf pstrSplit(1) = "CLN" Then
+            'ElseIf pstrSplit(1) = "BBY" Then
+            'End If
         End If
         pstrSplit = Split(Left(pstrText, pintLen), "-")
         If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
-            If pstrSplit(0).IndexOf("D,BOOKED") > 0 Then
-                mstrBookedBy = pstrSplit(1)
-            ElseIf pstrSplit(0).IndexOf("D,AC") > 0 Then
+            If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
+                mstrCLA = pstrSplit(1)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCC")) Then
+                mstrCC = pstrSplit(1)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCLN")) Then
                 mstrCLN = pstrSplit(1)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextBBY")) Then
+                mstrBookedBy = pstrSplit(1)
+            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
+                mstrVesselName = pstrSplit(1)
             End If
+            'If pstrSplit(0).IndexOf("D,BOOKED") > 0 Then
+            '    mstrBookedBy = pstrSplit(1)
+            'ElseIf pstrSplit(0).IndexOf("D,AC") > 0 Then
+            '    mstrCLN = pstrSplit(1)
+            'End If
         End If
 
 
@@ -1734,7 +1767,8 @@ Friend Class GDSReadPNR
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextSBN")) Then
                     mobjExistingGDSElements.SubDepartmentCode.SetValues(True, .ElementNo, MySettings.GDSElement("TextSBN"), .Remark, pFullText.Substring(MySettings.GDSValue("TextSBN").Length))
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextVSL")) Then
-                    mobjExistingGDSElements.VesselName.SetValues(True, .ElementNo, MySettings.GDSElement("TextVSL"), .Remark, pFullText.Substring(MySettings.GDSValue("TextVSL").Length))
+                    mstrVesselName = pFullText.Substring(MySettings.GDSValue("TextVSL").Length)
+                    mobjExistingGDSElements.VesselName.SetValues(True, .ElementNo, MySettings.GDSElement("TextVSL"), .Remark, mstrVesselName)
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextVSR")) Then
                     mobjExistingGDSElements.VesselFlag.SetValues(True, .ElementNo, MySettings.GDSElement("TextVSR"), .Remark, pFullText.Substring(MySettings.GDSValue("TextVSR").Length))
                 ElseIf pFullText.StartsWith("D,BOOKED") > 0 Then

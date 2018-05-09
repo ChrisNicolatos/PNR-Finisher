@@ -31,6 +31,7 @@ Namespace GDSSeg
             Dim EstimatedFlyingTime As String
             Dim AirlineLocator As String
             Dim Text As String
+            Dim OperatedBy As String
             Dim Stopovers As String
             Dim DepartTerminal As String
             Dim ArriveTerminal As String
@@ -272,18 +273,22 @@ Namespace GDSSeg
         End Property
         Public ReadOnly Property OperatedBy As String
             Get
-                OperatedBy = ""
-                For i = 81 To mudtProps.Text.Length Step 80
-                    If (mudtProps.Text & StrDup(80, " ")).Substring(i, 80).IndexOf("OPERATED BY") >= 0 Then
-                        If OperatedBy <> "" Then
-                            OperatedBy &= vbCrLf
+                If mudtProps.OperatedBy <> "" Then
+                    Return mudtProps.OperatedBy
+                Else
+                    OperatedBy = ""
+                    For i = 81 To mudtProps.Text.Length Step 80
+                        If (mudtProps.Text & StrDup(80, " ")).Substring(i, 80).IndexOf("OPERATED BY") >= 0 Then
+                            If OperatedBy <> "" Then
+                                OperatedBy &= vbCrLf
+                            End If
+                            OperatedBy &= (mudtProps.Text.Trim & StrDup(80, " ")).Substring(i, 80)
                         End If
-                        OperatedBy &= (mudtProps.Text.Trim & StrDup(80, " ")).Substring(i, 80)
-                    End If
-                Next
+                    Next
+                End If
             End Get
         End Property
-        Friend Sub SetValues(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pVL() As String, ByVal pText As String, ByVal SVC As String())
+        Friend Sub SetValues(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pVL() As String, ByVal pText As String, ByVal pOperatedBy As String, ByVal SVC As String())
             ' Galileo
             With mudtProps
                 .ElementNo = pElementNo
@@ -329,6 +334,7 @@ Namespace GDSSeg
 
                 End If
                 .Text = pText
+                .OperatedBy = pOperatedBy
                 Try
                     mobjAirlineDate.IgnoreAmadeusRange = True
                     mobjAirlineDate.VBDate = .DepartureDate
@@ -383,6 +389,7 @@ Namespace GDSSeg
                     .AirlineLocator = ""
                 End If
                 .Text = pText
+                .OperatedBy = ""
                 Try
                     mobjAirlineDate.IgnoreAmadeusRange = True
                     mobjAirlineDate.VBDate = .DepartureDate
@@ -472,7 +479,7 @@ Namespace GDSSeg
             Dim pOffPoint As String = ""
             Dim pFlyingTime As Date = TimeSerial(0, 0, 0)
             For iSVC As Integer = 0 To pSVC.GetUpperBound(0)
-                If IsNumeric(pSVC(iSVC).Trim.Substring(0, 1)) Then
+                If pSVC(iSVC).Substring(2, 1) = " " AndAlso (IsNumeric(pSVC(iSVC).Substring(0, 2)) Or IsNumeric(pSVC(iSVC).Substring(1, 1))) Then
                     If pSeg > 0 Then
                         ' add new entry to tickets
                         Dim x As String = ""
@@ -498,7 +505,7 @@ Namespace GDSSeg
                         mudtProps.Stopovers &= pOffPoint & "-" & Airport.CityAirportName(pOffPoint)
                         pBoardPoint = pSVC(iSVC).Substring(14, 3)
                         pOffPoint = pSVC(iSVC).Substring(17, 3)
-                        Dim pTime As String = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1)
+                        Dim pTime As String = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0")
                         pFlyingTime = DateAdd(DateInterval.Hour, CDbl(pTime.Substring(0, pTime.IndexOf(":"))), pFlyingTime)
                         pFlyingTime = DateAdd(DateInterval.Minute, CDbl(pTime.Substring(pTime.IndexOf(":") + 1, 2)), pFlyingTime)
                         mudtProps.EstimatedFlyingTime = Format(pFlyingTime, "HH:mm")
@@ -543,13 +550,13 @@ Namespace GDSSeg
             Return pobjClass
 
         End Function
-        Friend Function AddItem(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pVL() As String, ByVal pText As String, ByVal SVC() As String) As GDSSeg.GDSSegItem
+        Friend Function AddItem(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pVL() As String, ByVal pText As String, ByVal pOperatedBy As String, ByVal SVC() As String) As GDSSeg.GDSSegItem
 
             Dim pobjClass As GDSSeg.GDSSegItem
 
             pobjClass = New GDSSeg.GDSSegItem
 
-            pobjClass.SetValues(pAirline, pBoardPoint, pClass, pDepartureDate, pArrivalDate, pElementNo, pFlightNo, pOffPoint, pStatus, pDepartTime, pArriveTime, pVL, pText, SVC)
+            pobjClass.SetValues(pAirline, pBoardPoint, pClass, pDepartureDate, pArrivalDate, pElementNo, pFlightNo, pOffPoint, pStatus, pDepartTime, pArriveTime, pVL, pText, pOperatedBy, SVC)
             MyBase.Add(Format(pElementNo), pobjClass)
 
             SetNameLengths(pobjClass)

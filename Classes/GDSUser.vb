@@ -68,16 +68,16 @@ Friend Class GDSUser
             mudtProps.PCC = pSession.ActiveArea.AgentPcc.Trim
 
             If mudtProps.User = "" Or mudtProps.PCC = "" Then
-                Dim response() As String = mobjSession1G.SendTerminalCommand("OP/W*").ToArray
-                For i As Integer = 0 To response.GetUpperBound(0)
-                    If response(i).Length > 45 AndAlso response(i).Substring(31, 6) = "ACTIVE" Then
-                        mudtProps.User = response(i).Substring(12, 6).Trim
-                        mudtProps.PCC = response(i).Substring(24, 4).Trim
+                Dim pResponse As ObjectModel.ReadOnlyCollection(Of String) = mobjSession1G.SendTerminalCommand("OP/W*")
+                For i As Integer = 0 To pResponse.Count - 1
+                    If pResponse(i).Length > 45 AndAlso pResponse(i).Substring(31, 6) = "ACTIVE" Then
+                        mudtProps.User = pResponse(i).Substring(12, 6).Trim
+                        mudtProps.PCC = pResponse(i).Substring(24, 4).Trim
                         Exit For
                     End If
                 Next
                 If mudtProps.User = "" Then
-                    Throw New Exception(response(0))
+                    Throw New Exception(pResponse(0))
                 End If
             End If
         Catch ex As Travelport.TravelData.DesktopUserNotSignedOnException

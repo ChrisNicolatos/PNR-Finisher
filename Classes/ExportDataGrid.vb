@@ -4,7 +4,7 @@ Friend Class ExportDataGrid
     Public Sub Export(ByVal dGrid As DataGridView)
 
         Try
-            Dim pFileName As String = "C:\Users\cnicolatos\desktop\xxx.csv"
+            Dim pFileName As String = "C:\Users\Chris.Nicolatos\Desktop\xxx.csv"
 
             Dim pstrText As String = ""
             For j = 0 To dGrid.ColumnCount - 1

@@ -1,11 +1,10 @@
 ﻿Public Class frmPNR
-    Private Const VersionText As String = "Athens PNR Finisher (16/04/2018 10:09) "
+    Private Const VersionText As String = "Athens PNR Finisher (09/05/2018 15:54) "
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
     End Structure
 
-    'Private WithEvents mobjPNR As New GDSReadPNR
     Private WithEvents mobjPNR As New GDSReadPNR
     Private mSelectedPNRGDSCode As Utilities.EnumGDSCode
     Private mSelectedItnGDSCode As Utilities.EnumGDSCode
@@ -444,9 +443,6 @@
             mflgLoading = True
             Text = VersionText
             dgvApis.VirtualMode = False
-            'Dim mGDSUser As New GDSUser(Config.GDSCode.GDSisAmadeus)
-            'InitSettings(mGDSUser)
-            'SetupPCCOptions()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         Finally
@@ -1060,7 +1056,7 @@
 
         Try
             PNRWrite = UpdatePNR(WritePNR, WriteDocs)
-            If mSelectedPNRGDSCode = Utilities.EnumGDSCode.Galileo Then
+            If mSelectedPNRGDSCode = Utilities.EnumGDSCode.Galileo And PNRWrite.Length > 6 Then
                 MessageBox.Show("Please enter *R or *ALL in Galileo to show the PNR" & If(PNRWrite <> "", vbCrLf & vbCrLf & "PNR: " & PNRWrite, ""), "Galileo Information for PNR")
             End If
             mflgReadPNR = False
@@ -1074,17 +1070,7 @@
 
     Private Function UpdatePNR(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean) As String
         Try
-            '    Dim pPNR As New GDSReadPNR
-
-            '    pPNR.Read(mobjPNR.GDSCode)
-
-            '    If pPNR.PnrNumber = mobjPNR.PnrNumber And
-            'pPNR.Itinerary = mobjPNR.Itinerary And
-            '((pPNR.IsGroup And mobjPNR.IsGroup) Or (pPNR.PaxLeadName = mobjPNR.PaxLeadName)) Then
             UpdatePNR = mobjPNR.SendAllGDSEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, txtAirlineEntries)
-            'Else
-            '    Throw New Exception("PNR has been changed since read" & vbCrLf & "Please read again and re-enter data", New Exception("DifferentPNR"))
-            'End If
         Catch ex As Exception
             Throw New Exception("UpdatePNR()" & vbCrLf & ex.Message)
         End Try
@@ -2247,9 +2233,6 @@ td {
             xDoctext &= "PLEASE BE ADVISED OF THE FOLLOWING ARRANGEMENTS FOR EMBARKING / DISEMBARKING CREW.<br><br><br>"
             xDoctext &= "<font color=" & Chr(34) & "red" & Chr(34) & ">PLEASE CONFIRM RECEIPT OF BELOW :</font><br><br><br>"
 
-
-            'Dim pJoinerText As String = ""
-
             Dim pOnSigners As String = ""
             Dim pOnSignerNoVisa As String = ""
             Dim pOnSignerVisa As String = ""
@@ -2270,7 +2253,7 @@ td {
                     Case Else
                         pOther &= "<pre>" & pPax.Text & "</pre><br><br>"
                 End Select
-                'pJoinerText = dgvOSMPax.Rows(i).Cells("JoinerLeaver").Value
+
                 Select Case dgvOSMPax.Rows(i).Cells("VisaType").Value
                     Case "OKTB"
                         pOnSignerOKTB &= dgvOSMPax.Rows(i).Cells("Lastname").Value & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value & "<br>"
@@ -2629,7 +2612,7 @@ td {
                 Exit For
             End If
         Next
-        mflgAPISUpdate = mflgAPISUpdate Or (Not mobjPNR.SSRDocsExists And mobjPNR.SegmentsExist And pflgBirthDateOK) ' And pflgGenderFound And pflgPassportNumberOK)
+        mflgAPISUpdate = mflgAPISUpdate Or (Not mobjPNR.SSRDocsExists And mobjPNR.SegmentsExist And pflgBirthDateOK And pflgGenderFound) '  And pflgPassportNumberOK)
         If Not pflgBirthDateOK Then
             pstrErrorText &= "Invalid birth date" & vbCrLf
         End If
@@ -2668,6 +2651,10 @@ td {
 
         End Try
         APISValidateDataRow(dgvApis.Rows(e.RowIndex))
+    End Sub
+    Private Sub dgvApis_CurrentCellDirtyStateChanged(sender As Object, e As EventArgs) Handles dgvApis.CurrentCellDirtyStateChanged
+        cmdPNROnlyDocs.Enabled = False
+        cmdPNRWriteWithDocs.Enabled = False
     End Sub
     Private Sub dgvApis_RowValidating(sender As Object, e As DataGridViewCellCancelEventArgs) Handles dgvApis.RowValidating
         APISValidateDataRow(dgvApis.Rows(e.RowIndex))
@@ -2765,4 +2752,5 @@ td {
             MessageBox.Show(ex.Message)
         End Try
     End Sub
+
 End Class

@@ -57,6 +57,8 @@ Partial Class frmPNR
         Me.lblCostCentreHighlight = New System.Windows.Forms.Label()
         Me.tabPNR = New System.Windows.Forms.TabControl()
         Me.tabPageFinisher = New System.Windows.Forms.TabPage()
+        Me.lblPNRGalileo = New System.Windows.Forms.Label()
+        Me.lblPNRAmadeus = New System.Windows.Forms.Label()
         Me.txtPNRApis = New System.Windows.Forms.TextBox()
         Me.cmdAPISEditPax = New System.Windows.Forms.Button()
         Me.cmdPNRRead1GPNR = New System.Windows.Forms.Button()
@@ -153,8 +155,6 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.lblPNRAmadeus = New System.Windows.Forms.Label()
-        Me.lblPNRGalileo = New System.Windows.Forms.Label()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -536,6 +536,24 @@ Partial Class frmPNR
         Me.tabPageFinisher.TabIndex = 0
         Me.tabPageFinisher.Text = "PNR Finisher"
         Me.tabPageFinisher.UseVisualStyleBackColor = True
+        '
+        'lblPNRGalileo
+        '
+        Me.lblPNRGalileo.AutoSize = True
+        Me.lblPNRGalileo.Location = New System.Drawing.Point(13, 58)
+        Me.lblPNRGalileo.Name = "lblPNRGalileo"
+        Me.lblPNRGalileo.Size = New System.Drawing.Size(10, 13)
+        Me.lblPNRGalileo.TabIndex = 50
+        Me.lblPNRGalileo.Text = "."
+        '
+        'lblPNRAmadeus
+        '
+        Me.lblPNRAmadeus.AutoSize = True
+        Me.lblPNRAmadeus.Location = New System.Drawing.Point(13, 17)
+        Me.lblPNRAmadeus.Name = "lblPNRAmadeus"
+        Me.lblPNRAmadeus.Size = New System.Drawing.Size(10, 13)
+        Me.lblPNRAmadeus.TabIndex = 49
+        Me.lblPNRAmadeus.Text = "."
         '
         'txtPNRApis
         '
@@ -1591,24 +1609,6 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.TabIndex = 0
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
-        '
-        'lblPNRAmadeus
-        '
-        Me.lblPNRAmadeus.AutoSize = True
-        Me.lblPNRAmadeus.Location = New System.Drawing.Point(13, 17)
-        Me.lblPNRAmadeus.Name = "lblPNRAmadeus"
-        Me.lblPNRAmadeus.Size = New System.Drawing.Size(10, 13)
-        Me.lblPNRAmadeus.TabIndex = 49
-        Me.lblPNRAmadeus.Text = "."
-        '
-        'lblPNRGalileo
-        '
-        Me.lblPNRGalileo.AutoSize = True
-        Me.lblPNRGalileo.Location = New System.Drawing.Point(13, 58)
-        Me.lblPNRGalileo.Name = "lblPNRGalileo"
-        Me.lblPNRGalileo.Size = New System.Drawing.Size(10, 13)
-        Me.lblPNRGalileo.TabIndex = 50
-        Me.lblPNRGalileo.Text = "."
         '
         'frmPNR
         '
