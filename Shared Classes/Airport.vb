@@ -1,12 +1,16 @@
 Option Strict Off
 Option Explicit On
+
+<CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")>
 Friend Class Airport
+
 
     Private Shared mCode As String = ""
     Private Shared mCityName As String
     Private Shared mCityAirportName As String
     Private Shared mAirportShortname As String
     Private Shared mCountryName As String
+    Private Shared mCountryCode As String
 
     Public Shared ReadOnly Property CityAirportName(ByVal CityCode As String) As String
         Get
@@ -28,7 +32,14 @@ Friend Class Airport
     End Property
     Public Shared ReadOnly Property CountryName(ByVal CityCode As String) As String
         Get
+            ReadCityName(CityCode)
             CountryName = mCountryName
+        End Get
+    End Property
+    Public Shared ReadOnly Property CountryCode(ByVal CityCode As String) As String
+        Get
+            ReadCityName(CityCode)
+            CountryCode = mCountryCode
         End Get
     End Property
     Private Shared Sub ReadCityName(ByVal airportCode As String)
@@ -44,7 +55,7 @@ Friend Class Airport
             With pobjComm
                 .CommandType = CommandType.Text
                 .Parameters.Add("@AirportCode", SqlDbType.NVarChar, 3).Value = airportCode
-                .CommandText = " SELECT cityName, airportName, ISNULL(airportShortName, '') AS airportShortName , ISNULL(countryName, '') AS countryName " &
+                .CommandText = " SELECT cityName, airportName, ISNULL(airportShortName, '') AS airportShortName , ISNULL(countryName, '') AS countryName, ISNULL(countryISO3Code, '') AS countryISO3Code " &
                                " FROM [AmadeusReports].[dbo].[zzAirports] " &
                                " LEFT JOIN AmadeusReports.dbo.zzCities " &
                                " ON cityCode = airportCityCode_FK " &
@@ -66,10 +77,12 @@ Friend Class Airport
                     mCityName = .Item("cityName")
                     mAirportShortname = .Item("airportShortName")
                     mCountryName = .Item("countryName")
+                    mCountryCode = .Item("countryISO3Code")
                 Else
                     mCityAirportName = airportCode
                     mCityName = airportCode
                     mCountryName = ""
+                    mCountryCode = ""
                 End If
                 .Close()
             End With

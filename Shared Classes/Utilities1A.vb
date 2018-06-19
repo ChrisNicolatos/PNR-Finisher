@@ -1,4 +1,5 @@
-﻿Friend Class Utilities1A
+﻿<CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")>
+Friend Class Utilities1A
     Public Shared Function airStatus1A(ByRef pSegment As Object) As String
 
         Try
@@ -44,16 +45,13 @@
 
         Try
             pdteDate = pSegment.DepartureDate
-            Do While pdteDate > DateAdd(Microsoft.VisualBasic.DateInterval.Year, 1, Today) Or pdteDate < System.DateTime.FromOADate(2)
+            Do While pdteDate > DateAdd(Microsoft.VisualBasic.DateInterval.Year, 1, Today)
                 pdteDate = DateAdd(Microsoft.VisualBasic.DateInterval.Year, -1, pdteDate)
             Loop
-            If pdteDate < System.DateTime.FromOADate(2) Then
-                pdteDate = System.DateTime.FromOADate(0)
-            End If
 
             airDepartureDate1A = pdteDate
         Catch ex As Exception
-            airDepartureDate1A = System.DateTime.FromOADate(0)
+            airDepartureDate1A = Date.MinValue
         End Try
 
     End Function
@@ -64,16 +62,13 @@
 
         Try
             pdteDate = pSegment.ArrivalDate
-            Do While pdteDate > DateAdd(Microsoft.VisualBasic.DateInterval.Year, 1, Today) Or pdteDate < System.DateTime.FromOADate(2)
+            Do While pdteDate > DateAdd(Microsoft.VisualBasic.DateInterval.Year, 1, Today)
                 pdteDate = DateAdd(Microsoft.VisualBasic.DateInterval.Year, -1, pdteDate)
             Loop
-            If pdteDate < System.DateTime.FromOADate(2) Then
-                pdteDate = System.DateTime.FromOADate(0)
-            End If
 
             airArrivalDate1A = pdteDate
         Catch ex As Exception
-            airArrivalDate1A = System.DateTime.FromOADate(0)
+            airArrivalDate1A = Date.MinValue
         End Try
 
     End Function
@@ -111,7 +106,7 @@
         Try
             airDepartTime1A = pSegment.DepartureTime
         Catch ex As Exception
-            airDepartTime1A = System.DateTime.FromOADate(0)
+            airDepartTime1A = Date.MinValue
         End Try
 
     End Function
@@ -121,7 +116,7 @@
         Try
             airArriveTime1A = pSegment.ArrivalTime
         Catch ex As Exception
-            airArriveTime1A = System.DateTime.FromOADate(0)
+            airArriveTime1A = Date.MinValue
         End Try
 
     End Function

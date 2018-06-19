@@ -78,6 +78,7 @@ Friend Class GDSReadPNR
     Private mstrCC As String
     Private mstrCLN As String
     Private mstrCLA As String
+    Private mstrTRId As String
     Private mflgCancelError As Boolean
 
     Private mintStatus As Short
@@ -257,8 +258,8 @@ Friend Class GDSReadPNR
                     If pItem.Airline = Airline Or pItem.Airline = pAirlineCode Then
                         FrequentFlyerNumber = pItem.Airline & " " & pItem.FrequentTravelerNo
                         Exit For
-                    ElseIf pItem.CrossAccrual = Airline Or pItem.CrossAccrual = pAirlineCode Then
-                        FrequentFlyerNumber = pItem.Airline & " " & pItem.FrequentTravelerNo & " (Cross Accrual: " & pItem.CrossAccrual & ")"
+                    ElseIf pItem.CrossAccrual.IndexOf(Airline) > -1 Or pItem.CrossAccrual.IndexOf(pAirlineCode) > -1 Then
+                        FrequentFlyerNumber = pItem.Airline & " " & pItem.FrequentTravelerNo '& " (Cross Accrual: " & pItem.CrossAccrual & ")"
                     End If
                 End If
             Next
@@ -442,7 +443,7 @@ Friend Class GDSReadPNR
         If mGDSCode = Utilities.EnumGDSCode.Amadeus Then
             Read1A(PNR, ForReportOnly)
         ElseIf mGDSCode = Utilities.EnumGDSCode.Galileo Then
-            ReadPNR1G(PNR, ForReportOnly)
+            ReadPNR1G(PNR)
         Else
             Throw New Exception("Incorrect GDS")
         End If
@@ -562,7 +563,7 @@ Friend Class GDSReadPNR
             Throw New Exception("Read1A()" & vbCrLf & ex.Message)
         End Try
     End Function
-    Private Sub ReadPNR1G(ByVal PNR As String, ByVal ForReportOnly As Boolean)
+    Private Sub ReadPNR1G(ByVal PNR As String)
         Try
             If PNR <> "" Then
                 mobjSession1G.SendTerminalCommand("QXI+I")
@@ -685,6 +686,7 @@ Friend Class GDSReadPNR
         Utilities1A.PrepareLineNumbers1A(mobjExistingGDSElements.Department, pLineNumbers)
         Utilities1A.PrepareLineNumbers1A(mobjExistingGDSElements.ReasonForTravel, pLineNumbers)
         Utilities1A.PrepareLineNumbers1A(mobjExistingGDSElements.CostCentre, pLineNumbers)
+        Utilities1A.PrepareLineNumbers1A(mobjExistingGDSElements.TRId, pLineNumbers)
 
         Dim pMax As Integer = 0
         Dim pMaxIndex As Integer = -1
@@ -743,6 +745,7 @@ Friend Class GDSReadPNR
         PrepareLineNumbers1G(mobjExistingGDSElements.Department, pLineNumbers)
         PrepareLineNumbers1G(mobjExistingGDSElements.ReasonForTravel, pLineNumbers)
         PrepareLineNumbers1G(mobjExistingGDSElements.CostCentre, pLineNumbers)
+        PrepareLineNumbers1G(mobjExistingGDSElements.TRId, pLineNumbers)
 
         Dim pMax As Integer = 0
         Dim pMaxIndex As Integer = -1
@@ -836,7 +839,7 @@ Friend Class GDSReadPNR
         End If
 
     End Sub
-    Public Function SendAllGDSEntries(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean, ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView, AirlineEntries As TextBox) As String
+    Public Function SendAllGDSEntries(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean, ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView, AirlineEntries As CheckedListBox) As String
 
         SendAllGDSEntries = ""
         If mGDSCode = Utilities.EnumGDSCode.Amadeus Then
@@ -848,7 +851,7 @@ Friend Class GDSReadPNR
         End If
 
     End Function
-    Private Sub SendAllGDSEntries1A(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean, ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView, AirlineEntries As TextBox)
+    Private Sub SendAllGDSEntries1A(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean, ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView, AirlineEntries As CheckedListBox)
         Try
             If WritePNR Then
                 RemoveOldGDSEntries1A()
@@ -880,13 +883,13 @@ Friend Class GDSReadPNR
                 SendGDSElement1A(mobjNewGDSElements.Department)
                 SendGDSElement1A(mobjNewGDSElements.ReasonForTravel)
                 SendGDSElement1A(mobjNewGDSElements.CostCentre)
+                SendGDSElement1A(mobjNewGDSElements.TRId)
 
                 Dim pAirlineEntries() As String = AirlineEntries.Text.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
 
-                For i As Integer = 0 To pAirlineEntries.GetUpperBound(0)
-                    pAirlineEntries(i) = pAirlineEntries(i).Replace(">", "").Trim
-                    If pAirlineEntries(i).Trim <> "" Then
-                        SendGDSItemsNoDuplicate1A(pAirlineEntries(i).Replace("> ", ""))
+                For i As Integer = 0 To AirlineEntries.CheckedItems.Count - 1
+                    If AirlineEntries.CheckedItems(i).ToString.Trim <> "" Then
+                        SendGDSItemsNoDuplicate1A(AirlineEntries.CheckedItems(i).ToString.Trim)
                     End If
                 Next
             End If
@@ -902,7 +905,7 @@ Friend Class GDSReadPNR
             Throw New Exception("SendNewGDSEntries()" & vbCrLf & ex.Message)
         End Try
     End Sub
-    Private Function SendAllGDSEntries1G(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean, ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView, AirlineEntries As TextBox) As String
+    Private Function SendAllGDSEntries1G(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean, ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView, AirlineEntries As CheckedListBox) As String
         Try
             SendAllGDSEntries1G = ""
             If WritePNR Then
@@ -936,13 +939,14 @@ Friend Class GDSReadPNR
                 SendAllGDSEntries1G &= SendGDSElement1G(mobjNewGDSElements.ReasonForTravel, True)
                 SendAllGDSEntries1G &= SendGDSElement1G(mobjNewGDSElements.CostCentre, True)
                 SendAllGDSEntries1G &= SendGDSElement1G(mobjNewGDSElements.GalileoTrackingCode, True)
+                SendAllGDSEntries1G &= SendGDSElement1G(mobjNewGDSElements.TRId, True)
 
                 Dim pAirlineEntries() As String = AirlineEntries.Text.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
 
-                For i As Integer = 0 To pAirlineEntries.GetUpperBound(0)
+                For i As Integer = 0 To AirlineEntries.CheckedItems.Count - 1
                     pAirlineEntries(i) = pAirlineEntries(i).Replace(">", "").Trim
-                    If pAirlineEntries(i).Trim <> "" Then
-                        SendAllGDSEntries1G &= SendGDSAirlineItems1G(pAirlineEntries(i).Replace("> ", ""))
+                    If AirlineEntries.CheckedItems(i).ToString.Trim <> "" Then
+                        SendAllGDSEntries1G &= SendGDSAirlineItems1G(AirlineEntries.CheckedItems(i).ToString.Trim)
                     End If
                 Next
             End If
@@ -1045,7 +1049,7 @@ Friend Class GDSReadPNR
         For Each pCommand As CloseOffEntries.Item In pCloseOffEntries.Values
             SendGDSItemsNoDuplicate1A(pCommand.CloseOffEntry)
         Next
-        If mstrPNRResponse.Contains("WARNING: SECURE FLT PASSENGER DATA REQUIRED") Then
+        If mstrPNRResponse.Contains("WARNING: SECURE FLT PASSENGER DATA REQUIRED") Or mstrPNRResponse.Contains("SIMULTANEOUS CHANGES") Then
             MessageBox.Show(mstrPNRResponse)
         End If
 
@@ -1084,7 +1088,7 @@ Friend Class GDSReadPNR
         Else
             'MessageBox.Show(pResponse(0) & vbCrLf & pResponse(1), "ERROR IN PNR UPDATE", MessageBoxButtons.OK, MessageBoxIcon.Error)
             'mobjSession1G.SendTerminalCommand("IR")
-            Throw New Exception("Error in PNR Update. Please check your PNR and try again")
+            Throw New Exception("Error in PNR Update. Please check your PNR and try again" & vbCrLf & pResponse(0))
         End If
     End Function
     Private Sub SendGDSElement1A(ByVal pElement As GDSNew.Item)
@@ -1630,12 +1634,16 @@ Friend Class GDSReadPNR
             ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
                 mstrVesselName = pstrSplit(2)
             End If
+        ElseIf IsArray(pstrSplit) AndAlso pstrSplit.Length >= 1 Then
+            If pstrText.StartsWith(MySettings.GDSValue("TextTRID")) Then
+                mstrTRId = pstrSplit(1)
+            End If
             'If pstrSplit(1) = "CC" Then
             'ElseIf pstrSplit(1) = "CLN" Then
             'ElseIf pstrSplit(1) = "BBY" Then
             'End If
         End If
-        pstrSplit = Split(Left(pstrText, pintLen), "-")
+            pstrSplit = Split(Left(pstrText, pintLen), "-")
         If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
             If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
                 mstrCLA = pstrSplit(1)
@@ -1711,6 +1719,9 @@ Friend Class GDSReadPNR
             ElseIf pRemark.Text.Contains(MySettings.GDSValue("TextCC")) Then
                 Dim pCostCentre As String = pRemark.Text.Substring(pRemark.Text.IndexOf(MySettings.GDSValue("TextCC")) + MySettings.GDSValue("TextCC").Length)
                 mobjExistingGDSElements.CostCentre.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), MySettings.GDSElement("TextCC"), "", pCostCentre)
+            ElseIf pRemark.Text.Contains(MySettings.GDSValue("TextTRID")) Then
+                Dim pReference As String = pRemark.Text.Substring(pRemark.Text.IndexOf(MySettings.GDSValue("TextTRID")) + MySettings.GDSValue("TextTRID").Length)
+                mobjExistingGDSElements.TRId.SetValues(True, pRemark.Text.Substring(0, pRemark.Text.IndexOf(pRemark.ElementID) - 1), MySettings.GDSElement("TextTRID"), "", pReference)
             ElseIf pRemark.Text.Contains(MySettings.GDSValue("TextCLA")) Then
                 If mobjExistingGDSElements.CustomerName.Exists Then
                     Throw New Exception("Please check PNR. Duplicate customer name defined" & vbCrLf & mobjExistingGDSElements.CustomerName.LineNumber & vbCrLf & pRemark.Text)
@@ -1737,6 +1748,8 @@ Friend Class GDSReadPNR
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextCC")) Then
                     mstrCC = .Remark.Substring(9)
                     mobjExistingGDSElements.CostCentre.SetValues(True, .ElementNo, MySettings.GDSElement("TextCC"), .Remark, pFullText.Substring(MySettings.GDSValue("TextCC").Length))
+                ElseIf pFullText.StartsWith(MySettings.GDSValue("TextTRID")) Then
+                    mobjExistingGDSElements.TRId.SetValues(True, .ElementNo, MySettings.GDSElement("TextTRID"), .Remark, pFullText.Substring(MySettings.GDSValue("TextTRID").Length))
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextCLA")) Then
                     If mobjExistingGDSElements.CustomerName.Exists Then
                         Throw New Exception("Please check PNR. Duplicate customer name defined" & vbCrLf & mobjExistingGDSElements.CustomerName.LineNumber & vbCrLf & .Remark)

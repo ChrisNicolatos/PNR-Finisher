@@ -1,4 +1,4 @@
-﻿Public Class Utilities
+﻿Public NotInheritable Class Utilities
     Private Const MONTH_NAMES As String = "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC"
     Public Enum EnumItnFormat
         DefaultFormat = 0
@@ -13,6 +13,7 @@
         Galileo = 2
     End Enum
     Public Enum EnumCustomPropertyID As Integer
+        None = 0
         BookedBy = 1
         Department = 2
         ReasonFortravel = 4
@@ -25,6 +26,7 @@
         RequisitionNumber = 11
         PassengerID = 12
         OPT = 13
+        TRId = 14
     End Enum
     Public Enum EnumTicketDocType
         NONE = 0
@@ -36,6 +38,14 @@
         English = 0
         Brazil = 1
     End Enum
+    Public Enum CustomPropertyRequiredType
+        PropertyOptional = 613
+        PropertyReqToSave = 614
+        PropertyReqToInv = 615
+    End Enum
+    Private Sub New()
+    End Sub
+
     Public Shared Function MyMonthName(ByVal pDate As Date, ByVal Language As EnumLoGLanguage) As String
         Static Dim pNamesLang1() As String = {"janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"}
 

@@ -361,12 +361,12 @@
                                         If pFF <> "" Then
                                             pFF = "Frequent Flyer Number: " & pFF
                                         End If
-                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & "  " & tkt.Segs.PadRight(10).Substring(0, 10) & "   " & tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2) & "  " & pFF)
+                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, "") & "  " & tkt.Segs.PadRight(10).Substring(0, 10) & "   " & tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2) & "  " & pFF)
                                         For i As Integer = 12 To tkt.Segs.Length - 10 Step 12
-                                            pString.AppendLine(If(tkt.TicketType <> "PAX", "    ", "") & StrDup(16, " ") & tkt.Segs.Substring(i, 10))
+                                            pString.AppendLine(If(tkt.TicketType <> "PAX", "    ", "") & StrDup(16 + If(tkt.Books > 1, 4, 0), " ") & tkt.Segs.Substring(i, 10))
                                         Next
                                     Else
-                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document)
+                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, ""))
                                     End If
                                 End If
                             Next

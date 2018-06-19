@@ -60,6 +60,9 @@ Namespace osmVessels
         End Property
         Public ReadOnly Property Vessel_VesselGroup As Vessel_VesselGroupCollection
             Get
+                If mobjVessel_VesselGroup.Count = 0 Then
+                    mobjVessel_VesselGroup.Load(Id)
+                End If
                 Vessel_VesselGroup = mobjVessel_VesselGroup
             End Get
         End Property
@@ -82,7 +85,7 @@ Namespace osmVessels
                 .VesselName = pVesselName
                 .InUse = pInUse
                 .isNew = False
-                mobjVessel_VesselGroup.Load(Id)
+                'mobjVessel_VesselGroup.Load(Id)
             End With
             CheckValid()
         End Sub

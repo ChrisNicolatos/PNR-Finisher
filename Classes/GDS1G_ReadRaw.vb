@@ -4,23 +4,48 @@
         Private Structure PaxFFProps
             Dim PaxNumber As Short
             Dim Paxname As String
-            Dim TicketNumber As String
+            Private _TicketNumber As String
+            Private _DocumentNumber As String
+            Private _Airline As String
+            Dim Books As Integer
+            Property TicketNumber As String
+                Get
+                    TicketNumber = _TicketNumber
+                End Get
+                Set(value As String)
+                    value = value.Trim
+                    If value.Length = 10 Then
+                        _TicketNumber = value
+                        _DocumentNumber = value
+                        _Airline = ""
+                        Books = 1
+                    ElseIf value.Length = 13 AndAlso IsNumeric(value) Then
+                        _TicketNumber = value
+                        _DocumentNumber = value.Substring(3)
+                        _Airline = value.Substring(0, 3)
+                        Books = 1
+                    ElseIf value.Length = 17 AndAlso value.Substring(13, 1) = "-" Then
+                        _TicketNumber = value
+                        _DocumentNumber = value.Substring(3, 10)
+                        _Airline = value.Substring(0, 3)
+                        Dim pTemp As String = _DocumentNumber.Substring(0, 7) & value.Substring(14, 3)
+                        Books = CDbl(pTemp) - CDbl(_DocumentNumber) + 1
+                    Else
+                        _TicketNumber = ""
+                        _DocumentNumber = ""
+                        _Airline = ""
+                        Books = 0
+                    End If
+                End Set
+            End Property
             ReadOnly Property DocumentNumber As String
                 Get
-                    If TicketNumber.Length = 13 Then
-                        DocumentNumber = TicketNumber.Substring(3)
-                    Else
-                        DocumentNumber = ""
-                    End If
+                    DocumentNumber = _DocumentNumber
                 End Get
             End Property
             ReadOnly Property Airline As String
                 Get
-                    If TicketNumber.Length = 13 Then
-                        Airline = TicketNumber.Substring(0, 3)
-                    Else
-                        Airline = ""
-                    End If
+                    Airline = _Airline
                 End Get
             End Property
         End Structure
@@ -45,10 +70,8 @@
 
         Private mstrOfficeOfResponsibility As String
         Private mstrPNRNumber As String
-        Private mflgNewPNR As Boolean
         Private mdteDepartureDate As Date
         Private mstrItinerary As String
-        Private mflgExistsSegments As Boolean
         Private mSegsFirstElement As Integer
         Private mSegsLastElement As Integer
         Private mudtAllowance() As TQT
@@ -164,7 +187,6 @@
             Dim pAllPax As String = ""
             If pPax(0).IndexOf(".") >= 1 And pPax(0).IndexOf(".") <= 2 Then
                 mstrPNRNumber = "New PNR"
-                mflgNewPNR = True
             Else
                 mstrPNRNumber = pPax(0).Substring(0, 6)
                 For i As Integer = 0 To pPax.GetUpperBound(0)
@@ -173,20 +195,19 @@
                         Exit For
                     End If
                 Next
-                mflgNewPNR = False
             End If
             For i As Integer = 0 To pPax.GetUpperBound(0)
                 If pPax(i).IndexOf(".") >= 1 And pPax(i).IndexOf(".") <= 3 Then
                     pAllPax &= pPax(i) & " "
                 End If
             Next
+
             pPax = pAllPax.Split("/")
             For i As Integer = 0 To pPax.GetUpperBound(0) - 1
                 Dim iStart As Integer = 0
                 If pPax(i).LastIndexOf(" ") >= 0 Then
                     iStart = pPax(i).LastIndexOf(" ") + 1
                 End If
-                Dim iPaxNo As Integer = pPax(i).Substring(iStart, pPax(i).IndexOf(".", iStart) - iStart)
                 Dim iPaxCount As Integer = pPax(i).Substring(pPax(i).IndexOf(".", iStart) + 1, 1)
                 Dim iSurname As String = pPax(i).Substring(pPax(i).IndexOf(".", iStart) + 2)
                 If IsNumeric(pPax(i).Substring(pPax(i).IndexOf(".", iStart) + 1, 2)) Then
@@ -203,9 +224,6 @@
                 End If
                 i = i + iPaxCount - 1
             Next
-            Dim pPassengerNumber As Short = 0
-            Dim pFirstName As String = ""
-            Dim pLastName As String = ""
             Dim pNameRemark As String = ""
             mobjPassengers.Clear()
             For i As Integer = 1 To pPax.GetUpperBound(0)
@@ -302,8 +320,6 @@
                     End With
                 End If
             Next
-            mflgExistsSegments = ((mobjSegments.Count) > 0)
-
             If mdteDepartureDate > Date.MinValue Then
                 Dim pDate As New s1aAirlineDate.clsAirlineDate
                 pDate.SetFromString(mdteDepartureDate)
@@ -339,7 +355,6 @@
             Dim pPhones() As String = SendTerminalCommand("*P")
 
             For i As Integer = 0 To pPhones.GetUpperBound(0)
-                Dim pobjClass As New PhoneNumbersItem
                 Dim pElement As Short = 0
                 Dim pStart As Integer = 0
                 Dim pStar As Integer = 0
@@ -376,10 +391,8 @@
 
             Dim pEmails() As String = SendTerminalCommand("*EM")
 
-            Dim pobjClass As New EmailItem
             Dim pElementAddress As Short = 0
             Dim pElementComment As Short = 0
-            Dim pPrevElement As Short = 0
             Dim pFromAddress As String = ""
             Dim pToAddress As String = ""
             Dim pComment As String = ""
@@ -489,6 +502,46 @@
                     pAirline = pFF(i).Substring(24, 2).Trim
                     pPaxName = pFF(i).Substring(6, 18).Trim
                     pMembershipNo = pFF(i).Substring(28).Trim
+                    If pMembershipNo.IndexOf("*") > 0 Then
+                        pMembershipNo = pMembershipNo.Substring(0, pMembershipNo.IndexOf("*"))
+                    End If
+                    Dim pFound As Boolean = False
+                    Dim pFN As String = ""
+                    Dim pSN As String = ""
+                    If pPaxName.IndexOf("/") > 0 Then
+                        pSN = pPaxName.Substring(0, pPaxName.IndexOf("/")).Replace("+", "")
+                        pFN = pPaxName.Substring(pPaxName.IndexOf("/") + 1).Replace("+", "")
+                    End If
+                    For Each pPass As GDSPax.GDSPaxItem In Passengers.Values
+                        If pPass.LastName.StartsWith(pSN) And pPass.Initial.StartsWith(pFN) Then
+                            pPaxName = pPass.PaxName
+                            pFound = True
+                            Exit For
+                        End If
+                    Next
+
+                    'For j As Integer = 0 To Passengers.Count - 1
+                    '    If Passengers(j).PaxName = pPaxName Then
+                    '        pFound = True
+                    '        Exit For
+                    '    End If
+                    'Next j
+                    If Not pFound Then
+                        Dim pFirstName As String = ""
+                        Dim pSurname As String = ""
+                        If pPaxName.IndexOf("/") > 0 Then
+                            pSurname = pPaxName.Substring(0, pPaxName.IndexOf("/")).Replace("+", "")
+                            pFirstName = pPaxName.Substring(pPaxName.IndexOf("/") + 1).Replace("+", "")
+                        End If
+                        For Each pPass As GDSPax.GDSPaxItem In Passengers.Values
+                            If pPass.LastName.StartsWith(pSurname) And pPass.Initial.StartsWith(pFirstName) Then
+                                pPaxName = pPass.PaxName
+                                pFound = True
+                                Exit For
+                            End If
+
+                        Next
+                    End If
                     If i < pFF.Count - 1 AndAlso pFF(i + 1).StartsWith(Space(28)) Then
                         pCrossAccrual = pFF(i + 1).Substring(28).Trim
                     End If
@@ -509,7 +562,6 @@
             For i = 0 To pFF.GetUpperBound(0)
                 If pFF(i).StartsWith("FQ") Or pFF(i).StartsWith("FB") Then
                     Dim pFFid As Integer = pFF(i).Substring(2, pFF(i).IndexOf(" ") - 2)
-                    Dim pFFSegs As String = pFF(i).Substring(pFF(i).IndexOf("- S") + 3, pFF(i).IndexOf(" ", pFF(i).IndexOf("- S") + 4) - pFF(i).IndexOf("- S") - 2)
 
                     '
                     ' *FFx for each FF element
@@ -519,25 +571,35 @@
                     pPax(0).PaxNumber = 0
                     Dim pSeg(0) As SegFFProps
                     pSeg(0).SegNo = 0
-                    Dim pPaxNo As Integer = 0
-                    Dim pTicketNumber As String = ""
                     Dim pSegNo As Integer = 0
                     Dim pBaggageAllowance = ""
                     For iPFF As Integer = 0 To pFFx.GetUpperBound(0)
-                        If pFFx(iPFF).Length > 13 AndAlso pFFx(iPFF).StartsWith(" P") AndAlso IsNumeric(pFFx(iPFF).Substring(2, 1)) Then
+                        If pFFx(iPFF).Length > 13 _
+                            AndAlso pFFx(iPFF).StartsWith(" P") _
+                            AndAlso IsNumeric(pFFx(iPFF).Substring(2, 1)) Then
+
+                            ' If line starts with P and a number then it is a passenger name line
+                            ' Next passenger
                             pPax(0).PaxNumber += 1
                             ReDim Preserve pPax(pPax(0).PaxNumber)
                             pPax(pPax(0).PaxNumber).PaxNumber = pFFx(iPFF).Substring(2, pFFx(iPFF).IndexOf(" ", 2))
+                            pPax(pPax(0).PaxNumber).TicketNumber = ""
+
                             If pFFx(iPFF).IndexOf(" ", 5) > 5 Then
                                 pPax(pPax(0).PaxNumber).Paxname = pFFx(iPFF).Substring(5, pFFx(iPFF).IndexOf(" ", 5) - 4).Trim
                             Else
                                 pPax(pPax(0).PaxNumber).Paxname = pFFx(iPFF).Substring(5).Trim
                             End If
-                            If iPFF < pFFx.GetUpperBound(0) AndAlso pFFx(iPFF + 1).StartsWith(Space(13)) AndAlso IsNumeric(pFFx(iPFF + 1).Trim.Substring(pFFx(iPFF + 1).Trim.Length - 13)) AndAlso Not IsNumeric(pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 13)) Then
-                                pPax(pPax(0).PaxNumber).TicketNumber = pFFx(iPFF + 1).Trim.Substring(pFFx(iPFF + 1).Trim.Length - 13)
+
+                            If iPFF < pFFx.GetUpperBound(0) _
+                                AndAlso pFFx(iPFF + 1).StartsWith(Space(13)) _
+                                AndAlso IsNumeric(pFFx(iPFF + 1).Trim.Substring(pFFx(iPFF + 1).Trim.Length - 13)) _
+                                AndAlso Not IsNumeric(pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 13)) Then
+                                ' if the next line starts with spaces, then the ticket number is on the next line
+                                pPax(pPax(0).PaxNumber).TicketNumber = pFFx(iPFF + 1).Trim.Substring(pFFx(iPFF + 1).Trim.LastIndexOf(" ")).Trim
                                 pFFx(iPFF + 1) = ""
-                            ElseIf IsNumeric(pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 13)) Then
-                                pPax(pPax(0).PaxNumber).TicketNumber = pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 13)
+                            ElseIf IsNumeric(pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 2)) Then
+                                pPax(pPax(0).PaxNumber).TicketNumber = pFFx(iPFF).Trim.Substring(pFFx(iPFF).LastIndexOf(" "))
                             Else
                                 pPax(pPax(0).PaxNumber).TicketNumber = ""
                             End If
@@ -590,15 +652,32 @@
                                 End Try
                             End With
                         Next
-                        mobjTickets.addTicket("FA", 1, CDbl("0" & pPax(i1).DocumentNumber), 1, pPax(i1).Airline, Airlines.AirlineCode(pPax(i1).Airline), True, pTktSeg, pPax(i1).Paxname, "PAX")
-                        mstrSeats &= GetSeats(pPax(i1).PaxNumber)
+                        mobjTickets.addTicket("FA", 1, CDbl("0" & pPax(i1).DocumentNumber), pPax(i1).Books, pPax(i1).Airline, Airlines.AirlineCode(pPax(i1).Airline), True, pTktSeg, pPax(i1).Paxname, "PAX")
+
 
                     Next
                 End If
             Next
+            mstrSeats &= GetSeats()
+
+            'For Each pPax As GDSPax.GDSPaxItem In Passengers.Values
+            '    mstrSeats &= GetSeatsCharacteristics(pPax.ElementNo)
+            'Next
         End Sub
-        Private Function GetSeats(ByVal PaxNo As Short) As String
+        Private Function GetSeatsCharacteristics(ByVal PaxNo As Short) As String
             Dim pSeats() As String = SendTerminalCommand("SC*P" & PaxNo)
+            GetSeatsCharacteristics = ""
+            If pSeats(0).IndexOf("DATA NOT FOUND") = -1 Then
+                For i As Integer = 1 To pSeats.Count - 1
+                    If pSeats(i).Length > 2 AndAlso pSeats(i).Substring(2, 1) = "." AndAlso IsNumeric(pSeats(i).Substring(1, 1)) Then
+                        pSeats(i) = pSeats(i).Substring(0, 12) & " " & pSeats(i).Substring(15)
+                    End If
+                    GetSeatsCharacteristics &= pSeats(i).Replace("NO CHARACTERISTICS EXIST", "") & vbCrLf
+                Next
+            End If
+        End Function
+        Private Function GetSeats() As String
+            Dim pSeats() As String = SendTerminalCommand("*SD")
             GetSeats = ""
             If pSeats(0).IndexOf("DATA NOT FOUND") = -1 Then
                 For i As Integer = 1 To pSeats.Count - 1

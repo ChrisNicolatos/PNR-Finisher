@@ -64,6 +64,7 @@ Namespace GDSNew
         Private mobjDepartment As New Item
         Private mobjReasonForTravel As New Item
         Private mobjCostCentre As New Item
+        Private mobjTRId As New Item
 
         Private mobjVesselNameForPNR As New Item
         Private mobjVesselFlagForPNR As New Item
@@ -219,6 +220,11 @@ Namespace GDSNew
                 CostCentre = mobjCostCentre
             End Get
         End Property
+        Public ReadOnly Property TRId As Item
+            Get
+                TRId = mobjTRId
+            End Get
+        End Property
 
         Public Sub SetItem(ByVal Item As Customers.CustomerItem)
 
@@ -347,6 +353,14 @@ Namespace GDSNew
                 mobjCostCentre.Clear()
             End If
         End Sub
+        Public Sub SetTRId(ByVal Text As String)
+            Text = Text.Trim
+            If Text <> "" Then
+                mobjTRId.SetText(Text, MySettings.GDSValue("TextTRID") & Text)
+            Else
+                mobjTRId.Clear()
+            End If
+        End Sub
         Private Sub PrepareCommands()
 
             Dim pDateTimeLimit As New s1aAirlineDate.clsAirlineDate
@@ -354,12 +368,21 @@ Namespace GDSNew
             Dim pDateRetain As New s1aAirlineDate.clsAirlineDate
 
             If mdteDepartureDate > DateAdd(DateInterval.Day, 3, Today) Then
-                pDateTimeLimit.VBDate = DateAdd(DateInterval.Day, -3, mdteDepartureDate)
+                Try
+                    pDateTimeLimit.VBDate = DateAdd(DateInterval.Day, -3, mdteDepartureDate)
+                Catch ex As Exception
+                    pDateTimeLimit.VBDate = Today
+                End Try
             Else
                 pDateTimeLimit.VBDate = Today
             End If
+
             If mdteDepartureDate > Today Then
-                pDateReminder.VBDate = DateAdd(DateInterval.Day, 1, mdteDepartureDate)
+                Try
+                    pDateReminder.VBDate = DateAdd(DateInterval.Day, 1, mdteDepartureDate)
+                Catch ex As Exception
+                    pDateReminder.VBDate = Today
+                End Try
             Else
                 pDateReminder.VBDate = Today
             End If
@@ -367,7 +390,7 @@ Namespace GDSNew
             Try
                 pDateRetain.VBDate = DateAdd(DateInterval.Month, 11, Today)
             Catch ex As Exception
-                Throw New Exception("PreparePNRCommands()" & vbCrLf & ex.Message)
+                pDateRetain.VBDate = Today
             End Try
 
             mobjPhoneElement.SetText("", (MySettings.GDSValue("TextAP").Replace("  ", " ")))
@@ -432,6 +455,7 @@ Namespace GDSNew
             mobjCostCentre.Clear()
             mobjVesselNameForPNR.Clear()
             mobjVesselFlagForPNR.Clear()
+            mobjTRId.Clear()
         End Sub
     End Class
 

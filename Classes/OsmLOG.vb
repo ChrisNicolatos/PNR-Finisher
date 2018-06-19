@@ -38,7 +38,7 @@ Friend Class OsmLOG
 
         Select Case LoGLanguage
             Case Utilities.EnumLoGLanguage.Brazil
-                PDFDocumentLangBrazil(pFileName, CrewMembersText, pPax)
+                PDFDocumentLangBrazil(pFileName, pPax)
             Case Else
                 PDFDocument(pFileName, CrewMembersText, pPax)
         End Select
@@ -99,7 +99,7 @@ Friend Class OsmLOG
         pDoc.Close()
 
     End Sub
-    Private Sub PDFDocumentLangBrazil(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+    Private Sub PDFDocumentLangBrazil(ByVal pFileName As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
 
         Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
@@ -254,6 +254,8 @@ Friend Class OsmLOG
             'Nome:   Hugo Miguel
             Table.AddCell(AddCell("Nome:", pFont))
             Table.AddCell(AddCell(pPax.Initial, pFont))
+            Table.AddCell(AddCell("Posição:", pFont))
+            Table.AddCell(AddCell(pPax.IdNo, pFont))
             If mobjPNR.SSRDocsExists Then
                 For Each pDocs As PaxApisDB.Item In mobjPNR.SSRDocsCollection.Values
                     If pDocs.Surname.Replace(" ", "") = pPax.LastName.Replace(" ", "") And pPax.Initial.Replace(" ", "").StartsWith(pDocs.FirstName.Replace(" ", "")) Then
@@ -261,14 +263,18 @@ Friend Class OsmLOG
                         Table.AddCell(AddCell("Nacionalidade:", pFont))
                         Table.AddCell(AddCell(pDocs.Nationality, pFont))
                         'DOB:  18/03/1988
-                        Table.AddCell(AddCell("DOB:", pFont))
-                        Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.BirthDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                        If pDocs.BirthDate <> Date.MinValue Then
+                            Table.AddCell(AddCell("DOB:", pFont))
+                            Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.BirthDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                        End If
                         'Número do passaporte:  P876285
                         Table.AddCell(AddCell("Número do passaporte:", pFont))
                         Table.AddCell(AddCell(pDocs.PassportNumber, pFont))
                         'Data de validade:   06/07/2022 
-                        Table.AddCell(AddCell("Data de validade:", pFont))
-                        Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.ExpiryDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                        If pDocs.ExpiryDate <> Date.MinValue Then
+                            Table.AddCell(AddCell("Data de validade:", pFont))
+                            Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.ExpiryDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                        End If
                     End If
                 Next
             End If
@@ -299,6 +305,8 @@ Friend Class OsmLOG
         'Nome:   Hugo Miguel
         Table.AddCell(AddCell("Nome:", pFont))
         Table.AddCell(AddCell(pPax.Initial, pFont))
+        Table.AddCell(AddCell("Posição:", pFont))
+        Table.AddCell(AddCell(pPax.IdNo, pFont))
         If mobjPNR.SSRDocsExists Then
             For Each pDocs As PaxApisDB.Item In mobjPNR.SSRDocsCollection.Values
                 If pDocs.Surname = pPax.LastName And pDocs.FirstName = pPax.Initial Then
@@ -306,14 +314,18 @@ Friend Class OsmLOG
                     Table.AddCell(AddCell("Nacionalidade:", pFont))
                     Table.AddCell(AddCell(pDocs.Nationality, pFont))
                     'DOB:  18/03/1988
-                    Table.AddCell(AddCell("DOB:", pFont))
-                    Table.AddCell(AddCell(pDocs.BirthDate, pFont))
+                    If pDocs.BirthDate <> Date.MinValue Then
+                        Table.AddCell(AddCell("DOB:", pFont))
+                        Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.BirthDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                    End If
                     'Número do passaporte:  P876285
                     Table.AddCell(AddCell("Número do passaporte:", pFont))
                     Table.AddCell(AddCell(pDocs.PassportNumber, pFont))
                     'Data de validade:   06/07/2022 
-                    Table.AddCell(AddCell("Data de validade:", pFont))
-                    Table.AddCell(AddCell(pDocs.ExpiryDate, pFont))
+                    If pDocs.ExpiryDate <> Date.MinValue Then
+                        Table.AddCell(AddCell("Data de validade:", pFont))
+                        Table.AddCell(AddCell(Utilities.MyMonthName(pDocs.ExpiryDate, Utilities.EnumLoGLanguage.Brazil), pFont))
+                    End If
                 End If
             Next
         End If

@@ -49,6 +49,26 @@ Namespace GDSTickets
                 Document = mudtProps.Document
             End Get
         End Property
+        Public ReadOnly Property LastDocument As Decimal
+            Get
+                LastDocument = mudtProps.Document + mudtProps.Books - 1
+            End Get
+        End Property
+        Public ReadOnly Property Conjunction As String
+            Get
+                Dim pTemp As String = LastDocument.ToString
+                If pTemp.Length = 10 Then
+                    Return "-" & pTemp.Substring(7)
+                Else
+                    Return ""
+                End If
+            End Get
+        End Property
+        Public ReadOnly Property Books As Short
+            Get
+                Books = mudtProps.Books
+            End Get
+        End Property
         Public ReadOnly Property AirlineCode As String
             Get
                 AirlineCode = Trim(mudtProps.AirlineCode)

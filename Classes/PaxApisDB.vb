@@ -62,16 +62,25 @@ Namespace PaxApisDB
         End Sub
         Public Sub New(ByVal pId As Integer, ByVal pSSRDocs As String)
             Dim pItems() As String = pSSRDocs.Split("/")
-            If pItems.GetUpperBound(0) = 8 Then
+            If pItems.GetUpperBound(0) >= 8 Then
                 With mudtProps
                     .Id = pId
                     .Surname = pItems(7)
                     .FirstName = pItems(8)
-                    .Birthdate = pItems(4)
+
+                    If IsDate(pItems(4)) Then
+                        .Birthdate = pItems(4)
+                    Else
+                        .Birthdate = Date.MinValue
+                    End If
                     .Gender = pItems(5)
                     .IssuingCountry = pItems(1)
                     .PassportNumber = pItems(2)
-                    .ExpiryDate = pItems(6)
+                    If IsDate(pItems(6)) Then
+                        .ExpiryDate = pItems(6)
+                    Else
+                        .ExpiryDate = Date.MinValue
+                    End If
                     .Nationality = pItems(3)
                 End With
             Else
@@ -284,7 +293,10 @@ Namespace PaxApisDB
         End Sub
         Public Sub AddSSRDocsItem(ByVal Id As Integer, ByVal pSSRDocs As String)
             Dim pItem As New Item(Id, pSSRDocs)
-            MyBase.Add(pItem.Id, pItem)
+            If pItem.Id > 0 AndAlso Not MyBase.ContainsKey(pItem.Id) Then
+                MyBase.Add(pItem.Id, pItem)
+
+            End If
         End Sub
     End Class
     Friend Class ReferenceItem

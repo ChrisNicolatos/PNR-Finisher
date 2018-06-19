@@ -1,5 +1,5 @@
 ﻿Public Class frmPNR
-    Private Const VersionText As String = "Athens PNR Finisher (09/05/2018 15:54) "
+    Private Const VersionText As String = "Athens PNR Finisher (13/06/2018 14:54) "
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
@@ -67,7 +67,7 @@
             txtSubdepartment.Clear()
             txtCRM.Clear()
             txtVessel.Clear()
-            txtAirlineEntries.Clear()
+            lstAirlineEntries.Items.Clear()
 
             lstVessels.Items.Clear()
 
@@ -80,12 +80,18 @@
             txtReference.Clear()
             cmbDepartment.Items.Clear()
             cmbDepartment.Text = ""
+            cmbDepartment.Tag = Nothing
             cmbBookedby.Items.Clear()
             cmbBookedby.Text = ""
+            cmbBookedby.Tag = Nothing
             cmbReasonForTravel.Items.Clear()
             cmbReasonForTravel.Text = ""
+            cmbReasonForTravel.Tag = Nothing
             cmbCostCentre.Items.Clear()
             cmbCostCentre.Text = ""
+            cmbCostCentre.Tag = Nothing
+            txtTrId.Clear()
+            txtTrId.Tag = Nothing
 
             cmdPNRWrite.Enabled = False
             cmdPNRWriteWithDocs.Enabled = False
@@ -105,6 +111,8 @@
     End Sub
 
     Private Sub SetEnabled()
+
+        Dim pProps As CustomProperties.Item
 
         Try
             ' read PNR and Exit are always enabled
@@ -155,15 +163,29 @@
                 If mobjPNR.NewElements.CustomerCode.GDSCommand <> "" And lstCRM.Items.Count > 0 And mobjPNR.NewElements.CRMCode.GDSCommand = "" Then
                     txtCRM.BackColor = Color.Pink
                 End If
-
                 If mobjPNR.NewElements.BookedBy.GDSCommand = "" And cmbBookedby.Enabled Then
-                    cmdPNRWrite.Enabled = False
+                    pProps = cmbBookedby.Tag
+                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                        cmdPNRWrite.Enabled = False
+                    End If
                 End If
                 If mobjPNR.NewElements.CostCentre.GDSCommand = "" And cmbCostCentre.Enabled Then
-                    cmdPNRWrite.Enabled = False
+                    pProps = cmbCostCentre.Tag
+                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                        cmdPNRWrite.Enabled = False
+                    End If
                 End If
                 If mobjPNR.NewElements.ReasonForTravel.GDSCommand = "" And cmbReasonForTravel.Enabled Then
-                    cmdPNRWrite.Enabled = False
+                    pProps = cmbReasonForTravel.Tag
+                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                        cmdPNRWrite.Enabled = False
+                    End If
+                End If
+                If mobjPNR.NewElements.TRId.GDSCommand = "" And txtTrId.Enabled Then
+                    pProps = txtTrId.Tag
+                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                        cmdPNRWrite.Enabled = False
+                    End If
                 End If
             End If
 
@@ -177,23 +199,30 @@
             lblDepartmentHighlight.Enabled = (cmbDepartment.Enabled)
             lblReasonForTravelHighLight.Enabled = (cmbReasonForTravel.Enabled)
             lblCostCentreHighlight.Enabled = (cmbCostCentre.Enabled)
+            lblTRIDHighLight.Enabled = (txtTrId.Enabled)
 
-            SetLabelColor(lblBookedByHighlight)
-            SetLabelColor(lblDepartmentHighlight)
-            SetLabelColor(lblReasonForTravelHighLight)
-            SetLabelColor(lblCostCentreHighlight)
+            SetLabelColor(lblBookedByHighlight, cmbBookedby.Tag)
+            SetLabelColor(lblDepartmentHighlight, cmbDepartment.Tag)
+            SetLabelColor(lblReasonForTravelHighLight, cmbReasonForTravel.Tag)
+            SetLabelColor(lblCostCentreHighlight, cmbCostCentre.Tag)
+            SetLabelColor(lblTRIDHighLight, txtTrId.Tag)
+
         Catch ex As Exception
             Throw New Exception("SetEnabled()" & vbCrLf & ex.Message)
         End Try
 
     End Sub
-    Private Sub SetLabelColor(ByRef TextLabel As Label)
+    Private Sub SetLabelColor(ByRef TextLabel As Label, ByVal CustomProps As CustomProperties.Item)
         Try
             If TextLabel.Enabled Then
-                TextLabel.BackColor = Color.FromArgb(255, 128, 128)
+                If Not CustomProps Is Nothing AndAlso CustomProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                    TextLabel.BackColor = Color.FromArgb(255, 128, 128)
+                Else
+                    TextLabel.BackColor = Color.Cyan
+                End If
             Else
                 TextLabel.BackColor = Color.Silver
-            End If
+                End If
         Catch ex As Exception
             Throw New Exception("SetLabelColor()" & vbCrLf & ex.Message)
         End Try
@@ -300,6 +329,7 @@
                 DisplayOldCustomProperty(cmbDepartment, mobjPNR.ExistingElements.Department)
                 DisplayOldCustomProperty(cmbReasonForTravel, mobjPNR.ExistingElements.ReasonForTravel)
                 DisplayOldCustomProperty(cmbCostCentre, mobjPNR.ExistingElements.CostCentre)
+                DisplayOldCustomProperty(txtTrId, mobjPNR.ExistingElements.TRId)
 
                 txtReference.Text = mobjPNR.ExistingElements.Reference.Key
                 PrepareAirlinePoints()
@@ -330,6 +360,14 @@
         End Try
 
     End Sub
+    Private Sub DisplayOldCustomProperty(ByRef txtText As TextBox, ByVal Item As GDSExisting.Item)
+        Try
+            txtText.Text = Item.Key
+        Catch ex As Exception
+            Throw New Exception("DisplayOldCustomProperty(ByRef txtText As TextBox, ByVal Item As GDSExisting.Item)" & vbCrLf & ex.Message)
+        End Try
+
+    End Sub
     Private Sub DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As String)
         Try
             If Item <> "" Then
@@ -351,12 +389,21 @@
     End Sub
     Private Sub PrepareAirlinePoints()
         Try
-            txtAirlineEntries.Clear()
+            Dim pFound As Boolean = False
+            lstAirlineEntries.Items.Clear()
+
             For Each pSeg As GDSSeg.GDSSegItem In mobjPNR.Segments.Values
                 mobjAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline, mobjPNR.GDSCode)
                 For Each pItem As AirlinePoints.Item In mobjAirlinePoints.Values
-                    If txtAirlineEntries.Text.IndexOf(pItem.PointsCommand) < 0 Then
-                        txtAirlineEntries.AppendText("> " & pItem.PointsCommand & vbCrLf)
+                    pFound = False
+                    For i As Integer = 0 To lstAirlineEntries.Items.Count - 1
+                        If lstAirlineEntries.Items(i).ToString = pItem.ToString Then
+                            pFound = True
+                            Exit For
+                        End If
+                    Next
+                    If Not pFound Then
+                        lstAirlineEntries.Items.Add(pItem, True)
                     End If
                 Next
             Next
@@ -405,8 +452,15 @@
                                 Else
                                     pGDSCommand = .GDSElement & " " & pGDSText
                                 End If
-                                If txtAirlineEntries.Text.IndexOf(pGDSCommand) < 0 Then
-                                    txtAirlineEntries.AppendText("> " & pGDSCommand & vbCrLf)
+                                pFound = False
+                                For i As Integer = 0 To lstAirlineEntries.Items.Count - 1
+                                    If lstAirlineEntries.Items(i).ToString = pGDSCommand Then
+                                        pFound = True
+                                        Exit For
+                                    End If
+                                Next
+                                If Not pFound Then
+                                    lstAirlineEntries.Items.Add(pGDSCommand, True)
                                 End If
 
                             End If
@@ -425,9 +479,20 @@
                         Else
                             pGDSCommand = ""
                         End If
-                        If pGDSCommand <> "" And txtAirlineEntries.Text.IndexOf(pGDSCommand) < 0 Then
-                            txtAirlineEntries.AppendText("> " & pGDSCommand & vbCrLf)
+                        If pGDSCommand <> "" Then
+                            pFound = False
+                            For i As Integer = 0 To lstAirlineEntries.Items.Count - 1
+                                If lstAirlineEntries.Items(i).ToString = pGDSCommand Then
+                                    pFound = True
+                                    Exit For
+                                End If
+                            Next
+                            If Not pFound Then
+                                lstAirlineEntries.Items.Add(pGDSCommand, True)
+                            End If
+
                         End If
+
                     Next
                 End If
             End If
@@ -762,6 +827,7 @@
             cmbDepartment.Enabled = False
             cmbReasonForTravel.Enabled = False
             cmbCostCentre.Enabled = False
+            txtTrId.Enabled = False
 
             If Not mobjCustomerSelected Is Nothing Then
                 For Each pProp As CustomProperties.Item In mobjCustomerSelected.CustomerProperties.Values
@@ -773,6 +839,8 @@
                         PrepareCustomProperty(cmbReasonForTravel, pProp)
                     ElseIf pProp.CustomPropertyID = Utilities.EnumCustomPropertyID.CostCentre Then
                         PrepareCustomProperty(cmbCostCentre, pProp)
+                    ElseIf pProp.CustomPropertyID = Utilities.EnumCustomPropertyID.TRId Then
+                        PrepareCustomProperty(txtTrId, pProp)
                     End If
                 Next
             End If
@@ -786,6 +854,7 @@
 
         Try
             cmbCombo.Enabled = True
+            cmbCombo.Tag = pProp
             If pProp.LimitToLookup Then
                 cmbCombo.DropDownStyle = ComboBoxStyle.DropDownList
             Else
@@ -801,7 +870,16 @@
         End Try
 
     End Sub
+    Private Sub PrepareCustomProperty(ByRef txtText As TextBox, ByRef pProp As CustomProperties.Item)
 
+        Try
+            txtText.Enabled = True
+            txtText.Tag = pProp
+        Catch ex As Exception
+            Throw New Exception("PrepareCustomProperty()" & vbCrLf & ex.Message)
+        End Try
+
+    End Sub
     Private Sub txtCustomer_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtCustomer.TextChanged
 
         Try
@@ -844,6 +922,7 @@
 
             cmbBookedby.Text = ""
             cmbDepartment.Text = ""
+            txtTrId.Clear()
 
             If mobjCustomerSelected.HasVessels Then
                 PopulateVesselsList()
@@ -879,7 +958,7 @@
                 End If
             End If
 
-                SetEnabled()
+            SetEnabled()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -1070,7 +1149,7 @@
 
     Private Function UpdatePNR(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean) As String
         Try
-            UpdatePNR = mobjPNR.SendAllGDSEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, txtAirlineEntries)
+            UpdatePNR = mobjPNR.SendAllGDSEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, lstAirlineEntries)
         Catch ex As Exception
             Throw New Exception("UpdatePNR()" & vbCrLf & ex.Message)
         End Try
@@ -1165,7 +1244,19 @@
         End Try
 
     End Sub
+    Private Sub txtTrId_TextChanged(sender As Object, e As EventArgs) Handles txtTrId.TextChanged
 
+        Try
+            If Not mflgLoading Then
+                If Not MySettings Is Nothing Then
+                    mobjPNR.NewElements.SetTRId(txtTrId.Text)
+                End If
+            End If
+            SetEnabled()
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Sub
     Private Sub txtReference_TextChanged(sender As Object, e As EventArgs) Handles txtReference.TextChanged
 
         Try
@@ -2049,13 +2140,13 @@ td {
     Private Sub cmbOSMVesselGroup_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbOSMVesselGroup.SelectedIndexChanged
         Try
             If Not mflgLoading Then
-                If Not MySettings Is Nothing Then
-                    Dim pSelectedItem As osmVessels.VesselGroupItem
-                    pSelectedItem = cmbOSMVesselGroup.SelectedItem
-                    MySettings.OSMVesselGroup = pSelectedItem.Id
-                    MySettings.Save()
-                    UtilitiesOSM.OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
+                If MySettings Is Nothing Then
+                    InitSettings()
                 End If
+                Dim pSelectedItem As osmVessels.VesselGroupItem
+                pSelectedItem = cmbOSMVesselGroup.SelectedItem
+                MySettings.OSMVesselGroup = pSelectedItem.Id
+                UtilitiesOSM.OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
             End If
         Catch ex As Exception
             MessageBox.Show(ex.Message)
@@ -2664,9 +2755,8 @@ td {
             txtPNRApis.Location = dgvApis.Location
             txtPNRApis.Size = dgvApis.Size
             txtPNRApis.Text = mobjPNR.SSRDocs
-            txtPNRApis.BackColor = txtAirlineEntries.BackColor
-            txtPNRApis.ForeColor = txtAirlineEntries.ForeColor
-            txtPNRApis.Font = txtAirlineEntries.Font
+            txtPNRApis.BackColor = Color.Aqua
+            txtPNRApis.ForeColor = Color.Blue
             txtPNRApis.Visible = True
             txtPNRApis.BringToFront()
             cmdAPISEditPax.Enabled = False

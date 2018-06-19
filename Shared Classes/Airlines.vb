@@ -1,5 +1,7 @@
 Option Strict Off
 Option Explicit On
+
+<CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")>
 Friend Class Airlines
 
     Public Shared ReadOnly Property AirlineName(ByVal AirlineCode As String) As String

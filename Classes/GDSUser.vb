@@ -5,6 +5,7 @@ Friend Class GDSUser
         Dim GDSCode As Utilities.EnumGDSCode
         Dim PCC As String
         Dim User As String
+        <CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId:="pGDS")>
         Private Sub New(ByVal pGDS As String)
             GDSCode = Utilities.EnumGDSCode.Unknown
             PCC = ""

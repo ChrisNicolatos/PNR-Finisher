@@ -51,6 +51,9 @@ Friend Class Config
     Private mflgIsDirtyPCC As Boolean
     Private mflgIsDirtyUser As Boolean
     Private mGDSReferences As New Config_GDSReferences.Collection
+    Public Sub New()
+
+    End Sub
     Public Sub New(mGDSUser As GDSUser)
         Try
             mobjGDSUser = mGDSUser

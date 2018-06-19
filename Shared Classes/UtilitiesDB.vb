@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Imports System.Text
-Public Class UtilitiesDB
+Public NotInheritable Class UtilitiesDB
     '
     ' Prepares the SQL connection string for the Travel Force Cosmos database
     '
@@ -18,6 +18,8 @@ Public Class UtilitiesDB
     Private Shared mPnrDataCatalog As String = ""
     Private Shared mPnrUserName As String = ""
     Private Shared mPnrPassword As String = ""
+    Private Sub New()
+    End Sub
     Public Shared ReadOnly Property PNRDataSource As String
         Get
             PNRDataSource = mPnrDataSource

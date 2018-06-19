@@ -8,7 +8,26 @@ Module modPNR
     Private mHomeSettingsExist As Boolean
     Private mstrRequestedPCC As String = ""
     Private mstrRequestedUser As String = ""
+    Public Sub InitSettings()
+        Try
+            mstrRequestedPCC = ""
+            mstrRequestedUser = ""
 
+            mMySettings = New Config
+            If Not mHomeSettingsExist Then
+                mHomeSettings = mMySettings
+                mHomeSettingsExist = True
+            End If
+        Catch ex As Exception
+            If mHomeSettingsExist Then
+                mMySettings = mHomeSettings
+            Else
+                Throw New Exception(ex.Message)
+            End If
+        End Try
+
+
+    End Sub
     Public Sub InitSettings(ByVal mGDSUser As GDSUser)
         Try
             mstrRequestedPCC = mGDSUser.PCC

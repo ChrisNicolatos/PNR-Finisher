@@ -1,5 +1,5 @@
 ﻿Public Class DBUser
-    Public Event UserValid(ByVal isValid As Boolean, ByVal isUserNameValid As Boolean, ByVal isEmailValid As Boolean, ByVal isQueueNumberValid As Boolean, ByVal isOPQueueValid As Boolean)
+    Public Event UserValid() '(ByVal isValid As Boolean, ByVal isUserNameValid As Boolean, ByVal isEmailValid As Boolean, ByVal isQueueNumberValid As Boolean, ByVal isOPQueueValid As Boolean)
     Private Structure ClassProps
         Dim GDS As Utilities.EnumGDSCode
         Dim PCC As String
@@ -121,7 +121,7 @@
                 .IsOPQueueValid = System.Text.RegularExpressions.Regex.IsMatch(.OPQueue, "(?i)^[0-9]{1,2}(\*C[0-9]{1}|\*C[0-9]{1,2}|\*C[01][0-9][0-9]|\*C2[0-4][0-9]|\*C25[0-5])?$")
             End If
             .IsValid = .IsUserNameValid And .IsEmailValid And .IsQueueNumberValid And .IsOPQueueValid
-            RaiseEvent UserValid(isValid, isUserNameValid, isEmailValid, isQueueNumberValid, isOPQueueValid)
+            RaiseEvent UserValid() 'UserValid(isValid, isUserNameValid, isEmailValid, isQueueNumberValid, isOPQueueValid)
         End With
     End Sub
     Public Sub Update()
@@ -130,7 +130,6 @@
         If isValid Then
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
-            Dim pobjReader As SqlClient.SqlDataReader
 
             pobjConn.Open()
             pobjComm = pobjConn.CreateCommand
@@ -221,7 +220,7 @@
                                 "            ,@pfOSMLOGOnSigner " &
                                 "            ,@pfOSMLOGPath )"
 
-                pobjReader = .ExecuteScalar
+                .ExecuteScalar()
             End With
 
 

@@ -11,6 +11,9 @@ Namespace AirlinePoints
                 PointsCommand = mudtProps.PointsCommand
             End Get
         End Property
+        Public Overrides Function ToString() As String
+            Return PointsCommand
+        End Function
 
         Friend Sub SetValues(ByVal pPointsCommand As String)
             With mudtProps

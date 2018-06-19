@@ -87,6 +87,7 @@ Namespace GDSExisting
         Private mobjDepartment As New Item
         Private mobjReasonForTravel As New Item
         Private mobjCostCentre As New Item
+        Private mobjTRId As New Item
 
         Public ReadOnly Property OpenSegment As Item
             Get
@@ -207,6 +208,11 @@ Namespace GDSExisting
         Public ReadOnly Property CostCentre As Item
             Get
                 CostCentre = mobjCostCentre
+            End Get
+        End Property
+        Public ReadOnly Property TRId As Item
+            Get
+                TRId = mobjTRId
             End Get
         End Property
         Public Sub Clear()

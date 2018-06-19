@@ -82,7 +82,7 @@
         End If
     End Sub
 
-    Private Sub mobjDBUser_UserValid(isValid As Boolean, isUserNameValid As Boolean, isEmailValid As Boolean, isQueueNumberValid As Boolean, isOPQueueValid As Boolean) Handles mobjDBUser.UserValid
+    Private Sub mobjDBUser_UserValid() Handles mobjDBUser.UserValid
 
         EnableOptions()
 

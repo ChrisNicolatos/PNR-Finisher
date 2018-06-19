@@ -85,7 +85,6 @@ Namespace Vessels
                                                 " LEFT JOIN Company " &
                                                 " ON Costcen.Account_Id=Company.Account_Id " &
                                                 " WHERE Company.Account_Abbriviation = '" & pCustCode & "' AND Child_Name = 'CC1' AND Child_Value = '" & pVesselName & "' "
-
                 Case Else
                     PrepareVesselSelectCommand = ""
             End Select
@@ -140,7 +139,7 @@ Namespace Vessels
                     PrepareVesselSelectCommand = " SELECT [Child_Value] AS Name " &
                                                  ",'' AS Flag " &
                                                  "  FROM [Disco_Instone_EU].[dbo].[Costcen] " &
-                                                 "  WHERE Child_Name = 'CC1' AND CostCen.Account_id =  " & pEntityID
+                                                 "  WHERE Child_Value IS NOT NULL AND Child_Name = 'CC1' AND CostCen.Account_id =  " & pEntityID
                 Case Else
                     PrepareVesselSelectCommand = ""
             End Select

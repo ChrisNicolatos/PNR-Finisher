@@ -21,11 +21,13 @@ Namespace GDSSeg
             Dim BoardCityName As String
             Dim BoardAirportShortName As String
             Dim BoardCountryName As String
+            Dim BoardCountryCode As String
             Dim OffPoint As String
             Dim OffPointAirportName As String
             Dim OffPointCityName As String
             Dim OffPointAirportShortName As String
-            Dim offPointCountryName As String
+            Dim OffPointCountryName As String
+            Dim OffPointCountryCode As String
             Dim DepartTime As Date
             Dim ArriveTime As Date
             Dim EstimatedFlyingTime As String
@@ -111,7 +113,7 @@ Namespace GDSSeg
         End Property
         Public ReadOnly Property OffPointCountryName As String
             Get
-                OffPointCountryName = mudtProps.offPointCountryName
+                OffPointCountryName = mudtProps.OffPointCountryName
             End Get
         End Property
         Public ReadOnly Property Status As String
@@ -288,7 +290,21 @@ Namespace GDSSeg
                 End If
             End Get
         End Property
-        Friend Sub SetValues(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pVL() As String, ByVal pText As String, ByVal pOperatedBy As String, ByVal SVC As String())
+        Friend Sub SetValues(ByVal pAirline As String _
+                           , ByVal pBoardPoint As String _
+                           , ByVal pClass As String _
+                           , ByVal pDepartureDate As Date _
+                           , ByVal pArrivalDate As Date _
+                           , ByVal pElementNo As Short _
+                           , ByVal pFlightNo As String _
+                           , ByVal pOffPoint As String _
+                           , ByVal pStatus As String _
+                           , ByVal pDepartTime As Date _
+                           , ByVal pArriveTime As Date _
+                           , ByVal pVL() As String _
+                           , ByVal pText As String _
+                           , ByVal pOperatedBy As String _
+                           , ByVal SVC As String())
             ' Galileo
             With mudtProps
                 .ElementNo = pElementNo
@@ -303,11 +319,13 @@ Namespace GDSSeg
                 .BoardCityName = Airport.CityName(.BoardPoint)
                 .BoardAirportShortName = Airport.AirportShortname(.BoardPoint)
                 .BoardCountryName = Airport.CountryName(.BoardPoint)
+                .BoardCountryCode = Airport.CountryCode(.BoardPoint)
                 .OffPoint = pOffPoint
                 .OffPointAirportName = Airport.CityAirportName(.OffPoint)
                 .OffPointCityName = Airport.CityName(.OffPoint)
                 .OffPointAirportShortName = Airport.AirportShortname(.OffPoint)
-                .offPointCountryName = Airport.CountryName(.OffPoint)
+                .OffPointCountryName = Airport.CountryName(.OffPoint)
+                .OffPointCountryCode = Airport.CountryCode(.OffPoint)
                 .Status = pStatus
                 .DepartTime = pDepartTime
                 .ArriveTime = pArriveTime
@@ -373,11 +391,15 @@ Namespace GDSSeg
                 .BoardCityName = Airport.CityName(.BoardPoint)
                 .BoardAirportShortName = Airport.AirportShortname(.BoardPoint)
                 .BoardCountryName = Airport.CountryName(.BoardPoint)
+                .BoardCountryCode = Airport.CountryCode(.BoardPoint)
+
                 .OffPoint = pOffPoint
                 .OffPointAirportName = Airport.CityAirportName(.OffPoint)
                 .OffPointCityName = Airport.CityName(.OffPoint)
                 .OffPointAirportShortName = Airport.AirportShortname(.OffPoint)
-                .offPointCountryName = Airport.CountryName(.OffPoint)
+                .OffPointCountryName = Airport.CountryName(.OffPoint)
+                .OffPointCountryCode = Airport.CountryCode(.OffPoint)
+
                 .Status = pStatus
                 .DepartTime = pDepartTime
                 .ArriveTime = pArriveTime
@@ -390,6 +412,10 @@ Namespace GDSSeg
                 End If
                 .Text = pText
                 .OperatedBy = ""
+                'If .Text.Substring(35).StartsWith("FLWN") Then
+                '    .DepartureDate = Date.MinValue
+                '    .ArrivalDate = Date.MinValue
+                'End If
                 Try
                     mobjAirlineDate.IgnoreAmadeusRange = True
                     mobjAirlineDate.VBDate = .DepartureDate
@@ -409,11 +435,11 @@ Namespace GDSSeg
                 mudtProps.ArriveTerminal = ""
                 mudtProps.DepartTerminal = ""
                 mudtProps.EstimatedFlyingTime = ""
-                AnalyseSegDo(SegDo)
+                AnalyseSegDo1A(SegDo)
             End With
 
         End Sub
-        Private Sub AnalyseSegDo(ByVal SegDo As String)
+        Private Sub AnalyseSegDo1A(ByVal SegDo As String)
 
             Dim pSegDo() As String = SegDo.Split(vbCrLf)
 

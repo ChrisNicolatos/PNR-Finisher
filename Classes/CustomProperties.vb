@@ -8,6 +8,7 @@ Namespace CustomProperties
             Dim CustomPropertyID As Utilities.EnumCustomPropertyID
             Dim LookUpValues As String
             Dim LimitToLookup As Boolean
+            Dim RequiredType As Utilities.CustomPropertyRequiredType
             Dim Label As String
             Dim TFEntityID As Long
             Dim Values() As String
@@ -37,7 +38,11 @@ Namespace CustomProperties
                 LimitToLookup = mudtProps.LimitToLookup
             End Get
         End Property
-
+        Public ReadOnly Property RequiredType As Utilities.CustomPropertyRequiredType
+            Get
+                Return mudtProps.RequiredType
+            End Get
+        End Property
         Public ReadOnly Property Label() As String
             Get
                 Label = mudtProps.Label
@@ -66,11 +71,12 @@ Namespace CustomProperties
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCustomPropertyID As Utilities.EnumCustomPropertyID, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pLabel As String, ByVal pTFEntityID As Long)
+        Friend Sub SetValues(ByVal pID As Long, ByVal pCustomPropertyID As Utilities.EnumCustomPropertyID, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pRequiredType As Utilities.CustomPropertyRequiredType, ByVal pLabel As String, ByVal pTFEntityID As Long)
             With mudtProps
                 .ID = pID
                 .CustomPropertyID = pCustomPropertyID
                 .LookUpValues = pLookUpValues
+                .RequiredType = pRequiredType
                 .LimitToLookup = pLimitToLookup
                 .Label = pLabel
                 .TFEntityID = pTFEntityID
@@ -102,8 +108,8 @@ Namespace CustomProperties
 
             With pobjComm
                 .CommandType = CommandType.Text
-                .CommandText = "SELECT [Value] " &
-                               " FROM [TravelForceCosmos].[dbo].[CustomPropertyValues] " &
+                .CommandText = "SELECT Value " &
+                               " FROM TravelForceCosmos.dbo.CustomPropertyValues " &
                                " WHERE CustomPropertyID = " & mudtProps.CustomPropertyID & " And TFEntityID = " & mudtProps.TFEntityID &
                                " GROUP BY Value " &
                                " ORDER BY Value"
@@ -148,7 +154,7 @@ Namespace CustomProperties
                     With pobjComm
                         .CommandType = CommandType.Text
                         .CommandText = "SELECT LookUpValues, ISNULL(RelatedEntityID, 0) AS RelatedEntityID " &
-                                   " FROM [TravelForceCosmos].[dbo].[ClientCustomProperties] " &
+                                   " FROM TravelForceCosmos.dbo.ClientCustomProperties " &
                                    " LEFT JOIN TravelForceCosmos.dbo.TFEntities " &
                                    " 	ON TFEntityID=TFEntities.Id " &
                                    " WHERE CustomPropertyID = " & pCustomPropertyID & " And TFEntityID = " & pTfEntityID
@@ -169,15 +175,15 @@ Namespace CustomProperties
                     .CommandType = CommandType.Text
                     Select Case pCustomPropertyID
                         Case 1 ' booked by
-                            .CommandText = "SELECT [Child_Value] AS Name " &
-                                           " From [Disco_Instone_EU].[dbo].[Costcen] " &
+                            .CommandText = "SELECT Child_Value AS Name " &
+                                           " From Disco_Instone_EU.dbo.Costcen " &
                                            "  LEFT JOIN Company " &
                                            "  ON Costcen.Account_Id=Company.Account_Id " &
                                            "  WHERE CostCen.Account_id = " & pTfEntityID & " AND Child_Name = 'BBY' " &
                                            " ORDER BY Child_Value"
                         Case 4 ' reason for travel
-                            .CommandText = "SELECT [Child_Value] AS Name " &
-                                          " From [Disco_Instone_EU].[dbo].[Costcen] " &
+                            .CommandText = "SELECT Child_Value AS Name " &
+                                          " From Disco_Instone_EU.dbo.Costcen " &
                                           "  LEFT JOIN Company " &
                                           "  ON Costcen.Account_Id=Company.Account_Id " &
                                           "  WHERE CostCen.Account_id = " & pTfEntityID & " AND Child_Name = 'REF2' " &
@@ -256,13 +262,14 @@ Namespace CustomProperties
 
                 With pobjComm
                     .CommandType = CommandType.Text
-                    .CommandText = " SELECT [Id] " &
-                               "       ,[CustomPropertyID] " &
-                               "       ,[LookUpValues] " &
-                               "       ,[LimitToLookUp] " &
-                               "       ,[Label] " &
-                               "       ,[TFEntityID] " &
-                               "   FROM [TravelForceCosmos].[dbo].[ClientCustomProperties] " &
+                    .CommandText = " SELECT Id " &
+                               "       ,CustomPropertyID " &
+                               "       ,LookUpValues " &
+                               "       ,LimitToLookUp " &
+                               "       ,Label " &
+                               "       ,TFEntityID " &
+                               "       ,LTRequiredTypeID " &
+                               "   FROM TravelForceCosmos.dbo.ClientCustomProperties " &
                                "   WHERE TFEntityID = '" & pEntityID & "'   " &
                                "   AND IsDisabled = 0"
 
@@ -277,7 +284,7 @@ Namespace CustomProperties
                 With pobjReader
                     Do While .Read
                         pobjClass = New Item
-                        pobjClass.SetValues(.Item("Id"), .Item("CustomPropertyID"), .Item("LookUpValues"), .Item("LimitToLookUp"), .Item("Label"), .Item("TFEntityID"))
+                        pobjClass.SetValues(.Item("Id"), .Item("CustomPropertyID"), .Item("LookUpValues"), .Item("LimitToLookUp"), .Item("LTRequiredTypeID"), .Item("Label"), .Item("TFEntityID"))
                         MyBase.Add(pobjClass.ID, pobjClass)
                         If pobjClass.CustomPropertyID = Utilities.EnumCustomPropertyID.BookedBy Then
                             mflgBookedBy = True
@@ -295,7 +302,7 @@ Namespace CustomProperties
             Else
                 Dim pobjClass As Item
                 pobjClass = New Item
-                pobjClass.SetValues(1, Utilities.EnumCustomPropertyID.BookedBy, "", True, "BookedBy", pEntityID)
+                pobjClass.SetValues(1, Utilities.EnumCustomPropertyID.BookedBy, "", True, True, "BookedBy", pEntityID)
                 If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
                     mflgBookedBy = True
@@ -303,7 +310,7 @@ Namespace CustomProperties
                     mflgBookedBy = False
                 End If
                 pobjClass = New Item
-                pobjClass.SetValues(2, Utilities.EnumCustomPropertyID.ReasonFortravel, "", True, "ReasonFortravel", pEntityID)
+                pobjClass.SetValues(2, Utilities.EnumCustomPropertyID.ReasonFortravel, "", True, True, "ReasonFortravel", pEntityID)
                 If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
                     mflgReasonForTravel = True

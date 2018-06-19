@@ -1,4 +1,5 @@
-﻿Friend Class UtilitiesOSM
+﻿<CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")>
+Friend Class UtilitiesOSM
     Public Shared Sub OSMRefreshVessels(ByRef lstListBox As ListBox, ByVal InUseOnly As Boolean)
 
         Dim pOSMVessels As New osmVessels.VesselCollection
