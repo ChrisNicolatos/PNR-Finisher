@@ -1,9 +1,9 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace SubDepartments
     Friend Class Item
         Private Structure ClassProps
-            Dim ID As Long
+            Dim ID As Integer
             Dim Code As String
             Dim Name As String
         End Structure
@@ -13,7 +13,7 @@ Namespace SubDepartments
                 Return .Code & " " & .Name
             End With
         End Function
-        Public ReadOnly Property ID() As Long
+        Public ReadOnly Property ID() As Integer
             Get
                 ID = mudtProps.ID
             End Get
@@ -28,7 +28,7 @@ Namespace SubDepartments
                 Name = mudtProps.Name
             End Get
         End Property
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCode As String, ByVal pName As String)
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String)
             With mudtProps
                 .ID = pID
                 .Code = pCode
@@ -36,7 +36,7 @@ Namespace SubDepartments
             End With
         End Sub
 
-        Public Sub Load(ByVal pSubID As Long)
+        Public Sub Load(ByVal pSubID As Integer)
             If MySettings.PCCBackOffice = 1 Then
 
                 Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
@@ -61,7 +61,7 @@ Namespace SubDepartments
 
                 With pobjReader
                     Do While .Read
-                        SetValues(.Item("Id"), .Item("Code"), .Item("Name"))
+                        SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")))
                     Loop
                     .Close()
                 End With
@@ -71,7 +71,7 @@ Namespace SubDepartments
     End Class
     Friend Class Collection
 
-        Inherits Collections.Generic.Dictionary(Of String, Item)
+        Inherits Collections.Generic.Dictionary(Of Integer, Item)
         Private mlngEntityID As Long
 
         Public Sub Load(ByVal pEntityID As Long)
@@ -103,7 +103,7 @@ Namespace SubDepartments
                 With pobjReader
                     Do While .Read
                         pobjClass = New Item
-                        pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"))
+                        pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")))
                         MyBase.Add(pobjClass.ID, pobjClass)
                     Loop
                     .Close()

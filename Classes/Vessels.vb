@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace Vessels
 
@@ -10,7 +10,11 @@ Namespace Vessels
         Private mudtProps As ClassProps
         Public Overrides Function ToString() As String
             With mudtProps
-                Return .Name + IIf(.Flag = "", "", MySettings.GDSValue("TextREG") & .Flag)
+                If .Flag = "" Then
+                    Return .Name
+                Else
+                    Return .Name & MySettings.GDSValue("TextREG") & .Flag
+                End If
             End With
         End Function
 
@@ -58,14 +62,14 @@ Namespace Vessels
             Load = False
             With pobjReader
                 If .Read Then
-                    SetValues(.Item("Name"), .Item("Flag"))
+                    SetValues(CStr(.Item("Name")), CStr(.Item("Flag")))
                     Load = True
                 End If
                 .Close()
             End With
             pobjConn.Close()
         End Function
-        Private Function PrepareVesselSelectCommand(ByVal pCustCode As String, ByVal pVesselName As String)
+        Private Function PrepareVesselSelectCommand(ByVal pCustCode As String, ByVal pVesselName As String) As String
             Select Case MySettings.PCCBackOffice
                 Case 1
                     PrepareVesselSelectCommand = " SELECT DISTINCT " &
@@ -93,9 +97,9 @@ Namespace Vessels
 
     Friend Class Collection
         Inherits Collections.Generic.Dictionary(Of String, Item)
-        Private mlngEntityID As Long
+        Private mlngEntityID As Integer
 
-        Public Sub Load(ByVal pEntityID As Long)
+        Public Sub Load(ByVal pEntityID As Integer)
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
@@ -115,7 +119,7 @@ Namespace Vessels
             With pobjReader
                 Do While .Read
                     pobjClass = New Item
-                    pobjClass.SetValues(.Item("Name"), .Item("Flag"))
+                    pobjClass.SetValues(CStr(.Item("Name")), CStr(.Item("Flag")))
                     If pobjClass.ToString <> "" And Not MyBase.ContainsKey(pobjClass.ToString) Then
                         MyBase.Add(pobjClass.ToString, pobjClass)
                     End If

@@ -1,4 +1,6 @@
-﻿Namespace Config_GDSReferences
+﻿Option Strict On
+Option Explicit On
+Namespace Config_GDSReferences
     Friend Class Item
         Private Structure ClassProps
             Dim Id As Integer
@@ -98,8 +100,8 @@
             With pobjReader
                 While pobjReader.Read
                     Dim pItem As New Item
-                    pItem.SetValues(.Item("pfrID"), .Item("pfrKey"), .Item("pfrValue"), .Item("pfrGDS_fkey"), .Item("pfrBO_fkey"), .Item("pfrGDSElement"), .Item("pfrReferenceIdentifier"), .Item("pfrReferenceDetail"))
-                    MyBase.Add(.Item("pfrKey"), pItem)
+                    pItem.SetValues(CInt(.Item("pfrID")), CStr(.Item("pfrKey")), CStr(.Item("pfrValue")), CInt(.Item("pfrGDS_fkey")), CInt(.Item("pfrBO_fkey")), CStr(.Item("pfrGDSElement")), CStr(.Item("pfrReferenceIdentifier")), CStr(.Item("pfrReferenceDetail")))
+                    MyBase.Add(pItem.Key, pItem)
                 End While
                 .Close()
             End With

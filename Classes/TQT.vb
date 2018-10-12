@@ -1,4 +1,6 @@
-﻿Public Class TQT
+﻿Option Strict On
+Option Explicit On
+Public Class TQT
     Private Structure ClassProps
         Dim TQTElement As Integer
         Dim Segment As Integer

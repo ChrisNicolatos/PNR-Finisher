@@ -1,5 +1,8 @@
-﻿Public Class frmPNR
-    Private Const VersionText As String = "Athens PNR Finisher (13/06/2018 14:54) "
+﻿Option Strict Off
+Option Explicit On
+Public Class frmPNR
+    Private Const VersionText As String = "Athens PNR Finisher (12/10/2018 12:31) "
+    Private Const OptionPriceOptimizer As Boolean = False ' This blocks users' access to Price Optimiser until it is ready
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
@@ -14,6 +17,7 @@
 
     Private mobjAirlinePoints As New AirlinePoints.Collection
     Private mobjAirlineNotes As New AirlineNotes.Collection
+    Private mstrAirlineAlert As String
     Private mobjConditionalEntry As New ConditionalGDSEntry.Collection
 
     Private mobjCustomerSelected As Customers.CustomerItem
@@ -45,10 +49,22 @@
             mSelectedPNRGDSCode = Utilities.EnumGDSCode.Amadeus
             ClearForm()
             ReadPNR(Utilities.EnumGDSCode.Amadeus)
+            ShowPriceOptimiser()
             SetEnabled()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
+    End Sub
+    Private Sub ShowPriceOptimiser()
+
+        If OptionPriceOptimizer Then
+            If Not MySettings Is Nothing Then
+                If MySettings.GDSPcc <> "" And MySettings.GDSUser <> "" Then
+                    Dim pFrm As New frmPriceOptimiser(MySettings.GDSPcc, MySettings.GDSUser)
+                    pFrm.Show()
+                End If
+            End If
+        End If
     End Sub
     Private Sub ClearForm()
 
@@ -96,6 +112,8 @@
             cmdPNRWrite.Enabled = False
             cmdPNRWriteWithDocs.Enabled = False
             cmdPNROnlyDocs.Enabled = False
+            cmdPriceOptimiser.Enabled = False
+            cmdPriceOptimiser.Visible = OptionPriceOptimizer
 
             mobjPNR.ExistingElements.Clear()
 
@@ -141,6 +159,7 @@
 
             ' Update is enabled if a PNR has been read and if mandatory fields have been entered
             cmdPNRWrite.Enabled = mflgReadPNR
+            cmdPriceOptimiser.Enabled = (OptionPriceOptimizer And mflgReadPNR)
 
             ' Customer is always needed
 
@@ -164,25 +183,25 @@
                     txtCRM.BackColor = Color.Pink
                 End If
                 If mobjPNR.NewElements.BookedBy.GDSCommand = "" And cmbBookedby.Enabled Then
-                    pProps = cmbBookedby.Tag
+                    pProps = CType(cmbBookedby.Tag, CustomProperties.Item)
                     If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
                         cmdPNRWrite.Enabled = False
                     End If
                 End If
                 If mobjPNR.NewElements.CostCentre.GDSCommand = "" And cmbCostCentre.Enabled Then
-                    pProps = cmbCostCentre.Tag
+                    pProps = CType(cmbCostCentre.Tag, CustomProperties.Item)
                     If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
                         cmdPNRWrite.Enabled = False
                     End If
                 End If
                 If mobjPNR.NewElements.ReasonForTravel.GDSCommand = "" And cmbReasonForTravel.Enabled Then
-                    pProps = cmbReasonForTravel.Tag
+                    pProps = CType(cmbReasonForTravel.Tag, CustomProperties.Item)
                     If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
                         cmdPNRWrite.Enabled = False
                     End If
                 End If
                 If mobjPNR.NewElements.TRId.GDSCommand = "" And txtTrId.Enabled Then
-                    pProps = txtTrId.Tag
+                    pProps = CType(txtTrId.Tag, CustomProperties.Item)
                     If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
                         cmdPNRWrite.Enabled = False
                     End If
@@ -222,7 +241,7 @@
                 End If
             Else
                 TextLabel.BackColor = Color.Silver
-                End If
+            End If
         Catch ex As Exception
             Throw New Exception("SetLabelColor()" & vbCrLf & ex.Message)
         End Try
@@ -244,7 +263,7 @@
                         Throw New Exception("PNR Finisher cancelled because of itinerary check")
                     End If
                 End If
-                'End If
+
                 mflgReadPNR = True
                 .PrepareNewGDSElements()
                 lblPNR.Text = .PnrNumber
@@ -255,6 +274,9 @@
                 End If
 
                 lblSegs.Text = .Itinerary
+                If .Segments.AirlineAlert <> "" Then
+                    MessageBox.Show(.Segments.AirlineAlert, "AIRLINE ALERT", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                End If
 
                 Dim pFromDate As Date = DateAdd(DateInterval.Month, -3, Today)
 
@@ -347,7 +369,7 @@
                         cmbList.Text = Item.Key
                     End If
                 Else
-                    For i As Short = 0 To cmbList.Items.Count - 1
+                    For i As Integer = 0 To cmbList.Items.Count - 1
                         If Item.Key.ToUpper = cmbList.Items(i).ToString.ToUpper Then
                             cmbList.SelectedIndex = i
                             Exit For
@@ -374,7 +396,7 @@
                 If cmbList.DropDownStyle = ComboBoxStyle.DropDown Then
                     cmbList.Text = Item
                 Else
-                    For i As Short = 0 To cmbList.Items.Count - 1
+                    For i As Integer = 0 To cmbList.Items.Count - 1
                         If cmbList.Items(i).ToString.ToUpper.StartsWith(Item.ToUpper) Then
                             cmbList.SelectedIndex = i
                             Exit For
@@ -437,11 +459,11 @@
                                 End If
 
                                 If pGDSText.Contains("<?NBR OF PSGRS>") Then
-                                    pGDSText = pGDSText.Replace("<?NBR OF PSGRS>", mobjPNR.NumberOfPax)
+                                    pGDSText = pGDSText.Replace("<?NBR OF PSGRS>", CStr(mobjPNR.NumberOfPax))
                                 End If
 
                                 If pGDSText.Contains("<?Segment selection>") Then
-                                    pGDSText = pGDSText.Replace("<?Segment selection>", pSeg.ElementNo)
+                                    pGDSText = pGDSText.Replace("<?Segment selection>", CStr(pSeg.ElementNo))
                                 End If
 
                                 Dim pGDSCommand As String
@@ -563,15 +585,15 @@
                 End If
 
                 Select Case MySettings.FormatStyle
-                    Case 0
+                    Case Utilities.EnumItnFormat.DefaultFormat
                         optItnFormatDefault.Checked = True
-                    Case 1
+                    Case Utilities.EnumItnFormat.Plain
                         optItnFormatPlain.Checked = True
-                    Case 2
+                    Case Utilities.EnumItnFormat.SeaChefs
                         optItnFormatSeaChefs.Checked = True
-                    Case 3
+                    Case Utilities.EnumItnFormat.SeaChefsWithCode
                         optItnFormatSeaChefsWith3LetterCode.Checked = True
-                    Case 4
+                    Case Utilities.EnumItnFormat.Euronav
                         optItnFormatEuronav.Checked = True
                 End Select
                 SetITNEnabled(True)
@@ -692,8 +714,8 @@
             If lstCustomers.Items.Count = 1 Then
                 Try
                     mflgLoading = True
-
-                    SelectCustomer(lstCustomers.Items(0))
+                    Dim pCust As Customers.CustomerItem = CType(lstCustomers.Items(0), Customers.CustomerItem)
+                    SelectCustomer(pCust)
                     txtCustomer.Text = lstCustomers.Items(0).ToString
                 Catch ex As Exception
                     MessageBox.Show(ex.Message)
@@ -1031,7 +1053,8 @@
         Try
             If lstCustomers.SelectedIndex >= 0 Then
                 mflgLoading = True
-                SelectCustomer(lstCustomers.SelectedItem)
+                Dim pCust As Customers.CustomerItem = CType(lstCustomers.SelectedItem, Customers.CustomerItem)
+                SelectCustomer(pCust)
                 txtCustomer.Text = lstCustomers.SelectedItem.ToString
             End If
         Catch ex As Exception
@@ -1150,6 +1173,24 @@
     Private Function UpdatePNR(ByVal WritePNR As Boolean, ByVal WriteDocs As Boolean) As String
         Try
             UpdatePNR = mobjPNR.SendAllGDSEntries(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, lstAirlineEntries)
+            Dim pPNR As String = mobjPNR.PnrNumber
+            Dim pNewEntry = False
+            If pPNR = "New PNR" Or pPNR = "" Then
+                If UpdatePNR.LastIndexOf(" ") > -1 Then
+                    pPNR = UpdatePNR.Substring(UpdatePNR.LastIndexOf(" ")).Trim
+                ElseIf UpdatePNR.Length = 6 Then
+                    pPNR = UpdatePNR
+                End If
+                pNewEntry = True
+            End If
+            Dim pClient As String = mobjPNR.ClientCode
+            If pClient = "" Then
+                pClient = mobjPNR.NewElements.CustomerCode.TextRequested
+            End If
+            If pPNR <> "" Then
+                Dim pTrans As New PNRFinisherTransactions
+                pTrans.UpdateTransactions(pPNR, MySettings.GDSAbbreviation, MySettings.GDSPcc, MySettings.GDSUser, Now, mobjPNR.Passengers.AllPassengers, mobjPNR.Segments.FullItinerary, "", pClient, pNewEntry)
+            End If
         Catch ex As Exception
             Throw New Exception("UpdatePNR()" & vbCrLf & ex.Message)
         End Try
@@ -1382,7 +1423,7 @@
     Private Sub ProcessRequestedPNRs(ByVal txtPNR As TextBox)
 
         Try
-            Dim pPNR() As String = txtPNR.Text.Split(vbCrLf)
+            Dim pPNR() As String = txtPNR.Text.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
             Dim pPNRsOutsideRange As New System.Text.StringBuilder
             Dim pWebItn As String = ""
 
@@ -1580,8 +1621,8 @@ td {
                     pString.AppendLine("</td>")
                     pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>" & pobjSeg.FlightNo & "</td>")
                     pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>" & Format(pobjSeg.DepartureDate, "dd/MM/yyyy") & "<br><span style='font-size:6.0pt;font-family:arial'>" & pobjSeg.DepartureDay & "</span></td>")
-                    pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>" & pobjSeg.BoardPoint & " " & pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " ").Substring(0, .MaxCityNameLength + 1) & " - " &
-                    pobjSeg.OffPoint & " " & pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " ").Substring(0, .MaxCityNameLength + 1) & "</td>")
+                    pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>" & pobjSeg.BoardPoint & " " & pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " - " &
+                    pobjSeg.OffPoint & " " & pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & "</td>")
                     If pobjSeg.Text.Length > 35 AndAlso pobjSeg.Text.Substring(35, 4) = "FLWN" Then
                         pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>FLOWN</td>")
                         pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>&nbsp;</td>")
@@ -1589,7 +1630,7 @@ td {
                         pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>&nbsp;</td>")
                     Else
                         pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>" & Format(pobjSeg.DepartTime, "HH:mm") & "</td>")
-                        Dim pDateDiff As Integer = DateDiff(DateInterval.Day, pobjSeg.DepartureDate, pobjSeg.ArrivalDate)
+                        Dim pDateDiff As Long = DateDiff(DateInterval.Day, pobjSeg.DepartureDate, pobjSeg.ArrivalDate)
                         If pDateDiff = 0 Then
                             pString.AppendLine("<td style='font-size:10.0pt;font-family:arial'>" & Format(pobjSeg.ArriveTime, "HH:mm") & "</td>")
                         Else
@@ -2272,16 +2313,16 @@ td {
 
     End Sub
 
-    Private Sub OSMWebCreate()
+    Private Sub OSMWebCreate(ByVal ShowFullPaxDetails As Boolean)
 
         Try
-            webOSMDoc.DocumentText = OSMWebHeader()
+            webOSMDoc.DocumentText = OSMWebHeader(ShowFullPaxDetails)
             cmdOSMCopyDocument.Enabled = True
         Catch ex As Exception
             Throw New Exception("OSMWebCreate()" & vbCrLf & ex.Message)
         End Try
     End Sub
-    Private Function OSMWebHeader() As String
+    Private Function OSMWebHeader(ByVal ShowFullPaxDetails As Boolean) As String
 
         Try
             Dim xDoctext As String = "<html><head></head><body>"
@@ -2309,6 +2350,7 @@ td {
             Next
             xDoctext &= "CC         : 3rd party applicable<br>"
             xDoctext &= "<br>"
+            xDoctext &= "<br>If more information is required please contact ATPI Greece and copy travel vessel IMO no@osm.biz<br><br>"
             xDoctext &= "DATE/REF   : " & Format(Now, "dd/MM/yyyy") & "<br><br><br>"
             Dim pTempSubject As String = ""
 
@@ -2334,24 +2376,36 @@ td {
             Dim pOther As String = ""
 
             For i As Integer = 0 To dgvOSMPax.Rows.Count - 1
-                Dim pId = dgvOSMPax.Rows(i).Cells(0).Value
+                Dim pId As Integer = CInt(dgvOSMPax.Rows(i).Cells(0).Value)
                 Dim pPax As osmPax.Pax = mOSMPax(pId)
-                Select Case dgvOSMPax.Rows(i).Cells("JoinerLeaver").Value
+                Select Case CStr(dgvOSMPax.Rows(i).Cells("JoinerLeaver").Value)
                     Case "ONSIGNER"
-                        pOnSigners &= "<pre>" & pPax.Text & "</pre><br><br>"
+                        If ShowFullPaxDetails Then
+                            pOnSigners &= "<pre>" & pPax.TextFullDetails & "</pre><br><br>"
+                        Else
+                            pOnSigners &= "<pre>" & pPax.Text & "</pre><br><br>"
+                        End If
                     Case "OFFSIGNER"
-                        pOffSigners &= "<pre>" & pPax.Text & "</pre><br><br>"
+                        If ShowFullPaxDetails Then
+                            pOffSigners &= "<pre>" & pPax.TextFullDetails & "</pre><br><br>"
+                        Else
+                            pOffSigners &= "<pre>" & pPax.Text & "</pre><br><br>"
+                        End If
                     Case Else
-                        pOther &= "<pre>" & pPax.Text & "</pre><br><br>"
+                        If ShowFullPaxDetails Then
+                            pOther &= "<pre>" & pPax.TextFullDetails & "</pre><br><br>"
+                        Else
+                            pOther &= "<pre>" & pPax.Text & "</pre><br><br>"
+                        End If
                 End Select
 
-                Select Case dgvOSMPax.Rows(i).Cells("VisaType").Value
+                Select Case CStr(dgvOSMPax.Rows(i).Cells("VisaType").Value)
                     Case "OKTB"
-                        pOnSignerOKTB &= dgvOSMPax.Rows(i).Cells("Lastname").Value & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value & "<br>"
+                        pOnSignerOKTB &= dgvOSMPax.Rows(i).Cells("Lastname").Value.ToString & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value.ToString & "<br>"
                     Case "NO VISA"
-                        pOnSignerNoVisa &= dgvOSMPax.Rows(i).Cells("Lastname").Value & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value & "<br>"
+                        pOnSignerNoVisa &= dgvOSMPax.Rows(i).Cells("Lastname").Value.ToString & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value.ToString & "<br>"
                     Case "VISA"
-                        pOnSignerVisa &= dgvOSMPax.Rows(i).Cells("Lastname").Value & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value & "<br>"
+                        pOnSignerVisa &= dgvOSMPax.Rows(i).Cells("Lastname").Value.ToString & "/" & dgvOSMPax.Rows(i).Cells("Firstname").Value.ToString & "<br>"
                 End Select
             Next
 
@@ -2472,7 +2526,7 @@ td {
     End Sub
     Private Sub cmdOSMPrepareDoc_Click(sender As Object, e As EventArgs) Handles cmdOSMPrepareDoc.Click
         Try
-            OSMWebCreate()
+            OSMWebCreate(chkOSMFullPaxSDetails.Checked)
             cmdOSMCopyDocument.Enabled = True
 
         Catch ex As Exception
@@ -2505,7 +2559,7 @@ td {
                 mflgLoading = True
                 If e.ColumnIndex = 5 Then
                     For i As Integer = 0 To dgvOSMPax.Rows.Count - 1
-                        If i <> e.RowIndex AndAlso dgvOSMPax.Rows(i).Cells("JoinerLeaver").Value = "ONSIGNER" AndAlso dgvOSMPax.Rows(i).Cells("VisaType").Value Is Nothing Then
+                        If i <> e.RowIndex AndAlso CStr(dgvOSMPax.Rows(i).Cells("JoinerLeaver").Value) = "ONSIGNER" AndAlso dgvOSMPax.Rows(i).Cells("VisaType").Value Is Nothing Then
                             dgvOSMPax.Rows(i).Cells("VisaType").Value = dgvOSMPax.Rows(e.RowIndex).Cells("VisaType").Value
                         End If
                     Next
@@ -2571,7 +2625,7 @@ td {
                     If cmdItnRefresh.Enabled Then
                         ReadPNRandCreateItn(True)
                     End If
-                    If sender.Name = "optItnFormatDefault" Or sender.name = "optItnFormatPlain" Then
+                    If sender.Name = "optItnFormatDefault" Or sender.Name = "optItnFormatPlain" Then
                         SetITNEnabled(True)
                     Else
                         SetITNEnabled(False)
@@ -2586,7 +2640,7 @@ td {
         Try
             If mobjPNR.Segments.Count > 0 And mobjPNR.Passengers.Count > 0 Then
                 Dim pOSMLoG = New OsmLOG
-                pOSMLoG.CreatePDF(mobjPNR)
+                pOSMLoG.CreatePDF(MySettings.AgentName, mobjPNR)
             Else
                 MessageBox.Show("PNR must have passengers and segments to produce a Letter of Guarantee")
             End If
@@ -2688,8 +2742,8 @@ td {
         Else
             pflgBirthDateOK = True
         End If
-        If Not Date.TryParse(Row.Cells("ExpiryDate").Value, pdteDate) Then
-            pdteDate = Utilities.DateFromIATA(Row.Cells("ExpiryDate").Value)
+        If Not Date.TryParse(CStr(Row.Cells("ExpiryDate").Value), pdteDate) Then
+            pdteDate = Utilities.DateFromIATA(CStr(Row.Cells("ExpiryDate").Value))
         End If
         If pdteDate > Now Then
             mflgExpiryDateOK = True
@@ -2698,7 +2752,7 @@ td {
         End If
         pflgGenderFound = False
         For Each pGenderItem As PaxApisDB.ReferenceItem In mobjGender.Values
-            If Row.Cells("Gender").Value = pGenderItem.Code Then
+            If CStr(Row.Cells("Gender").Value) = pGenderItem.Code Then
                 pflgGenderFound = True
                 Exit For
             End If
@@ -2798,7 +2852,7 @@ td {
     Private Sub cmdAdmin_Click(sender As Object, e As EventArgs) Handles cmdAdmin.Click
         Try
             Dim pfrmAdmin As New frmUser(Utilities.EnumGDSCode.Amadeus, "ATHG42100", "9044CN")
-            MessageBox.Show(pfrmAdmin.ShowDialog(Me))
+            MessageBox.Show(pfrmAdmin.ShowDialog(Me).ToString)
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -2843,4 +2897,9 @@ td {
         End Try
     End Sub
 
+    Private Sub cmdPriceOptimiser_Click(sender As Object, e As EventArgs) Handles cmdPriceOptimiser.Click
+
+        ShowPriceOptimiser()
+
+    End Sub
 End Class

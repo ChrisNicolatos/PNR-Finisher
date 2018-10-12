@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace PaxApisDB
     Friend Class Item
@@ -61,7 +61,7 @@ Namespace PaxApisDB
             SetValid()
         End Sub
         Public Sub New(ByVal pId As Integer, ByVal pSSRDocs As String)
-            Dim pItems() As String = pSSRDocs.Split("/")
+            Dim pItems() As String = pSSRDocs.Split("/"c)
             If pItems.GetUpperBound(0) >= 8 Then
                 With mudtProps
                     .Id = pId
@@ -69,7 +69,7 @@ Namespace PaxApisDB
                     .FirstName = pItems(8)
 
                     If IsDate(pItems(4)) Then
-                        .Birthdate = pItems(4)
+                        .Birthdate = CDate(pItems(4))
                     Else
                         .Birthdate = Date.MinValue
                     End If
@@ -77,7 +77,7 @@ Namespace PaxApisDB
                     .IssuingCountry = pItems(1)
                     .PassportNumber = pItems(2)
                     If IsDate(pItems(6)) Then
-                        .ExpiryDate = pItems(6)
+                        .ExpiryDate = CDate(pItems(6))
                     Else
                         .ExpiryDate = Date.MinValue
                     End If
@@ -281,9 +281,9 @@ Namespace PaxApisDB
 
             With pobjReader
                 Do While .Read
-                    pobjItem = New Item(.Item("ppId"), Surname, FirstName, If(IsDBNull(.Item("ppBirthdate")), Date.MinValue, .Item("ppBirthdate")), .Item("ppGender"),
-                                        .Item("ppDocIssuingCountry"), .Item("ppDocnumber"), If(IsDBNull(.Item("ppDocExpiryDate")), Date.MinValue, .Item("ppDocExpiryDate")),
-                                        .Item("ppNationality"))
+                    pobjItem = New Item(CInt(.Item("ppId")), Surname, FirstName, CDate(If(IsDBNull(.Item("ppBirthdate")), Date.MinValue, .Item("ppBirthdate"))), CStr(.Item("ppGender")),
+                                        CStr(.Item("ppDocIssuingCountry")), CStr(.Item("ppDocnumber")), CDate(If(IsDBNull(.Item("ppDocExpiryDate")), Date.MinValue, .Item("ppDocExpiryDate"))),
+                                        CStr(.Item("ppNationality")))
                     MyBase.Add(pobjItem.Id, pobjItem)
                     'Exit Do
                 Loop
@@ -372,7 +372,7 @@ Namespace PaxApisDB
             With pobjReader
                 Do While .Read
                     pobjClass = New ReferenceItem
-                    pobjClass.SetValues(.Item("countryISO3Code"), .Item("countryName"))
+                    pobjClass.SetValues(CStr(.Item("countryISO3Code")), CStr(.Item("countryName")))
                     MyBase.Add(pobjClass.Code, pobjClass)
                 Loop
                 .Close()

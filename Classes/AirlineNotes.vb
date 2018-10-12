@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace AirlineNotes
     Friend Class Item
@@ -119,8 +119,8 @@ Namespace AirlineNotes
                 Do While .Read
                     pID += 1
                     pobjClass = New Item
-                    pobjClass.SetValues(.Item("anID"), .Item("anAirlineCode"), .Item("anFlightType"), .Item("anSeaman"),
-                                        .Item("anSeqNo"), .Item("GDSElement"), .Item("GDSText"))
+                    pobjClass.SetValues(CInt(.Item("anID")), CStr(.Item("anAirlineCode")), CStr(.Item("anFlightType")), CBool(.Item("anSeaman")),
+                                        CInt(.Item("anSeqNo")), CStr(.Item("GDSElement")), CStr(.Item("GDSText")))
                     MyBase.Add(pID, pobjClass)
                 Loop
                 .Close()

@@ -1,4 +1,6 @@
-﻿Imports System.Data.SqlClient
+﻿Option Strict On
+Option Explicit On
+Imports System.Data.SqlClient
 
 Namespace AirlinePoints1G
 
@@ -117,12 +119,12 @@ Namespace AirlinePoints1G
 
             With pobjReader
                 Do While .Read
-                    Dim p1GRemark As String = Get1GRemark(.Item("Remarks"))
+                    Dim p1GRemark As String = Get1GRemark(CStr(.Item("Remarks")))
                     If p1GRemark <> "" Then
                         pID += 1
                         pobjClass = New Item
-                        pobjClass.SetValues(.Item("ID"), .Item("Code"), .Item("Name"), .Item("IATACode"),
-                                        .Item("AirlineName"), p1GRemark)
+                        pobjClass.SetValues(CInt(.Item("ID")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("IATACode")),
+                                        CStr(.Item("AirlineName")), p1GRemark)
                         MyBase.Add(pID, pobjClass)
                     End If
                 Loop

@@ -1,5 +1,7 @@
-﻿Public Class DBUser
-    Public Event UserValid() '(ByVal isValid As Boolean, ByVal isUserNameValid As Boolean, ByVal isEmailValid As Boolean, ByVal isQueueNumberValid As Boolean, ByVal isOPQueueValid As Boolean)
+﻿Option Strict On
+Option Explicit On
+Public Class DBUser
+    Public Event UserValid()
     Private Structure ClassProps
         Dim GDS As Utilities.EnumGDSCode
         Dim PCC As String

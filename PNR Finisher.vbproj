@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>39</ApplicationRevision>
+    <ApplicationRevision>48</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -55,11 +55,13 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>PNRFinisher.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
     <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>PNR Finisher.ruleset</CodeAnalysisRuleSet>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -68,9 +70,11 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>PNRFinisher.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
     <CodeAnalysisRuleSet>PNR Finisher.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Forms\ATPI PNR.ico</ApplicationIcon>
@@ -141,7 +145,14 @@
     <Compile Include="Classes\FrequentFlyer.vb" />
     <Compile Include="Classes\GDS.vb" />
     <Compile Include="Classes\GreekToLatin.vb" />
+    <Compile Include="Classes\PNRFinisherTransactions.vb" />
     <Compile Include="Classes\TQT.vb" />
+    <Compile Include="Forms\frmPriceOptimiser.Designer.vb">
+      <DependentUpon>frmPriceOptimiser.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmPriceOptimiser.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\frmUser.Designer.vb">
       <DependentUpon>frmUser.vb</DependentUpon>
     </Compile>
@@ -155,7 +166,6 @@
     <Compile Include="Classes\GDSSeg.vb" />
     <Compile Include="Classes\ItnRTBDoc.vb" />
     <Compile Include="Classes\OsmLOG.vb" />
-    <Compile Include="Classes\Ticket.vb" />
     <Compile Include="Classes\osmVessels.vb" />
     <Compile Include="Classes\AveragePrice.vb" />
     <Compile Include="Classes\SubDepartments.vb" />
@@ -269,6 +279,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmCostCentre.resx">
       <DependentUpon>frmCostCentre.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmPriceOptimiser.resx">
+      <DependentUpon>frmPriceOptimiser.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmItnMSReportDates.resx">
       <DependentUpon>frmItnMSReportDates.vb</DependentUpon>

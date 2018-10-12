@@ -1,4 +1,4 @@
-Option Strict Off
+Option Strict On
 Option Explicit On
 Namespace GDSPax
     Friend Class GDSPaxItem
@@ -49,7 +49,7 @@ Namespace GDSPax
                 Department = mudtProps.Department
             End Get
         End Property
-        Public ReadOnly Property Nationality
+        Public ReadOnly Property Nationality As String
             Get
                 Nationality = mudtProps.Nationality
             End Get
@@ -95,6 +95,14 @@ Namespace GDSPax
                 If MyBase.Count > 1 Then
                     LeadName &= " x " & MyBase.Count
                 End If
+            End Get
+        End Property
+        Public ReadOnly Property AllPassengers As String
+            Get
+                AllPassengers = ""
+                For Each pPax As GDSPaxItem In MyBase.Values
+                    AllPassengers &= pPax.ElementNo & "." & pPax.PaxName & vbCrLf
+                Next
             End Get
         End Property
     End Class

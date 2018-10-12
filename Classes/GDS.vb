@@ -1,4 +1,6 @@
-﻿Namespace GDS
+﻿Option Strict On
+Option Explicit On
+Namespace GDS
     Friend Class GDSItem
         Private Structure ClassProps
             Dim Id As Integer
@@ -30,7 +32,7 @@
         End Sub
     End Class
     Friend Class GDSCollection
-        Inherits Collections.Generic.Dictionary(Of String, GDSItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, GDSItem)
         Public Sub Load()
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR)
             Dim pobjComm As New SqlClient.SqlCommand
@@ -49,7 +51,7 @@
             With pobjReader
                 Do While .Read
                     pobjClass = New GDSItem
-                    pobjClass.SetValues(.Item("pfrGDSId"), .Item("pfrGDSName"), .Item("pfrGDSCode"))
+                    pobjClass.SetValues(CInt(.Item("pfrGDSId")), CStr(.Item("pfrGDSName")), CStr(.Item("pfrGDSCode")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()

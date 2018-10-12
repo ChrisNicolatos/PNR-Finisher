@@ -1,0 +1,22 @@
+﻿E-Ticket Record Status:	Definition:
+OPEN	Open for use, not yet used.
+ARPT	Under airport control - the operating carrier has secured the  coupon prior to the scheduled departure.
+UNVL	The validating carrier has determined that the coupon can no longer be used. You must either reissue or refund the ticket.
+CKIN	The passenger has checked in for the flight.
+LFTD	The passenger has boarded the aircraft.
+SUSP	The validating carrier has restricted the use of the flight coupon to avoid fraudulent use.
+EXCH	The value of the coupon has been used as payment for a new transaction.
+FLWN	The flight has been completed.
+USED	
+RFND	The e-ticket record has been refunded.
+VOID	The e-ticket record has been voided.
+CLSD	The validating carrier has determined that the coupon can no longer be used, and cannot be reissued or refunded.
+REMV	The validating carrier has removed e-ticketing data from their system when the ticket has been fully used.
+PRTD	Ticket reprinted at the airport or the airline has issued a paper ticket to replace the e-ticket.
+REFUND TAXES ONLY	The validating carrier has determined that the coupon is no longer available for use as ticketed.
+	
+Flight Status:	Definition:
+OK	Flight confirmed
+NS	Infant not occupying a seat
+RQ	Flight requested but not confirmed, or flight waitlisted
+SA	Subject to space being available, used whenever the fare prohibits making an advance reservation

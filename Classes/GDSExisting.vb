@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace GDSExisting
     Friend Class Item
@@ -73,6 +73,7 @@ Namespace GDSExisting
         Private mobjSavingsElement As New Item
         Private mobjLossElement As New Item
 
+        Private mobjCustomerCodeAI As New Item
         Private mobjCustomerCode As New Item
         Private mobjCustomerName As New Item
         Private mobjSubDepartmentCode As New Item
@@ -139,7 +140,11 @@ Namespace GDSExisting
                 LossElement = mobjLossElement
             End Get
         End Property
-
+        Public ReadOnly Property CustomerCodeAI As Item
+            Get
+                Return mobjCustomerCodeAI
+            End Get
+        End Property
         Public ReadOnly Property CustomerCode As Item
             Get
                 CustomerCode = mobjCustomerCode
@@ -227,6 +232,7 @@ Namespace GDSExisting
             mobjSavingsElement.Clear()
             mobjLossElement.Clear()
 
+            mobjCustomerCodeAI.Clear()
             mobjCustomerCode.Clear()
             mobjCustomerName.Clear()
             mobjSubDepartmentCode.Clear()

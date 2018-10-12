@@ -251,9 +251,9 @@
         Try
             Dim mExport As New ExportDataGrid
 
-            mExport.Export(dgvCostCentres)
+            Dim pResponse As String = mExport.Export(dgvCostCentres)
 
-            MessageBox.Show("Exported OK")
+            MessageBox.Show("Exported OK" & vbCrLf & "File: " & pResponse)
 
         Catch ex As Exception
             MessageBox.Show(ex.Message)

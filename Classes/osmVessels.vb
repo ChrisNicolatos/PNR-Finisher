@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace osmVessels
     Friend Class VesselItem
@@ -116,7 +116,7 @@ Namespace osmVessels
                                            " VALUES " &
                                            " ( '" & mudtProps.VesselName & "', '', " & If(mudtProps.InUse, 1, 0) & ") " &
                                            " select scope_identity() as Id"
-                            Dim pTemp As Object = .ExecuteScalar
+                            Dim pTemp As Integer = CInt(.ExecuteScalar)
                             If IsDBNull(pTemp) Then
                                 Throw New Exception("Vessel Already exists")
                             Else
@@ -146,7 +146,7 @@ Namespace osmVessels
     End Class
 
     Friend Class VesselCollection
-        Inherits Collections.Generic.Dictionary(Of String, VesselItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, VesselItem)
 
         Public Sub Load()
 
@@ -192,7 +192,7 @@ Namespace osmVessels
             With pobjReader
                 Do While .Read
                     pobjClass = New VesselItem
-                    pobjClass.SetValues(.Item("osmvId"), .Item("osmvVesselName"), .Item("osmvInUse"))
+                    pobjClass.SetValues(CInt(.Item("osmvId")), CStr(.Item("osmvVesselName")), CBool(.Item("osmvInUse")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()
@@ -274,7 +274,7 @@ Namespace osmVessels
         End Sub
     End Class
     Friend Class Vessel_VesselGroupCollection
-        Inherits Collections.Generic.Dictionary(Of String, Vessel_VesselGroupItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, Vessel_VesselGroupItem)
 
         Public Sub Load(ByVal pVesselId As Integer)
 
@@ -306,7 +306,7 @@ Namespace osmVessels
                 Do While .Read
                     pobjClass = New Vessel_VesselGroupItem
                     pId += 1
-                    pobjClass.SetValues(pId, .Item("osmvId"), .Item("osmvrId"), .Item("osmvVesselName"), .Item("osmvrGroupName"), .Item("osmvId_fkey"))
+                    pobjClass.SetValues(pId, CInt(.Item("osmvId")), CInt(.Item("osmvrId")), CStr(.Item("osmvVesselName")), CStr(.Item("osmvrGroupName")), CInt(.Item("osmvId_fkey")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()
@@ -412,7 +412,7 @@ Namespace osmVessels
                                " VALUES " &
                                " ( '" & GroupName & ", ') " &
                                " select scope_identity() as Id"
-                mudtProps.Id = .ExecuteScalar
+                mudtProps.Id = CInt(.ExecuteScalar)
                 mudtProps.isNew = False
             End With
         End Sub
@@ -434,7 +434,7 @@ Namespace osmVessels
         End Sub
     End Class
     Friend Class VesselGroupCollection
-        Inherits Collections.Generic.Dictionary(Of String, VesselGroupItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, VesselGroupItem)
 
         Public Sub Load(ByVal pVesselGroupID As Integer)
 
@@ -461,7 +461,7 @@ Namespace osmVessels
             With pobjReader
                 Do While .Read
                     pobjClass = New VesselGroupItem
-                    pobjClass.SetValues(.Item("osmvrId"), .Item("osmvrGroupName"))
+                    pobjClass.SetValues(CInt(.Item("osmvrId")), CStr(.Item("osmvrGroupName")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()
@@ -492,7 +492,7 @@ Namespace osmVessels
             With pobjReader
                 Do While .Read
                     pobjClass = New VesselGroupItem
-                    pobjClass.SetValues(.Item("osmvrId"), .Item("osmvrGroupName"))
+                    pobjClass.SetValues(CInt(.Item("osmvrId")), CStr(.Item("osmvrGroupName")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()
@@ -668,7 +668,7 @@ Namespace osmVessels
                                        " select scope_identity() as Id"
 
                     End If
-                    mudtprops.Id = .ExecuteScalar
+                    mudtprops.Id = CInt(.ExecuteScalar)
                     mudtprops.isNew = False
                 Else
                     .CommandText = "UPDATE AmadeusReports.dbo.osmEmailDetails " &
@@ -699,7 +699,7 @@ Namespace osmVessels
         End Sub
     End Class
     Friend Class EmailCollection
-        Inherits Collections.Generic.Dictionary(Of String, emailItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, emailItem)
 
         Public Sub Load(ByVal pVesselID As Integer)
 
@@ -732,7 +732,7 @@ Namespace osmVessels
             With pobjReader
                 Do While .Read
                     pobjClass = New emailItem
-                    pobjClass.SetValues(.Item("osmeId"), .Item("osmeVessel_FK"), .Item("osmeName"), .Item("osmeDetails"), .Item("osmeType"), .Item("osmeEmail"), .Item("osmvVesselName"))
+                    pobjClass.SetValues(CInt(.Item("osmeId")), CInt(.Item("osmeVessel_FK")), CStr(.Item("osmeName")), CStr(.Item("osmeDetails")), CStr(.Item("osmeType")), CStr(.Item("osmeEmail")), CStr(.Item("osmvVesselName")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()
@@ -771,7 +771,7 @@ Namespace osmVessels
             With pobjReader
                 Do While .Read
                     pobjClass = New emailItem
-                    pobjClass.SetValues(.Item("osmeId"), .Item("osmeVessel_FK"), .Item("osmeName"), .Item("osmeDetails"), .Item("osmeType"), .Item("osmeEmail"), .Item("osmvVesselName"))
+                    pobjClass.SetValues(CInt(.Item("osmeId")), CInt(.Item("osmeVessel_FK")), CStr(.Item("osmeName")), CStr(.Item("osmeDetails")), CStr(.Item("osmeType")), CStr(.Item("osmeEmail")), CStr(.Item("osmvVesselName")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()

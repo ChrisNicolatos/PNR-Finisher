@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Friend Class Config
     Private Structure ClassProps
@@ -36,8 +36,9 @@ Friend Class Config
         Dim ShowCostCentre As Boolean
         Dim ShowSeating As Boolean
         Dim ShowVessel As Boolean
-        Dim Administrator As String
-        Dim FormatStyle As Integer
+        Dim Administrator As Boolean
+        Dim FormatStyle As Utilities.EnumItnFormat
+        Dim LastVersionTextShown As Integer
         Dim OSMVesselGroup As Integer
         Dim OSMLoGPerPax As Boolean
         Dim OSMLoGOnsigner As Boolean
@@ -492,6 +493,14 @@ Friend Class Config
             mudtProps.AgentName = value
         End Set
     End Property
+    Public Property LastVersionTextShown As Integer
+        Get
+            Return mudtProps.LastVersionTextShown
+        End Get
+        Set(value As Integer)
+            mudtProps.LastVersionTextShown = value
+        End Set
+    End Property
     Public Property AgentEmail As String
         Get
             AgentEmail = mudtProps.AgentEmail.ToUpper
@@ -523,6 +532,11 @@ Friend Class Config
     Public ReadOnly Property GDSUser As String
         Get
             GDSUser = mobjGDSUser.User.ToUpper
+        End Get
+    End Property
+    Public ReadOnly Property GDSAbbreviation As String
+        Get
+            Return mobjGDSUser.GDSCodeAbbreviation
         End Get
     End Property
     Private Sub DBReadPCC()
@@ -558,20 +572,20 @@ Friend Class Config
         End With
         With pobjReader
             If pobjReader.Read Then
-                mudtProps.PCCId = .Item("pfpId")
-                mudtProps.OfficeCityCode = .Item("pfpOfficeCityCode")
-                mudtProps.CountryCode = .Item("pfpCountryCode")
-                mudtProps.OfficeName = .Item("pfpOfficeName")
-                mudtProps.CityName = .Item("pfpCityName")
-                mudtProps.Phone = .Item("pfpOfficePhone")
-                mudtProps.AOHPhone = .Item("pfpAOHPhone")
-                mudtProps.PCCBackOffice = .Item("pfpBO_fkey")
-                mudtProps.pCCDBDataSource = .Item("pfpDBDataSource")
-                mudtProps.pCCDBInitialCatalog = .Item("pfpDBInitialCatalog")
-                mudtProps.pCCDBUserId = .Item("pfpDBUserId")
-                mudtProps.pCCDBUserPassword = .Item("pfpDBUserPassword")
-                mudtProps.pCCIATANumber = .Item("pfpIATANumber")
-                mudtProps.PCCFormalOfficeName = .Item("pfpFormalOfficeName")
+                mudtProps.PCCId = CInt(.Item("pfpId"))
+                mudtProps.OfficeCityCode = CStr(.Item("pfpOfficeCityCode"))
+                mudtProps.CountryCode = CStr(.Item("pfpCountryCode"))
+                mudtProps.OfficeName = CStr(.Item("pfpOfficeName"))
+                mudtProps.CityName = CStr(.Item("pfpCityName"))
+                mudtProps.Phone = CStr(.Item("pfpOfficePhone"))
+                mudtProps.AOHPhone = CStr(.Item("pfpAOHPhone"))
+                mudtProps.PCCBackOffice = CInt(.Item("pfpBO_fkey"))
+                mudtProps.pCCDBDataSource = CStr(.Item("pfpDBDataSource"))
+                mudtProps.pCCDBInitialCatalog = CStr(.Item("pfpDBInitialCatalog"))
+                mudtProps.pCCDBUserId = CStr(.Item("pfpDBUserId"))
+                mudtProps.pCCDBUserPassword = CStr(.Item("pfpDBUserPassword"))
+                mudtProps.pCCIATANumber = CStr(.Item("pfpIATANumber"))
+                mudtProps.PCCFormalOfficeName = CStr(.Item("pfpFormalOfficeName"))
             Else
                 mudtProps.PCCId = 0
                 mudtProps.OfficeCityCode = ""
@@ -714,31 +728,32 @@ Friend Class Config
 
         With pobjReader
             If pobjReader.Read Then
-                mudtProps.AgentId = .Item("pfID")
-                mudtProps.AgentQueue = .Item("pfAgentQueue")
-                mudtProps.AgentOPQueue = .Item("pfAgentOPQueue")
-                mudtProps.AgentName = .Item("pfAgentName")
-                mudtProps.AgentEmail = .Item("pfAgentEmail")
-                mudtProps.AirportName = .Item("pfAirportName")
-                mudtProps.ShowAirlineLocator = .Item("pfAirlineLocator")
-                mudtProps.ShowClassOfService = .Item("pfClassOfService")
-                mudtProps.ShowBanElectricalEquipment = .Item("pfBanElectricalEquipment")
-                mudtProps.ShowBrazilText = .Item("pfBrazilText")
-                mudtProps.ShowUSAText = .Item("pfUSAText")
-                mudtProps.ShowTickets = .Item("pfTickets")
-                mudtProps.ShowPaxSegPerTkt = .Item("pfPaxSegPerTkt")
-                mudtProps.ShowStopovers = .Item("pfShowStopovers")
-                mudtProps.ShowTerminal = .Item("pfShowTerminal")
-                mudtProps.ShowFlyingTime = .Item("pfFlyingTime")
-                mudtProps.ShowCostCentre = .Item("pfCostCentre")
-                mudtProps.ShowSeating = .Item("pfSeating")
-                mudtProps.ShowVessel = .Item("pfVessel")
-                mudtProps.Administrator = .Item("pfAdministrator")
-                mudtProps.FormatStyle = .Item("pfFormatStyle")
-                mudtProps.OSMVesselGroup = .Item("pfOSMVesselGroup")
-                mudtProps.OSMLoGPerPax = .Item("pfOSMLOGPerPax")
-                mudtProps.OSMLoGOnsigner = .Item("pfOSMLOGOnSigner")
-                mudtProps.OSMLoGPath = .Item("pfOSMLOGPath")
+                mudtProps.AgentId = CInt(.Item("pfID"))
+                mudtProps.AgentQueue = CStr(.Item("pfAgentQueue"))
+                mudtProps.AgentOPQueue = CStr(.Item("pfAgentOPQueue"))
+                mudtProps.AgentName = CStr(.Item("pfAgentName"))
+                mudtProps.AgentEmail = CStr(.Item("pfAgentEmail"))
+                mudtProps.AirportName = CInt(.Item("pfAirportName"))
+                mudtProps.ShowAirlineLocator = CBool(.Item("pfAirlineLocator"))
+                mudtProps.ShowClassOfService = CBool(.Item("pfClassOfService"))
+                mudtProps.ShowBanElectricalEquipment = CBool(.Item("pfBanElectricalEquipment"))
+                mudtProps.ShowBrazilText = CBool(.Item("pfBrazilText"))
+                mudtProps.ShowUSAText = CBool(.Item("pfUSAText"))
+                mudtProps.ShowTickets = CBool(.Item("pfTickets"))
+                mudtProps.ShowPaxSegPerTkt = CBool(.Item("pfPaxSegPerTkt"))
+                mudtProps.ShowStopovers = CBool(.Item("pfShowStopovers"))
+                mudtProps.ShowTerminal = CBool(.Item("pfShowTerminal"))
+                mudtProps.ShowFlyingTime = CBool(.Item("pfFlyingTime"))
+                mudtProps.ShowCostCentre = CBool(.Item("pfCostCentre"))
+                mudtProps.ShowSeating = CBool(.Item("pfSeating"))
+                mudtProps.ShowVessel = CBool(.Item("pfVessel"))
+                mudtProps.Administrator = CBool(.Item("pfAdministrator"))
+                mudtProps.FormatStyle = CType(.Item("pfFormatStyle"), Utilities.EnumItnFormat)
+                mudtProps.OSMVesselGroup = CInt(.Item("pfOSMVesselGroup"))
+                mudtProps.OSMLoGPerPax = CBool(.Item("pfOSMLOGPerPax"))
+                mudtProps.OSMLoGOnsigner = CBool(.Item("pfOSMLOGOnSigner"))
+                mudtProps.OSMLoGPath = CStr(.Item("pfOSMLOGPath"))
+                mudtProps.LastVersionTextShown = 0 ' .Item("pfLastVersionTextShown_fk")
                 mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
             Else
                 mudtProps.AgentId = 0
@@ -762,6 +777,7 @@ Friend Class Config
                 mudtProps.ShowVessel = False
                 mudtProps.Administrator = False
                 mudtProps.FormatStyle = 0
+                mudtProps.LastVersionTextShown = 0
                 mudtProps.OSMVesselGroup = 0
                 mudtProps.OSMLoGPerPax = False
                 mudtProps.OSMLoGOnsigner = False
@@ -911,7 +927,7 @@ Friend Class Config
         End Get
     End Property
 
-    Private Function ReplaceReference(ByVal InputValue As String, ByVal RefKey As String, ByVal RefValue As String)
+    Private Function ReplaceReference(ByVal InputValue As String, ByVal RefKey As String, ByVal RefValue As String) As String
         If InputValue.IndexOf(RefKey) >= 0 Then
             ReplaceReference = InputValue.Replace(RefKey, RefValue)
         Else

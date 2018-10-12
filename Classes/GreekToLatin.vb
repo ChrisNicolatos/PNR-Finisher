@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Friend Class GreekToLatin
 
@@ -169,7 +169,7 @@ Friend Class GreekToLatin
 
     End Function
 
-    Function ReplacexY(ByVal Text As String, ByVal Diph As String, ByVal DiphLat As String)
+    Function ReplacexY(ByVal Text As String, ByVal Diph As String, ByVal DiphLat As String) As String
 
         ' AY --> AV (*), AF (**)
         ' EY --> EV (*), EF (**)

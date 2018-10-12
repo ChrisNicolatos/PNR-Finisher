@@ -21,9 +21,9 @@ Namespace GDSTickets
             Dim SellingPrice As Decimal
 
             Dim GDSLine As String
-            Dim StockType As Short
+            Dim StockType As Integer
             Dim Document As Decimal
-            Dim Books As Short
+            Dim Books As Integer
             Dim AirlineCode As String
             Dim eTicket As Boolean
             Dim Segs As String
@@ -64,7 +64,7 @@ Namespace GDSTickets
                 End If
             End Get
         End Property
-        Public ReadOnly Property Books As Short
+        Public ReadOnly Property Books As Integer
             Get
                 Books = mudtProps.Books
             End Get
@@ -96,7 +96,7 @@ Namespace GDSTickets
                 TicketType = mudtProps.TicketType
             End Get
         End Property
-        Friend Sub SetValues(ByRef pGDSLine As String, ByRef pStockType As Short, ByRef pDocument As Decimal, ByRef pBooks As Short, ByRef pIssuingAirline As String, ByVal AirlineCode As String, ByRef peTicket As Boolean, pSegs As String, pPax As String, pTicketType As String)
+        Friend Sub SetValues(ByRef pGDSLine As String, ByRef pStockType As Integer, ByRef pDocument As Decimal, ByRef pBooks As Integer, ByRef pIssuingAirline As String, ByVal AirlineCode As String, ByRef peTicket As Boolean, pSegs As String, pPax As String, pTicketType As String)
 
             With mudtProps
                 .GDSLine = pGDSLine
@@ -320,7 +320,7 @@ Namespace GDSTickets
     Friend Class GDSTicketCollection
         Inherits Collections.Generic.Dictionary(Of String, GDSTicketItem)
 
-        Private mintCount As Short
+        Private mintCount As Integer
 
         Private mobjTickets() As GDSTicketItem
         Private mobjPNR As s1aPNR.PNR
@@ -331,7 +331,7 @@ Namespace GDSTickets
             mobjPNR = pPnr
             ReadTickets()
         End Sub
-        Public Sub addTicket(ByVal pGDSLine As String, ByVal pTicketType As Short, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Short, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String)
+        Public Sub addTicket(ByVal pGDSLine As String, ByVal pTicketType As Integer, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Integer, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String)
 
             Dim pobjTicket As GDSTicketItem
 
@@ -339,8 +339,8 @@ Namespace GDSTickets
                 If pTicketNumber > 0 Then
                     pobjTicket = New GDSTicketItem
 
-                mintCount = mintCount + 1
-                pobjTicket.SetValues(pGDSLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType)
+                    mintCount = mintCount + 1
+                    pobjTicket.SetValues(pGDSLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType)
                     MyBase.Add(Format(mintCount), pobjTicket)
                 End If
             Catch ex As Exception
@@ -448,7 +448,7 @@ Namespace GDSTickets
                         SegNo &= ElementNo
                     Else
                         ' compare the segment no with the last one in the list
-                        Dim a2 As Integer = SegNo.Substring(SegNo.Length - 1, 1)
+                        Dim a2 As Integer = CInt(SegNo.Substring(SegNo.Length - 1, 1))
                         ' if it is in sequence
                         If ElementNo = a2 + 1 Then
                             ' and it is the second one, put it in the list preceded by a hyphen

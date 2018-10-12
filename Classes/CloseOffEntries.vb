@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace CloseOffEntries
 
@@ -16,7 +16,7 @@ Namespace CloseOffEntries
         End Sub
     End Class
     Friend Class Collection
-        Inherits Collections.Generic.Dictionary(Of String, Item)
+        Inherits Collections.Generic.Dictionary(Of Integer, Item)
 
         Public Sub Load(ByVal GDSPcc As String, ByVal OwnPCC As Boolean)
 
@@ -45,7 +45,7 @@ Namespace CloseOffEntries
                 While pobjReader.Read
                     Dim pItem As New Item
                     pIndex += 1
-                    pItem.SetValues(.Item("pfcEntry"))
+                    pItem.SetValues(CStr(.Item("pfcEntry")))
                     MyBase.Add(pIndex, pItem)
                 End While
                 .Close()

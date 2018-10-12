@@ -198,6 +198,12 @@
             End If
             For i As Integer = 0 To pPax.GetUpperBound(0)
                 If pPax(i).IndexOf(".") >= 1 And pPax(i).IndexOf(".") <= 3 Then
+                    ' remove any / character after the one that separates last name and first name. Specifically, this could appear in the name field entry
+                    'If pPax(i).IndexOf("/") > -1 And pPax(i).IndexOf("/") < pPax(i).Length - 1 Then
+                    '    If pPax(i).IndexOf("/", pPax(i).IndexOf("/") + 1) > -1 Then
+                    '        pPax(i) = pPax(i).Substring(0, pPax(i).IndexOf("/") + 1) & pPax(i).Substring(pPax(i).IndexOf("/") + 1).Replace("/", "")
+                    '    End If
+                    'End If
                     pAllPax &= pPax(i) & " "
                 End If
             Next

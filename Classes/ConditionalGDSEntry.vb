@@ -1,4 +1,6 @@
-﻿Namespace ConditionalGDSEntry
+﻿Option Strict On
+Option Explicit On
+Namespace ConditionalGDSEntry
     Friend Class Item
 
         Dim m1AEntry As String
@@ -19,7 +21,7 @@
         End Sub
     End Class
     Friend Class Collection
-        Inherits Collections.Generic.Dictionary(Of String, Item)
+        Inherits Collections.Generic.Dictionary(Of Integer, Item)
         Public Sub Load(ByVal BOFkey As Integer, ByVal ClientId As Integer, ByVal Vesselname As String)
 
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
@@ -47,7 +49,7 @@
                 While pobjReader.Read
                     Dim pItem As New Item
                     pIndex += 1
-                    pItem.SetValues(.Item("pfcAmadeusEntry"), .Item("pfcGalileoEntry"))
+                    pItem.SetValues(CStr(.Item("pfcAmadeusEntry")), CStr(.Item("pfcGalileoEntry")))
                     MyBase.Add(pIndex, pItem)
                 End While
                 .Close()

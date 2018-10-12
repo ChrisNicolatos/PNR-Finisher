@@ -1,23 +1,23 @@
-Option Strict Off
+Option Strict On
 Option Explicit On
 Friend Class GDSNumberParser
 
     Private Structure ParserProps
 
-        Dim ParseType As Short ' 1 = Ticket number text 2 = Segment number association
+        Dim ParseType As Integer ' 1 = Ticket number text 2 = Segment number association
 
         ' Ticket number text properties
         Dim TicketNumberText As String ' Input
-        Dim StockType As Short
+        Dim StockType As Integer
         Dim DocumentNumber As Decimal
-        Dim Books As Short
+        Dim Books As Integer
         Dim Airline As String
         Dim AirlineNumber As String
 
         ' Segment number association text properties
         Dim SegmentAssociationText As String
-        Dim SegmentCount As Short
-        Dim SegmentElements() As Short
+        Dim SegmentCount As Integer
+        Dim SegmentElements() As Integer
         Dim isValid As Boolean
     End Structure
 
@@ -35,7 +35,7 @@ Friend Class GDSNumberParser
 
     End Function
 
-    Public ReadOnly Property StockType() As Short
+    Public ReadOnly Property StockType() As Integer
         Get
 
             StockType = mudtProps.StockType
@@ -49,7 +49,7 @@ Friend Class GDSNumberParser
 
         End Get
     End Property
-    Public ReadOnly Property Books() As Short
+    Public ReadOnly Property Books() As Integer
         Get
 
             Books = mudtProps.Books
@@ -74,15 +74,15 @@ Friend Class GDSNumberParser
         ' AAATTTTTTTTTT-XX 3 digit airline + 10 digit ticket number
         ' AAA-TTTTTTTTTT-XX 3 digit airline + 10 digit ticket number separated by hyphen
 
-        Dim i As Short
+        Dim i As Integer
         Dim pstrTicket As String = ""
-        Dim pintAirlineFrom As Short
-        Dim pintAirlineTo As Short
-        Dim pintTicketFrom As Short
-        Dim pintTicketTo As Short
-        Dim pintConjFrom As Short
-        Dim pintConjTo As Short
-        Dim pintEndOfString As Short
+        Dim pintAirlineFrom As Integer
+        Dim pintAirlineTo As Integer
+        Dim pintTicketFrom As Integer
+        Dim pintTicketTo As Integer
+        Dim pintConjFrom As Integer
+        Dim pintConjTo As Integer
+        Dim pintEndOfString As Integer
 
         Dim pstrTemp As String
         Dim pstrTemp2 As String
@@ -186,7 +186,7 @@ Friend Class GDSNumberParser
                         Mid(pstrTemp2, Len(pstrTemp2) - Len(pstrTemp) + 1, Len(pstrTemp)) = pstrTemp
                         pcurrDoc2 = Utilities.myCurr(pstrTemp2)
                         If pcurrDoc2 > .DocumentNumber Then
-                            .Books = pcurrDoc2 - .DocumentNumber + 1
+                            .Books = CInt(pcurrDoc2 - .DocumentNumber + 1)
                         End If
                     End If
                 End If

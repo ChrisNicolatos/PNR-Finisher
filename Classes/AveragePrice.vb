@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace AveragePrice
     Friend Class Item
@@ -67,31 +67,31 @@ Namespace AveragePrice
                     .CustomerName = ""
                 Else
                     .CustomerNameNull = False
-                    .CustomerName = pCustomerName
+                    .CustomerName = CStr(pCustomerName)
                 End If
                 If IsDBNull(pAirline) Then
                     .AirlineNull = True
                     .Airline = ""
                 Else
                     .AirlineNull = False
-                    .Airline = pAirline
+                    .Airline = CStr(pAirline)
                 End If
                 If IsDBNull(pClassOfService) Then
                     .ClassOfServiceNull = True
                     .ClassOfService = ""
                 Else
                     .ClassOfServiceNull = False
-                    .ClassOfService = pClassOfService
+                    .ClassOfService = CStr(pClassOfService)
                 End If
                 If IsDBNull(pTicketCount) Then
                     .TicketCount = 0
                 Else
-                    .TicketCount = pTicketCount
+                    .TicketCount = CInt(pTicketCount)
                 End If
                 If IsDBNull(pAveragePrice) Then
                     .AveragePrice = 0
                 Else
-                    .AveragePrice = pAveragePrice
+                    .AveragePrice = CDec(pAveragePrice)
                 End If
             End With
         End Sub

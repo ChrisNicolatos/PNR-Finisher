@@ -1,4 +1,6 @@
-﻿Imports iTextSharp.text.pdf
+﻿Option Strict On
+Option Explicit On
+Imports iTextSharp.text.pdf
 Imports iTextSharp.text
 Imports System.IO
 Friend Class OsmLOG
@@ -6,9 +8,11 @@ Friend Class OsmLOG
     Private mobjPortAgent As osmVessels.emailItem
     Private mflgNoPortAgent As Boolean
     Private mstrSignedBy As String
-    Public Sub CreatePDF(ByRef pPNR As GDSReadPNR)
+    Private mstrAgentName As String
+    Public Sub CreatePDF(ByVal AgentName As String, ByRef pPNR As GDSReadPNR)
 
         mobjPNR = pPNR
+        mstrAgentName = AgentName
         ReadOptions()
 
     End Sub
@@ -222,7 +226,8 @@ Friend Class OsmLOG
         Else
             Table.AddCell(AddCell("Position", pHeaderFont))
         End If
-
+        Table.AddCell(AddCell(pPax.PaxName, pFont))
+        Table.AddCell(AddCell(pPax.IdNo, pFont))
 
         MakePaxTable = Table
 
@@ -334,7 +339,7 @@ Friend Class OsmLOG
     End Function
     Private Function MakeSegTable(ByRef pSegs As GDSSeg.GDSSegColl, ByVal pFont As Font) As PdfPTable
 
-        Dim pWidths(6) As Integer
+        Dim pWidths(6) As Single
         Dim pVBFont As New Drawing.Font(pFont.Familyname, pFont.Size, If(pFont.IsBold, FontStyle.Bold, FontStyle.Regular))
         Dim pfrm As New frmOSMLoG(mobjPNR)
         Dim g As Graphics = pfrm.CreateGraphics

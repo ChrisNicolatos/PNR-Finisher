@@ -1,10 +1,10 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Imports System.Xml
 Namespace CustomProperties
     Friend Class Item
         Private Structure ClassProps
-            Dim ID As Long
+            Dim ID As Integer
             Dim CustomPropertyID As Utilities.EnumCustomPropertyID
             Dim LookUpValues As String
             Dim LimitToLookup As Boolean
@@ -15,7 +15,7 @@ Namespace CustomProperties
         End Structure
         Private mudtProps As ClassProps
 
-        Public ReadOnly Property ID() As Long
+        Public ReadOnly Property ID() As Integer
             Get
                 ID = mudtProps.ID
             End Get
@@ -71,7 +71,7 @@ Namespace CustomProperties
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCustomPropertyID As Utilities.EnumCustomPropertyID, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pRequiredType As Utilities.CustomPropertyRequiredType, ByVal pLabel As String, ByVal pTFEntityID As Long)
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pCustomPropertyID As Utilities.EnumCustomPropertyID, ByVal pLookUpValues As String, ByVal pLimitToLookup As Boolean, ByVal pRequiredType As Utilities.CustomPropertyRequiredType, ByVal pLabel As String, ByVal pTFEntityID As Integer)
             With mudtProps
                 .ID = pID
                 .CustomPropertyID = pCustomPropertyID
@@ -89,7 +89,7 @@ Namespace CustomProperties
             End With
         End Sub
 
-        Private Sub ReadXML(ByVal pCustomPropertyID As Long, ByVal pTfEntityID As Long)
+        Private Sub ReadXML(ByVal pCustomPropertyID As Integer, ByVal pTfEntityID As Integer)
 
             Dim pobjXMLValues As New XMLValues
             pobjXMLValues.ReadValues(pCustomPropertyID, pTfEntityID)
@@ -121,7 +121,7 @@ Namespace CustomProperties
                 Do While .Read
                     iCount += 1
                     ReDim Preserve mudtProps.Values(iCount - 1)
-                    mudtProps.Values(iCount - 1) = .Item("Value")
+                    mudtProps.Values(iCount - 1) = CStr(.Item("Value"))
                 Loop
                 .Close()
             End With
@@ -136,7 +136,7 @@ Namespace CustomProperties
 
         Private mstrID As String
 
-        Public Sub ReadValues(ByVal pCustomPropertyID As Long, ByVal pTfEntityID As Long)
+        Public Sub ReadValues(ByVal pCustomPropertyID As Integer, ByVal pTfEntityID As Integer)
 
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
@@ -162,9 +162,9 @@ Namespace CustomProperties
                     End With
                     With pobjReader
                         Do While .Read
-                            ParseXML(.Item("LookUpValues"))
+                            ParseXML(CStr(.Item("LookUpValues")))
                             mstrID &= "," & pTfEntityID & ","
-                            pTfEntityID = .Item("RelatedEntityID")
+                            pTfEntityID = CInt(.Item("RelatedEntityID"))
                         Loop
                     End With
                     pobjReader.Close()
@@ -194,8 +194,8 @@ Namespace CustomProperties
                 End With
                 With pobjReader
                     Do While .Read
-                        If Not MyBase.Contains(.Item("Name")) Then
-                            MyBase.Add(.Item("Name"))
+                        If Not MyBase.Contains(CStr(.Item("Name"))) Then
+                            MyBase.Add(CStr(.Item("Name")))
                         End If
                     Loop
                 End With
@@ -241,7 +241,7 @@ Namespace CustomProperties
 
     End Class
     Friend Class Collection
-        Inherits Collections.Generic.Dictionary(Of String, Item)
+        Inherits Collections.Generic.Dictionary(Of Integer, Item)
 
         Private Const MyXMLString As String = "<?xml version='1.0' encoding='utf-8'?><LookUpValues xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema'><CustomPropertyLookupValue Description='Crew' Value='Crew' IsDefault='false' /><CustomPropertyLookupValue Description='Technical' Value='Technical' IsDefault='false' /><CustomPropertyLookupValue Description='Marine' Value='Marine' IsDefault='false' /><CustomPropertyLookupValue Description='HSQE' Value='HSQE' IsDefault='false' /><CustomPropertyLookupValue Description='Finance' Value='Finance' IsDefault='false' /></LookUpValues>"
         Private mflgBookedBy As Boolean
@@ -249,7 +249,7 @@ Namespace CustomProperties
         Private mflgReasonForTravel As Boolean
         Private mflgCostCentre As Boolean
 
-        Public Sub Load(ByVal pEntityID As Long)
+        Public Sub Load(ByVal pEntityID As Integer)
 
             If MySettings.PCCBackOffice = 1 Then
                 Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringACC) ' ActiveConnection)
@@ -284,7 +284,7 @@ Namespace CustomProperties
                 With pobjReader
                     Do While .Read
                         pobjClass = New Item
-                        pobjClass.SetValues(.Item("Id"), .Item("CustomPropertyID"), .Item("LookUpValues"), .Item("LimitToLookUp"), .Item("LTRequiredTypeID"), .Item("Label"), .Item("TFEntityID"))
+                        pobjClass.SetValues(CInt(.Item("Id")), CType(.Item("CustomPropertyID"), Utilities.EnumCustomPropertyID), CStr(.Item("LookUpValues")), CBool(.Item("LimitToLookUp")), CType(.Item("LTRequiredTypeID"), Utilities.CustomPropertyRequiredType), CStr(.Item("Label")), CInt(.Item("TFEntityID")))
                         MyBase.Add(pobjClass.ID, pobjClass)
                         If pobjClass.CustomPropertyID = Utilities.EnumCustomPropertyID.BookedBy Then
                             mflgBookedBy = True
@@ -302,7 +302,7 @@ Namespace CustomProperties
             Else
                 Dim pobjClass As Item
                 pobjClass = New Item
-                pobjClass.SetValues(1, Utilities.EnumCustomPropertyID.BookedBy, "", True, True, "BookedBy", pEntityID)
+                pobjClass.SetValues(1, Utilities.EnumCustomPropertyID.BookedBy, "", True, Utilities.CustomPropertyRequiredType.PropertyReqToSave, "BookedBy", pEntityID)
                 If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
                     mflgBookedBy = True
@@ -310,7 +310,7 @@ Namespace CustomProperties
                     mflgBookedBy = False
                 End If
                 pobjClass = New Item
-                pobjClass.SetValues(2, Utilities.EnumCustomPropertyID.ReasonFortravel, "", True, True, "ReasonFortravel", pEntityID)
+                pobjClass.SetValues(2, Utilities.EnumCustomPropertyID.ReasonFortravel, "", True, Utilities.CustomPropertyRequiredType.PropertyReqToSave, "ReasonFortravel", pEntityID)
                 If pobjClass.ValuesCount > 0 Then
                     MyBase.Add(pobjClass.ID, pobjClass)
                     mflgReasonForTravel = True
@@ -408,7 +408,7 @@ Namespace CustomProperties
     End Class
 
     Friend Class CostCentreLookupCollection
-        Inherits Collections.Generic.Dictionary(Of String, CostCentreLookupItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, CostCentreLookupItem)
 
         Public Sub LoadCustomerGroup(ByVal CustomerGroup As Integer)
             Load(True, CustomerGroup)
@@ -516,7 +516,7 @@ Namespace CustomProperties
                 With pobjReader
                     Do While .Read
                         pId = pId + 1
-                        pobjClass = New CostCentreLookupItem(pId, .Item("Code"), .Item("Remarks"), .Item("Name"), .Item("Logo"), .Item("ActualVessel"), .Item("CostCentre"))
+                        pobjClass = New CostCentreLookupItem(pId, CStr(.Item("Code")), CStr(.Item("Remarks")), CStr(.Item("Name")), CStr(.Item("Logo")), CStr(.Item("ActualVessel")), CStr(.Item("CostCentre")))
                         MyBase.Add(pobjClass.Id, pobjClass)
                     Loop
                     .Close()

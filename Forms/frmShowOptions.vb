@@ -6,25 +6,28 @@
 
     Private Sub DisplayOptions()
 
-        With MySettings
+        If Not MySettings Is Nothing Then
+            With MySettings
 
-            txtOfficePCCAmadeus.Text = .GDSPcc
-            txtOfficeCityCode.Text = .OfficeCityCode
-            txtCountryCode.Text = .CountryCode
-            txtOfficeName.Text = .OfficeName
-            txtCityName.Text = .CityName
-            txtOfficePhone.Text = .Phone
-            txtAOHPhone.Text = .AOHPhone
+                txtOfficePCCAmadeus.Text = .GDSPcc
+                txtOfficeCityCode.Text = .OfficeCityCode
+                txtCountryCode.Text = .CountryCode
+                txtOfficeName.Text = .OfficeName
+                txtCityName.Text = .CityName
+                txtOfficePhone.Text = .Phone
+                txtAOHPhone.Text = .AOHPhone
 
-            txtAgentIDAmadeus.Text = .GDSUser
-            txtAgentQueueAmadeus.Text = .AgentQueue
-            txtAgentOPQueueAmadeus.Text = .AgentOPQueue
-            txtAgentName.Text = .AgentName
-            txtAgentEmail.Text = .AgentEmail
+                txtAgentIDAmadeus.Text = .GDSUser
+                txtAgentQueueAmadeus.Text = .AgentQueue
+                txtAgentOPQueueAmadeus.Text = .AgentOPQueue
+                txtAgentName.Text = .AgentName
+                txtAgentEmail.Text = .AgentEmail
 
-            txtDBConnectionFile.Text = UtilitiesDB.DBConnectionsFile
-            txtSQLServer.Text = "DataSource:" & UtilitiesDB.PNRDataSource & " DataCatalog:" & UtilitiesDB.PNRDataCatalog & " UserName:" & UtilitiesDB.PNRUserName
-        End With
+                txtDBConnectionFile.Text = UtilitiesDB.DBConnectionsFile
+                txtSQLServer.Text = "DataSource:" & UtilitiesDB.PNRDataSource & " DataCatalog:" & UtilitiesDB.PNRDataCatalog & " UserName:" & UtilitiesDB.PNRUserName
+            End With
+
+        End If
 
     End Sub
 

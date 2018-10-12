@@ -1,4 +1,6 @@
-﻿Friend Class ItnRTBDoc
+﻿Option Strict On
+Option Explicit On
+Friend Class ItnRTBDoc
     Private mobjPNR As GDSReadPNR
     Private mintMaxString As Integer
     Private mstrRemarks As String
@@ -178,11 +180,11 @@
                             pSeg.Append(pobjSeg.Airline & pobjSeg.FlightNo.PadLeft(4) & " ")
                             pSeg.Append(pobjSeg.DepartureDateIATA & " ")
                             If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
-                                pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
-                                pSeg.Append(pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
+                                pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " ")
+                                pSeg.Append(pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " ")
                             Else
-                                pSeg.Append(pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
-                                pSeg.Append(pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " ").Substring(0, .MaxAirportShortNameLength + 1) & " ")
+                                pSeg.Append(pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " ")
+                                pSeg.Append(pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " ")
                             End If
                             If pobjSeg.Text.Length > 35 AndAlso pobjSeg.Text.Substring(35, 4) = "FLWN" Then
                                 pSeg.Append("FLWN")
@@ -229,17 +231,17 @@
                                 Case 0 'code
                                     pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.OffPoint & " ")
                                 Case 1 'airport name
-                                    pSeg.Append(pobjSeg.BoardAirportName.PadRight(.MaxAirportNameLength + 1, " ").Substring(0, .MaxAirportNameLength + 1) & " " &
-                                                pobjSeg.OffPointAirportName.PadRight(.MaxAirportNameLength + 1, " ").Substring(0, .MaxAirportNameLength + 1) & " ")
+                                    pSeg.Append(pobjSeg.BoardAirportName.PadRight(.MaxAirportNameLength + 1, " "c).Substring(0, .MaxAirportNameLength + 1) & " " &
+                                                pobjSeg.OffPointAirportName.PadRight(.MaxAirportNameLength + 1, " "c).Substring(0, .MaxAirportNameLength + 1) & " ")
                                 Case 2 'code and airport
-                                    pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportName.PadRight(.MaxAirportNameLength + 1, " ").Substring(0, .MaxAirportNameLength + 1) & " " &
-                                                pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportName.PadRight(.MaxAirportNameLength + 1, " ").Substring(0, .MaxAirportNameLength + 1) & " ")
+                                    pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportName.PadRight(.MaxAirportNameLength + 1, " "c).Substring(0, .MaxAirportNameLength + 1) & " " &
+                                                pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportName.PadRight(.MaxAirportNameLength + 1, " "c).Substring(0, .MaxAirportNameLength + 1) & " ")
                                 Case 3 'city name
-                                    pSeg.Append(pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " ").Substring(0, .MaxCityNameLength + 1) & " " &
-                                                pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " ").Substring(0, .MaxCityNameLength + 1) & " ")
+                                    pSeg.Append(pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " " &
+                                                pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " ")
                                 Case 4 'code and city
-                                    pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " ").Substring(0, .MaxCityNameLength + 1) & " " &
-                                                pobjSeg.OffPoint & " " & pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " ").Substring(0, .MaxCityNameLength + 1) & " ")
+                                    pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " " &
+                                                pobjSeg.OffPoint & " " & pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " ")
                             End Select
                             If pobjSeg.Text.Length > 35 AndAlso pobjSeg.Text.Substring(35, 4) = "FLWN" Then
                                 pSeg.Append("FLWN")
@@ -251,7 +253,7 @@
                                     pSeg.Append(pobjSeg.EstimatedFlyingTime & " ")
                                 End If
                                 pSeg.Append(pobjSeg.ArrivalDateIATA & "   ")
-                                pSeg.Append(If(MySettings.ShowAirlineLocator, pobjSeg.AirlineLocator.PadRight(9, " "), ""))
+                                pSeg.Append(If(MySettings.ShowAirlineLocator, pobjSeg.AirlineLocator.PadRight(9, " "c), ""))
                                 pSeg.Append(" - " & mobjPNR.AllowanceForSegment(pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.Airline)) ', ""))
                                 If pobjSeg.Status = "HL" Then
                                     pSeg.Append("   WAITLISTED")

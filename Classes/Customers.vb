@@ -1,12 +1,12 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace Customers
     Friend Class CustomerItem
         Private Structure ClassProps
-            Dim ID As Long
+            Dim ID As Integer
             Dim Code As String
             Dim Name As String
-            Dim EntityKindLT As Long
+            Dim EntityKindLT As Integer
             Dim HasVessels As Boolean
             Dim HasDepartments As Boolean
             Dim Alert As String
@@ -23,7 +23,7 @@ Namespace Customers
             End With
         End Function
 
-        Public ReadOnly Property ID() As Long
+        Public ReadOnly Property ID() As Integer
             Get
                 ID = mudtProps.ID
             End Get
@@ -41,7 +41,7 @@ Namespace Customers
             End Get
         End Property
 
-        Public ReadOnly Property EntityKindLT() As Long
+        Public ReadOnly Property EntityKindLT() As Integer
             Get
                 EntityKindLT = mudtProps.EntityKindLT
             End Get
@@ -78,7 +78,7 @@ Namespace Customers
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCode As String, ByVal pName As String, ByVal pEntityKindLT As Long, ByVal pAlert As String, ByVal pGalileoTrackingCode As String)
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String, ByVal pEntityKindLT As Integer, ByVal pAlert As String, ByVal pGalileoTrackingCode As String)
             With mudtProps
                 .ID = pID
                 .Code = pCode
@@ -121,7 +121,7 @@ Namespace Customers
             End With
             With pobjReader
                 If pobjReader.Read Then
-                    SetValues(.Item("Id"), .Item("Code"), .Item("Name"), .Item("TFEntityKindLT"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")), .Item("GalileoTrackingCode"))
+                    SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
                     .Close()
                 End If
             End With
@@ -162,7 +162,7 @@ Namespace Customers
     End Class
 
     Friend Class CustomerCollection
-        Inherits Collections.Generic.Dictionary(Of String, CustomerItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, CustomerItem)
         Private mAllCustomer As New AllCustomer
         Public Sub Load(ByVal SearchString As String)
 
@@ -193,7 +193,7 @@ Namespace Customers
     End Class
     Friend Class AllCustomer
 
-        Inherits Collections.Generic.Dictionary(Of String, CustomerItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, CustomerItem)
 
         Dim mobjAlerts As New Alerts.Collection
         Dim mintPCCBackoffice As Integer
@@ -273,7 +273,7 @@ Namespace Customers
             With pobjReader
                 Do While .Read
                     pobjClass = New CustomerItem
-                    pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"), .Item("TFEntityKindLT"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")), .Item("GalileoTrackingCode"))
+                    pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
                     MyBase.Add(pobjClass.ID, pobjClass)
                 Loop
                 .Close()
@@ -286,7 +286,7 @@ Namespace Customers
 
     Friend Class CustomerGroupItem
         Private Structure ClassProps
-            Dim ID As Long
+            Dim ID As Integer
             Dim Name As String
         End Structure
         Private mudtProps As ClassProps
@@ -295,7 +295,7 @@ Namespace Customers
                 Return .Name
             End With
         End Function
-        Public ReadOnly Property ID() As Long
+        Public ReadOnly Property ID() As Integer
             Get
                 ID = mudtProps.ID
             End Get
@@ -305,7 +305,7 @@ Namespace Customers
                 Name = mudtProps.Name
             End Get
         End Property
-        Friend Sub SetValues(ByVal pID As Long, ByVal pName As String)
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pName As String)
             With mudtProps
                 .ID = pID
                 .Name = pName
@@ -313,7 +313,7 @@ Namespace Customers
         End Sub
     End Class
     Friend Class AllCustomerGroups
-        Inherits Collections.Generic.Dictionary(Of String, CustomerGroupItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, CustomerGroupItem)
         Public Sub Load()
 
             Dim pCommandText As String
@@ -350,7 +350,7 @@ Namespace Customers
             With pobjReader
                 Do While .Read
                     pobjClass = New CustomerGroupItem
-                    pobjClass.SetValues(.Item("Id"), .Item("Description"))
+                    pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Description")))
                     MyBase.Add(pobjClass.ID, pobjClass)
                 Loop
                 .Close()
@@ -360,7 +360,7 @@ Namespace Customers
         End Sub
     End Class
     Friend Class CustomerGroupCollection
-        Inherits Collections.Generic.Dictionary(Of String, CustomerGroupItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, CustomerGroupItem)
         Private mAllCustomer As New AllCustomerGroups
 
         Public Sub Load(ByVal SearchString As String)

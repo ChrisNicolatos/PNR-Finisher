@@ -1,9 +1,9 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace CRM
     Friend Class Item
         Private Structure ClassProps
-            Dim ID As Long
+            Dim ID As Integer
             Dim Code As String
             Dim Name As String
             Dim Alert As String
@@ -15,7 +15,7 @@ Namespace CRM
                 Return .Code & " " & .Name
             End With
         End Function
-        Public ReadOnly Property ID() As Long
+        Public ReadOnly Property ID() As Integer
             Get
                 ID = mudtProps.ID
             End Get
@@ -35,7 +35,7 @@ Namespace CRM
                 Alert = mudtProps.Alert
             End Get
         End Property
-        Friend Sub SetValues(ByVal pID As Long, ByVal pCode As String, ByVal pName As String, ByVal pAlert As String)
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String, ByVal pAlert As String)
             With mudtProps
                 .ID = pID
                 .Code = pCode
@@ -70,7 +70,7 @@ Namespace CRM
 
             With pobjReader
                 Do While .Read
-                    SetValues(.Item("Id"), .Item("Code"), .Item("Name"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")))
+                    SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))))
                 Loop
                 .Close()
             End With
@@ -78,7 +78,7 @@ Namespace CRM
         End Sub
     End Class
     Friend Class Collection
-        Inherits Collections.Generic.Dictionary(Of String, Item)
+        Inherits Collections.Generic.Dictionary(Of Integer, Item)
         Private mlngEntityID As Long
         Private mobjAlerts As New Alerts.Collection
         Public Sub Load(ByVal pEntityID As Long)
@@ -112,7 +112,7 @@ Namespace CRM
                 With pobjReader
                     Do While .Read
                         pobjClass = New Item
-                        pobjClass.SetValues(.Item("Id"), .Item("Code"), .Item("Name"), mobjAlerts.Alert(MySettings.PCCBackOffice, .Item("Code")))
+                        pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))))
                         MyBase.Add(pobjClass.ID, pobjClass)
                     Loop
                     .Close()

@@ -1,4 +1,6 @@
-﻿Namespace BackOffice
+﻿Option Strict On
+Option Explicit On
+Namespace BackOffice
     Friend Class BackOfficeItem
         Private Structure ClassProps
             Dim Id As Integer
@@ -24,7 +26,7 @@
         End Sub
     End Class
     Friend Class BackOfficeCollection
-        Inherits Collections.Generic.Dictionary(Of String, BackOfficeItem)
+        Inherits Collections.Generic.Dictionary(Of Integer, BackOfficeItem)
 
         Public Sub Load()
 
@@ -48,7 +50,7 @@
             With pobjReader
                 Do While .Read
                     pobjClass = New BackOfficeItem
-                    pobjClass.SetValues(.Item("pfrBOId"), .Item("pfrBOName"))
+                    pobjClass.SetValues(CInt(.Item("pfrBOId")), CStr(.Item("pfrBOName")))
                     MyBase.Add(pobjClass.Id, pobjClass)
                 Loop
                 .Close()

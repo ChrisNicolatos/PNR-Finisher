@@ -93,6 +93,18 @@ Friend Class GDSUser
             GDSCode = mudtProps.GDSCode
         End Get
     End Property
+    Public ReadOnly Property GDSCodeAbbreviation As String
+        Get
+            Select Case mudtProps.GDSCode
+                Case Utilities.EnumGDSCode.Amadeus
+                    Return "1A"
+                Case Utilities.EnumGDSCode.Galileo
+                    Return "1G"
+                Case Else
+                    Return ""
+            End Select
+        End Get
+    End Property
     Public ReadOnly Property PCC As String
         Get
             PCC = mudtProps.PCC.ToUpper

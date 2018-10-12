@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace GDSNew
     Friend Class Item
@@ -50,6 +50,7 @@ Namespace GDSNew
         Private mobjSavingsElement As New Item
         Private mobjLossElement As New Item
 
+        Private mobjCustomerCodeAI As New Item
         Private mobjCustomerCode As New Item
         Private mobjCustomerName As New Item
         Private mobjSubDepartmentCode As New Item
@@ -123,6 +124,11 @@ Namespace GDSNew
         Public ReadOnly Property AgentID As Item
             Get
                 AgentID = mobjAgentID
+            End Get
+        End Property
+        Public ReadOnly Property CustomerCodeAI As Item
+            Get
+                Return mobjCustomerCodeAI
             End Get
         End Property
         Public ReadOnly Property CustomerCode As Item
@@ -228,11 +234,13 @@ Namespace GDSNew
 
         Public Sub SetItem(ByVal Item As Customers.CustomerItem)
 
+            mobjCustomerCodeAI.Clear()
             mobjCustomerCode.Clear()
             mobjCustomerName.Clear()
             If Not Item Is Nothing Then
                 If Item.Code <> "" Then
                     mobjCustomerCode.SetText(Item.Code, MySettings.GDSValue("TextCLN") & Item.Code)
+                    mobjCustomerCodeAI.SetText(Item.Code, MySettings.GDSValue("TextAI") & Item.Code)
                 End If
                 If Item.Name <> "" Then
                     mobjCustomerName.SetText(Item.Name, MySettings.GDSValue("TextCLA") & mobjGreekToLatin.Convert(Item.Name))
@@ -407,7 +415,7 @@ Namespace GDSNew
                 mobjTicketElement.SetText("", pTTLString)
                 mobjOpenSegment.SetText("",
                                     MySettings.GDSValue("TextMISSegmentCommand") &
-                                    IIf(mintNumberOfPax = 0, 1, mintNumberOfPax) & " " &
+                                    IIf(mintNumberOfPax = 0, 1, mintNumberOfPax).ToString & " " &
                                     MySettings.OfficeCityCode & " " &
                                     pDateRetain.IATA & "-" & MySettings.GDSValue("TextMISSegmentText"))
                 mobjOptionQueueElement.SetText("", MySettings.GDSValue("TextOP") & MySettings.GDSPcc & "/" & pDateReminder.IATA & "/" & MySettings.AgentOPQueue)
@@ -438,6 +446,7 @@ Namespace GDSNew
 
         End Sub
         Public Sub ClearCustomerElements()
+            mobjCustomerCodeAI.Clear()
             mobjCustomerCode.Clear()
             mobjCustomerName.Clear()
             mobjSubDepartmentCode.Clear()

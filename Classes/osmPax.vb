@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace osmPax
     Friend Class Pax
@@ -8,8 +8,9 @@ Namespace osmPax
             Dim FirstName As String
             Dim Nationality As String
             Dim Text As String
+            Dim TextFullDetails As String
             Dim JoinerLeaver As String
-            Dim VisaType As String
+            'Dim VisaType As String
         End Structure
         Dim mudtProps As ClassProps
         Public ReadOnly Property Id As Integer
@@ -37,6 +38,11 @@ Namespace osmPax
                 Text = mudtProps.Text
             End Get
         End Property
+        Public ReadOnly Property TextFullDetails As String
+            Get
+                Return mudtProps.TextFullDetails
+            End Get
+        End Property
         Public Property JoinerLeaver As String
             Get
                 JoinerLeaver = mudtProps.JoinerLeaver
@@ -45,33 +51,38 @@ Namespace osmPax
                 mudtProps.JoinerLeaver = value
             End Set
         End Property
-        Public Property VisaType As String
-            Get
-                VisaType = mudtProps.VisaType
-            End Get
-            Set(value As String)
-                mudtProps.VisaType = value
-            End Set
-        End Property
+        'Public Property VisaType As String
+        '    Get
+        '        VisaType = mudtProps.VisaType
+        '    End Get
+        '    Set(value As String)
+        '        mudtProps.VisaType = value
+        '    End Set
+        'End Property
         Friend Sub SetData(ByVal pId As Integer, ByVal pJoiner As String, ByVal pText As String)
 
             mudtProps.Id = pId
-            mudtProps.Text = pText
+            mudtProps.TextFullDetails = pText
+            mudtProps.Text = ""
             Dim pLines() As String = pText.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
             For i As Integer = 0 To pLines.GetUpperBound(0)
                 If pLines(i).ToUpper.StartsWith("LAST NAME") Then
-                    Dim pN() As String = pLines(i).Split(":")
+                    mudtProps.Text &= pLines(i) & vbCrLf
+                    Dim pN() As String = pLines(i).Split(":"c)
                     mudtProps.LastName = pN(1).Trim
                 ElseIf pLines(i).ToUpper.StartsWith("FIRST AND MIDDLE NAMES") Then
-                    Dim pN() As String = pLines(i).Split(":")
+                    mudtProps.Text &= pLines(i) & vbCrLf
+                    Dim pN() As String = pLines(i).Split(":"c)
                     mudtProps.FirstName = pN(1).Trim
                 ElseIf pLines(i).ToUpper.StartsWith("NATIONALITY") Then
-                    Dim pN() As String = pLines(i).Split(":")
+                    Dim pN() As String = pLines(i).Split(":"c)
                     mudtProps.Nationality = pN(1).Trim
+                ElseIf pLines(i).ToUpper.StartsWith("POSITION") Then
+                    mudtProps.Text &= pLines(i) & vbCrLf & vbCrLf
                 End If
             Next
             mudtProps.JoinerLeaver = pJoiner
-            mudtProps.VisaType = 0
+            'mudtProps.VisaType = 0
         End Sub
     End Class
 

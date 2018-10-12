@@ -123,6 +123,7 @@ Partial Class frmPNR
         Me.txtItnPNR = New System.Windows.Forms.TextBox()
         Me.lblItnPNR = New System.Windows.Forms.Label()
         Me.tabOSM = New System.Windows.Forms.TabPage()
+        Me.chkOSMFullPaxSDetails = New System.Windows.Forms.CheckBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.cmbOSMVesselGroup = New System.Windows.Forms.ComboBox()
         Me.chkOSMVesselInUse = New System.Windows.Forms.CheckBox()
@@ -157,6 +158,7 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.cmdPriceOptimiser = New System.Windows.Forms.Button()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -484,6 +486,7 @@ Partial Class frmPNR
         '
         'tabPageFinisher
         '
+        Me.tabPageFinisher.Controls.Add(Me.cmdPriceOptimiser)
         Me.tabPageFinisher.Controls.Add(Me.lstAirlineEntries)
         Me.tabPageFinisher.Controls.Add(Me.txtTrId)
         Me.tabPageFinisher.Controls.Add(Me.lblTRIDHighLight)
@@ -1293,6 +1296,7 @@ Partial Class frmPNR
         '
         'tabOSM
         '
+        Me.tabOSM.Controls.Add(Me.chkOSMFullPaxSDetails)
         Me.tabOSM.Controls.Add(Me.Label2)
         Me.tabOSM.Controls.Add(Me.cmbOSMVesselGroup)
         Me.tabOSM.Controls.Add(Me.chkOSMVesselInUse)
@@ -1327,6 +1331,16 @@ Partial Class frmPNR
         Me.tabOSM.TabIndex = 2
         Me.tabOSM.Text = "OSM"
         Me.tabOSM.UseVisualStyleBackColor = True
+        '
+        'chkOSMFullPaxSDetails
+        '
+        Me.chkOSMFullPaxSDetails.AutoSize = True
+        Me.chkOSMFullPaxSDetails.Location = New System.Drawing.Point(755, 413)
+        Me.chkOSMFullPaxSDetails.Name = "chkOSMFullPaxSDetails"
+        Me.chkOSMFullPaxSDetails.Size = New System.Drawing.Size(126, 17)
+        Me.chkOSMFullPaxSDetails.TabIndex = 28
+        Me.chkOSMFullPaxSDetails.Text = "Show Full Pax details"
+        Me.chkOSMFullPaxSDetails.UseVisualStyleBackColor = True
         '
         'Label2
         '
@@ -1635,6 +1649,15 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
         '
+        'cmdPriceOptimiser
+        '
+        Me.cmdPriceOptimiser.Location = New System.Drawing.Point(512, 6)
+        Me.cmdPriceOptimiser.Name = "cmdPriceOptimiser"
+        Me.cmdPriceOptimiser.Size = New System.Drawing.Size(116, 35)
+        Me.cmdPriceOptimiser.TabIndex = 49
+        Me.cmdPriceOptimiser.Text = "Price Optimiser"
+        Me.cmdPriceOptimiser.UseVisualStyleBackColor = True
+        '
         'frmPNR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1798,4 +1821,6 @@ Partial Class frmPNR
     Friend WithEvents txtTrId As TextBox
     Friend WithEvents lblTRIDHighLight As Label
     Friend WithEvents lstAirlineEntries As CheckedListBox
+    Friend WithEvents chkOSMFullPaxSDetails As CheckBox
+    Friend WithEvents cmdPriceOptimiser As Button
 End Class

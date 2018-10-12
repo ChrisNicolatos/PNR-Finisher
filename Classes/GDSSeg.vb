@@ -1,4 +1,4 @@
-Option Strict Off
+Option Strict On
 Option Explicit On
 Namespace GDSSeg
 
@@ -441,11 +441,11 @@ Namespace GDSSeg
         End Sub
         Private Sub AnalyseSegDo1A(ByVal SegDo As String)
 
-            Dim pSegDo() As String = SegDo.Split(vbCrLf)
+            Dim pSegDo() As String = SegDo.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
 
             Dim pItinStarts As Integer = -1
             For i As Integer = 0 To pSegDo.GetUpperBound(0) - 1
-                If pSegDo(i).IndexOf("*1A PLANNED FLIGHT INFO*") = 1 And pSegDo(i + 1).IndexOf("APT") = 1 Then
+                If pSegDo(i).IndexOf("*1A PLANNED FLIGHT INFO*") >= 0 And pSegDo(i + 1).IndexOf("APT") >= 0 Then
                     pItinStarts = i + 2
                     Exit For
                 End If
@@ -453,7 +453,7 @@ Namespace GDSSeg
             Dim pBoardStarts As Integer = -1
             If pItinStarts >= 0 Then
                 For i As Integer = pItinStarts To pSegDo.GetUpperBound(0)
-                    If pSegDo(i).Length > 3 AndAlso pSegDo(i).Substring(1, 3) = mudtProps.BoardPoint Then
+                    If pSegDo(i).Length > 3 AndAlso pSegDo(i).Substring(0, 3) = mudtProps.BoardPoint Then
                         pBoardStarts = i
                         Exit For
                     End If
@@ -462,11 +462,11 @@ Namespace GDSSeg
             Dim pOffStarts As Integer = -1
             If pBoardStarts >= 0 Then
                 For i As Integer = pBoardStarts + 1 To pSegDo.GetUpperBound(0)
-                    If pSegDo(i).Length > 3 AndAlso pSegDo(i).Substring(1, 3) = mudtProps.OffPoint Then
+                    If pSegDo(i).Length > 3 AndAlso pSegDo(i).Substring(0, 3) = mudtProps.OffPoint Then
                         pOffStarts = i
                         Exit For
                     End If
-                    If pSegDo(i).Length > 3 AndAlso pSegDo(i).Substring(1, 3) <> "   " Then
+                    If pSegDo(i).Length > 3 AndAlso pSegDo(i).Substring(0, 3) <> "   " Then
                         If mudtProps.Stopovers <> "" Then
                             mudtProps.Stopovers &= vbCrLf
                         End If
@@ -476,7 +476,7 @@ Namespace GDSSeg
             End If
             If pOffStarts >= 0 Then
                 If pSegDo(pOffStarts).Length > 63 Then
-                    mudtProps.EstimatedFlyingTime = pSegDo(pOffStarts).Substring(60, 5)
+                    mudtProps.EstimatedFlyingTime = pSegDo(pOffStarts).Substring(pSegDo(pOffStarts).LastIndexOf(" ")).Trim.PadLeft(5)
                 Else
                     mudtProps.EstimatedFlyingTime = ""
                 End If
@@ -515,12 +515,12 @@ Namespace GDSSeg
                         mudtProps.DepartTerminal = ""
                         mudtProps.ArriveTerminal = ""
                     End If
-                    pSeg = pSVC(iSVC).Trim.Substring(0, pSVC(iSVC).Trim.IndexOf(" "))
+                    pSeg = CInt(pSVC(iSVC).Trim.Substring(0, pSVC(iSVC).Trim.IndexOf(" ")))
                     pRouting = pSVC(iSVC).Substring(14, 3) & " " & pSVC(iSVC).Substring(3, 2) & " " & pSVC(iSVC).Substring(17, 3)
-                    mudtProps.EstimatedFlyingTime = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0")
+                    mudtProps.EstimatedFlyingTime = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0"c)
                     pBoardPoint = pSVC(iSVC).Substring(14, 3)
                     pOffPoint = pSVC(iSVC).Substring(17, 3)
-                    pFlyingTime = TimeSerial(mudtProps.EstimatedFlyingTime.Substring(0, mudtProps.EstimatedFlyingTime.IndexOf(":")), mudtProps.EstimatedFlyingTime.Substring(mudtProps.EstimatedFlyingTime.IndexOf(":") + 1, 2), 0)
+                    pFlyingTime = TimeSerial(CInt(mudtProps.EstimatedFlyingTime.Substring(0, mudtProps.EstimatedFlyingTime.IndexOf(":"))), CInt(mudtProps.EstimatedFlyingTime.Substring(mudtProps.EstimatedFlyingTime.IndexOf(":") + 1, 2)), 0)
                 ElseIf pSeg > 0 Then
                     If pSVC(iSVC).IndexOf("OPERATED BY") >= 0 Then
                         pOperatedBy = pSVC(iSVC).Trim
@@ -531,7 +531,7 @@ Namespace GDSSeg
                         mudtProps.Stopovers &= pOffPoint & "-" & Airport.CityAirportName(pOffPoint)
                         pBoardPoint = pSVC(iSVC).Substring(14, 3)
                         pOffPoint = pSVC(iSVC).Substring(17, 3)
-                        Dim pTime As String = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0")
+                        Dim pTime As String = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0"c)
                         pFlyingTime = DateAdd(DateInterval.Hour, CDbl(pTime.Substring(0, pTime.IndexOf(":"))), pFlyingTime)
                         pFlyingTime = DateAdd(DateInterval.Minute, CDbl(pTime.Substring(pTime.IndexOf(":") + 1, 2)), pFlyingTime)
                         mudtProps.EstimatedFlyingTime = Format(pFlyingTime, "HH:mm")
@@ -562,6 +562,20 @@ Namespace GDSSeg
         Private mMaxAirportNameLength As Integer = 11
         Private mMaxCityNameLength As Integer = 11
         Private mMaxAirportShortNameLength As Integer = 11
+        Private mAirlineAlert As String = ""
+        Private mAirlineAlerts As New Alerts.Collection
+        Private mAmadeusQueue As String
+        Private mGalileoQueue As String
+        Public Overloads Sub Clear()
+            MyBase.Clear()
+            mMaxAirportNameLength = 11
+            mMaxCityNameLength = 11
+            mMaxAirportShortNameLength = 11
+            mAirlineAlert = ""
+            mAirlineAlerts = New Alerts.Collection
+            mAmadeusQueue = ""
+            mGalileoQueue = ""
+        End Sub
         Friend Function AddItem(ByVal pAirline As String, ByVal pBoardPoint As String, ByVal pClass As String, ByVal pDepartureDate As Date, ByVal pArrivalDate As Date, ByVal pElementNo As Short, ByVal pFlightNo As String, ByVal pOffPoint As String, ByVal pStatus As String, ByVal pDepartTime As Date, ByVal pArriveTime As Date, ByVal pText As String, ByVal SegDo As String) As GDSSeg.GDSSegItem
 
             Dim pobjClass As GDSSeg.GDSSegItem
@@ -571,7 +585,7 @@ Namespace GDSSeg
             pobjClass.SetValues(pAirline, pBoardPoint, pClass, pDepartureDate, pArrivalDate, pElementNo, pFlightNo, pOffPoint, pStatus, pDepartTime, pArriveTime, pText, SegDo)
             MyBase.Add(Format(pElementNo), pobjClass)
 
-            SetNameLengths(pobjClass)
+            SetItinValues(pobjClass)
 
             Return pobjClass
 
@@ -585,12 +599,12 @@ Namespace GDSSeg
             pobjClass.SetValues(pAirline, pBoardPoint, pClass, pDepartureDate, pArrivalDate, pElementNo, pFlightNo, pOffPoint, pStatus, pDepartTime, pArriveTime, pVL, pText, pOperatedBy, SVC)
             MyBase.Add(Format(pElementNo), pobjClass)
 
-            SetNameLengths(pobjClass)
+            SetItinValues(pobjClass)
 
             Return pobjClass
 
         End Function
-        Private Sub SetNameLengths(ByVal pobjClass As GDSSeg.GDSSegItem)
+        Private Sub SetItinValues(ByVal pobjClass As GDSSeg.GDSSegItem)
 
             mMaxAirportNameLength = Math.Max(pobjClass.BoardAirportName.Length, mMaxAirportNameLength)
             mMaxAirportNameLength = Math.Max(pobjClass.OffPointAirportName.Length, mMaxAirportNameLength)
@@ -598,6 +612,14 @@ Namespace GDSSeg
             mMaxCityNameLength = Math.Max(pobjClass.OffPointCityName.Length, mMaxCityNameLength)
             mMaxAirportShortNameLength = Math.Max(pobjClass.BoardAirportShortName.Length, mMaxAirportShortNameLength)
             mMaxAirportShortNameLength = Math.Max(pobjClass.OffPointAirportShortName.Length, mMaxAirportShortNameLength)
+
+            Dim pAirlineAlert As String = ""
+            pAirlineAlert = mAirlineAlerts.AirlineAlert(pobjClass.Airline)
+            If pAirlineAlert <> "" And mAirlineAlert.IndexOf(pAirlineAlert) = -1 Then
+                mAirlineAlert &= pAirlineAlert & vbCrLf
+            End If
+            mAmadeusQueue = mAirlineAlerts.AmadeusQueue(pobjClass.Airline)
+            mGalileoQueue = mAirlineAlerts.GalileoQueue(pobjClass.Airline)
 
         End Sub
         Friend ReadOnly Property MaxAirportNameLength As Integer
@@ -634,6 +656,47 @@ Namespace GDSSeg
                 Next
             End Get
         End Property
+        Friend ReadOnly Property FullItinerary As String
+            Get
+                Dim pItin As String = ""
+                Dim pClasses As String = ""
+                Dim pDates As String = ""
+                Dim pFlights As String = ""
+                Dim PrevOff As String = ""
 
+                For Each Seg As GDSSeg.GDSSegItem In MyBase.Values
+                    With Seg
+                        If PrevOff = .BoardPoint Then
+                            pItin &= " " & .Airline & " " & .OffPoint
+                        Else
+                            If pItin <> "" Then
+                                pItin &= " *** "
+                            End If
+                            pItin &= .BoardPoint & " " & .Airline & " " & .OffPoint
+                        End If
+                        PrevOff = .OffPoint
+                        pClasses &= .ClassOfService
+                        pDates &= .DepartureDateIATA & " "
+                        pFlights &= .Airline & .FlightNo & " "
+                    End With
+                Next
+                FullItinerary = pItin.Trim & "|" & pClasses.Trim & "|" & pDates.Trim & "|" & pFlights.Trim
+            End Get
+        End Property
+        Friend ReadOnly Property AirlineAlert As String
+            Get
+                Return mAirlineAlert
+            End Get
+        End Property
+        Friend ReadOnly Property AmadeusQueue As String
+            Get
+                Return mAmadeusQueue
+            End Get
+        End Property
+        Friend ReadOnly Property GalileoQueue As String
+            Get
+                Return mGalileoQueue
+            End Get
+        End Property
     End Class
 End Namespace

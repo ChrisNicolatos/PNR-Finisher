@@ -1,4 +1,4 @@
-﻿Option Strict Off
+﻿Option Strict On
 Option Explicit On
 Namespace AirlinePoints
     Friend Class Item
@@ -80,7 +80,7 @@ Namespace AirlinePoints
                 Do While .Read
                     pID += 1
                     pobjClass = New Item
-                    pobjClass.SetValues(.Item("Remarks"))
+                    pobjClass.SetValues(CStr(.Item("Remarks")))
                     MyBase.Add(pID, pobjClass)
                 Loop
                 .Close()
