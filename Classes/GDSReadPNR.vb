@@ -944,7 +944,6 @@ Friend Class GDSReadPNR
                 SendAllGDSEntries1G &= SendGDSElement1G(mobjNewGDSElements.GalileoTrackingCode, True)
                 SendAllGDSEntries1G &= SendGDSElement1G(mobjNewGDSElements.TRId, True)
 
-
                 For i As Integer = 0 To AirlineEntries.CheckedItems.Count - 1
                     If AirlineEntries.CheckedItems(i).ToString.Trim <> "" Then
                         SendAllGDSEntries1G &= SendGDSAirlineItems1G(AirlineEntries.CheckedItems(i).ToString.Trim)

@@ -172,8 +172,15 @@ Friend Class ItnRTBDoc
                     End If
 
                     Dim iSegCount As Integer = 0
+                    Dim pPrevOff As String = ""
                     For Each pobjSeg In .Segments.Values
                         iSegCount = iSegCount + 1
+                        If iSegCount > 1 And pPrevOff <> pobjSeg.BoardPoint Then
+                            Dim pSegChange As New System.Text.StringBuilder
+                            pSegChange.Append("** CHANGE OF AIRPORT **")
+                            pString.AppendLine(pSegChange.ToString)
+                        End If
+                        pPrevOff = pobjSeg.OffPoint
                         Dim pSeg As New System.Text.StringBuilder
 
                         If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then

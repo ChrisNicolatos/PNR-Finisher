@@ -30,6 +30,8 @@ Partial Class frmOSMLoG
         Me.optOnSigners = New System.Windows.Forms.RadioButton()
         Me.optOffSigners = New System.Windows.Forms.RadioButton()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
+        Me.txtOSMAgentsFilter = New System.Windows.Forms.TextBox()
         Me.chkNoPortAgent = New System.Windows.Forms.CheckBox()
         Me.lstPortAgent = New System.Windows.Forms.ListBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -41,12 +43,13 @@ Partial Class frmOSMLoG
         Me.lblPax = New System.Windows.Forms.Label()
         Me.lblSegs = New System.Windows.Forms.Label()
         Me.txtSignedBy = New System.Windows.Forms.TextBox()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
-        Me.txtOSMAgentsFilter = New System.Windows.Forms.TextBox()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.optSignedBy = New System.Windows.Forms.RadioButton()
+        Me.optSignedByPHL = New System.Windows.Forms.RadioButton()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
         Me.SuspendLayout()
         '
         'optPerPax
@@ -140,6 +143,23 @@ Partial Class frmOSMLoG
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Port Agent"
         '
+        'lblOSMMultipleSearchSeparator
+        '
+        Me.lblOSMMultipleSearchSeparator.AutoSize = True
+        Me.lblOSMMultipleSearchSeparator.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.lblOSMMultipleSearchSeparator.Location = New System.Drawing.Point(15, 42)
+        Me.lblOSMMultipleSearchSeparator.Name = "lblOSMMultipleSearchSeparator"
+        Me.lblOSMMultipleSearchSeparator.Size = New System.Drawing.Size(112, 9)
+        Me.lblOSMMultipleSearchSeparator.TabIndex = 25
+        Me.lblOSMMultipleSearchSeparator.Text = "Multiple search separated with |"
+        '
+        'txtOSMAgentsFilter
+        '
+        Me.txtOSMAgentsFilter.Location = New System.Drawing.Point(15, 19)
+        Me.txtOSMAgentsFilter.Name = "txtOSMAgentsFilter"
+        Me.txtOSMAgentsFilter.Size = New System.Drawing.Size(166, 20)
+        Me.txtOSMAgentsFilter.TabIndex = 24
+        '
         'chkNoPortAgent
         '
         Me.chkNoPortAgent.AutoSize = True
@@ -161,7 +181,7 @@ Partial Class frmOSMLoG
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 256)
+        Me.Label1.Location = New System.Drawing.Point(12, 287)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(79, 13)
         Me.Label1.TabIndex = 5
@@ -170,7 +190,7 @@ Partial Class frmOSMLoG
         'txtFileDestination
         '
         Me.txtFileDestination.Enabled = False
-        Me.txtFileDestination.Location = New System.Drawing.Point(97, 252)
+        Me.txtFileDestination.Location = New System.Drawing.Point(97, 283)
         Me.txtFileDestination.Name = "txtFileDestination"
         Me.txtFileDestination.Size = New System.Drawing.Size(518, 20)
         Me.txtFileDestination.TabIndex = 6
@@ -178,7 +198,7 @@ Partial Class frmOSMLoG
         'cmdFileDestination
         '
         Me.cmdFileDestination.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdFileDestination.Location = New System.Drawing.Point(621, 252)
+        Me.cmdFileDestination.Location = New System.Drawing.Point(621, 283)
         Me.cmdFileDestination.Name = "cmdFileDestination"
         Me.cmdFileDestination.Size = New System.Drawing.Size(45, 20)
         Me.cmdFileDestination.TabIndex = 7
@@ -187,7 +207,7 @@ Partial Class frmOSMLoG
         '
         'cmdCreatePDF
         '
-        Me.cmdCreatePDF.Location = New System.Drawing.Point(252, 395)
+        Me.cmdCreatePDF.Location = New System.Drawing.Point(252, 426)
         Me.cmdCreatePDF.Name = "cmdCreatePDF"
         Me.cmdCreatePDF.Size = New System.Drawing.Size(103, 23)
         Me.cmdCreatePDF.TabIndex = 8
@@ -196,7 +216,7 @@ Partial Class frmOSMLoG
         '
         'cmdExit
         '
-        Me.cmdExit.Location = New System.Drawing.Point(377, 395)
+        Me.cmdExit.Location = New System.Drawing.Point(377, 426)
         Me.cmdExit.Name = "cmdExit"
         Me.cmdExit.Size = New System.Drawing.Size(103, 23)
         Me.cmdExit.TabIndex = 9
@@ -208,7 +228,7 @@ Partial Class frmOSMLoG
         Me.lblPax.BackColor = System.Drawing.Color.Aqua
         Me.lblPax.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPax.ForeColor = System.Drawing.Color.Blue
-        Me.lblPax.Location = New System.Drawing.Point(20, 291)
+        Me.lblPax.Location = New System.Drawing.Point(20, 322)
         Me.lblPax.Name = "lblPax"
         Me.lblPax.Size = New System.Drawing.Size(288, 89)
         Me.lblPax.TabIndex = 10
@@ -218,51 +238,58 @@ Partial Class frmOSMLoG
         Me.lblSegs.BackColor = System.Drawing.Color.Aqua
         Me.lblSegs.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblSegs.ForeColor = System.Drawing.Color.Blue
-        Me.lblSegs.Location = New System.Drawing.Point(366, 291)
+        Me.lblSegs.Location = New System.Drawing.Point(366, 322)
         Me.lblSegs.Name = "lblSegs"
         Me.lblSegs.Size = New System.Drawing.Size(288, 89)
         Me.lblSegs.TabIndex = 11
         '
         'txtSignedBy
         '
-        Me.txtSignedBy.Location = New System.Drawing.Point(97, 208)
+        Me.txtSignedBy.Location = New System.Drawing.Point(97, 17)
         Me.txtSignedBy.Name = "txtSignedBy"
         Me.txtSignedBy.Size = New System.Drawing.Size(518, 20)
         Me.txtSignedBy.TabIndex = 13
         '
-        'Label2
+        'GroupBox4
         '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(12, 212)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(54, 13)
-        Me.Label2.TabIndex = 12
-        Me.Label2.Text = "Signed by"
+        Me.GroupBox4.Controls.Add(Me.optSignedByPHL)
+        Me.GroupBox4.Controls.Add(Me.optSignedBy)
+        Me.GroupBox4.Controls.Add(Me.txtSignedBy)
+        Me.GroupBox4.Location = New System.Drawing.Point(12, 202)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(651, 75)
+        Me.GroupBox4.TabIndex = 14
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Signed By"
         '
-        'lblOSMMultipleSearchSeparator
+        'optSignedBy
         '
-        Me.lblOSMMultipleSearchSeparator.AutoSize = True
-        Me.lblOSMMultipleSearchSeparator.Font = New System.Drawing.Font("Microsoft Sans Serif", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.lblOSMMultipleSearchSeparator.Location = New System.Drawing.Point(15, 42)
-        Me.lblOSMMultipleSearchSeparator.Name = "lblOSMMultipleSearchSeparator"
-        Me.lblOSMMultipleSearchSeparator.Size = New System.Drawing.Size(112, 9)
-        Me.lblOSMMultipleSearchSeparator.TabIndex = 25
-        Me.lblOSMMultipleSearchSeparator.Text = "Multiple search separated with |"
+        Me.optSignedBy.AutoSize = True
+        Me.optSignedBy.Location = New System.Drawing.Point(6, 19)
+        Me.optSignedBy.Name = "optSignedBy"
+        Me.optSignedBy.Size = New System.Drawing.Size(73, 17)
+        Me.optSignedBy.TabIndex = 14
+        Me.optSignedBy.TabStop = True
+        Me.optSignedBy.Text = "Signed By"
+        Me.optSignedBy.UseVisualStyleBackColor = True
         '
-        'txtOSMAgentsFilter
+        'optSignedByPHL
         '
-        Me.txtOSMAgentsFilter.Location = New System.Drawing.Point(15, 19)
-        Me.txtOSMAgentsFilter.Name = "txtOSMAgentsFilter"
-        Me.txtOSMAgentsFilter.Size = New System.Drawing.Size(166, 20)
-        Me.txtOSMAgentsFilter.TabIndex = 24
+        Me.optSignedByPHL.AutoSize = True
+        Me.optSignedByPHL.Location = New System.Drawing.Point(6, 42)
+        Me.optSignedByPHL.Name = "optSignedByPHL"
+        Me.optSignedByPHL.Size = New System.Drawing.Size(250, 17)
+        Me.optSignedByPHL.TabIndex = 15
+        Me.optSignedByPHL.TabStop = True
+        Me.optSignedByPHL.Text = "PHL : Signed By Cherryl Rose Omnes Nemenzo"
+        Me.optSignedByPHL.UseVisualStyleBackColor = True
         '
         'frmOSMLoG
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(694, 462)
-        Me.Controls.Add(Me.txtSignedBy)
-        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.lblSegs)
         Me.Controls.Add(Me.lblPax)
         Me.Controls.Add(Me.cmdExit)
@@ -283,6 +310,8 @@ Partial Class frmOSMLoG
         Me.GroupBox2.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -306,8 +335,10 @@ Partial Class frmOSMLoG
     Friend WithEvents lblSegs As Label
     Friend WithEvents chkNoPortAgent As CheckBox
     Friend WithEvents txtSignedBy As TextBox
-    Friend WithEvents Label2 As Label
     Friend WithEvents optOnSignersBrazil As RadioButton
     Friend WithEvents lblOSMMultipleSearchSeparator As Label
     Friend WithEvents txtOSMAgentsFilter As TextBox
+    Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents optSignedByPHL As RadioButton
+    Friend WithEvents optSignedBy As RadioButton
 End Class

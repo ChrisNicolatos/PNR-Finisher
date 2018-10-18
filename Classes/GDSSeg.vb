@@ -470,7 +470,7 @@ Namespace GDSSeg
                         If mudtProps.Stopovers <> "" Then
                             mudtProps.Stopovers &= vbCrLf
                         End If
-                        mudtProps.Stopovers &= pSegDo(i).Substring(1, 3) & "-" & Airport.CityAirportName(pSegDo(i).Substring(1, 3))
+                        mudtProps.Stopovers &= pSegDo(i).Substring(0, 3) & "-" & Airport.CityAirportName(pSegDo(i).Substring(0, 3))
                     End If
                 Next
             End If

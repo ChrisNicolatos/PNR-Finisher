@@ -44,7 +44,8 @@ Friend Class Config
         Dim OSMLoGOnsigner As Boolean
         Dim OSMLoGPath As String
         Dim OSMLoGLanguage As Utilities.EnumLoGLanguage
-
+        Dim Location As String
+        Dim PriceOptimiser As Boolean
     End Structure
 
     Private mudtProps As ClassProps
@@ -493,6 +494,22 @@ Friend Class Config
             mudtProps.AgentName = value
         End Set
     End Property
+    Public Property Location As String
+        Get
+            Return mudtProps.Location
+        End Get
+        Set(value As String)
+            mudtProps.Location = value
+        End Set
+    End Property
+    Public Property PriceOptimiser As Boolean
+        Get
+            Return mudtProps.PriceOptimiser
+        End Get
+        Set(value As Boolean)
+            mudtProps.PriceOptimiser = value
+        End Set
+    End Property
     Public Property LastVersionTextShown As Integer
         Get
             Return mudtProps.LastVersionTextShown
@@ -721,7 +738,10 @@ Friend Class Config
                            "       ,ISNULL(pfOSMLOGPerPax,0) AS pfOSMLOGPerPax " &
                            "       ,ISNULL(pfOSMLOGOnSigner,0) AS pfOSMLOGOnSigner " &
                            "       ,ISNULL(pfOSMLOGPath,'') AS pfOSMLOGPath " &
+                           "       ,ISNULL(pfnLocation,'') AS pfnLocation " &
+                           "       ,ISNULL(pfnPriceOptimiser,0) AS pfnPriceOptimiser " &
                            "   FROM [AmadeusReports].[dbo].[PNRFinisherUsers] " &
+                           "   LEFT JOIN [AmadeusReports].[dbo].[PNRFinisherUserName] ON pfnID = pfUserName_fk " &
                            "   WHERE pfPCC = '" & mobjGDSUser.PCC & "' AND pfUser = '" & mobjGDSUser.User & "'"
             pobjReader = .ExecuteReader
         End With
@@ -755,6 +775,8 @@ Friend Class Config
                 mudtProps.OSMLoGPath = CStr(.Item("pfOSMLOGPath"))
                 mudtProps.LastVersionTextShown = 0 ' .Item("pfLastVersionTextShown_fk")
                 mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
+                mudtProps.Location = CStr(.Item("pfnLocation"))
+                mudtProps.PriceOptimiser = CBool(.Item("pfnPriceOptimiser"))
             Else
                 mudtProps.AgentId = 0
                 mudtProps.AgentQueue = ""
@@ -783,6 +805,8 @@ Friend Class Config
                 mudtProps.OSMLoGOnsigner = False
                 mudtProps.OSMLoGPath = ""
                 mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
+                mudtProps.Location = ""
+                mudtProps.PriceOptimiser = False
             End If
             .Close()
         End With

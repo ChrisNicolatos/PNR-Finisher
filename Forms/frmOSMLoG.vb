@@ -29,6 +29,15 @@
             SignedBy = txtSignedBy.Text
         End Get
     End Property
+    Public ReadOnly Property SignatoryType As Integer
+        Get
+            If optSignedByPHL.Checked Then
+                Return 2
+            Else
+                Return 1
+            End If
+        End Get
+    End Property
     Private Sub frmOSMLoG_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Try
@@ -168,5 +177,8 @@
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
+    End Sub
+    Private Sub txtSignedBy_TextChanged(sender As Object, e As EventArgs) Handles txtSignedBy.TextChanged
+        optSignedBy.Checked = True
     End Sub
 End Class

@@ -6,6 +6,7 @@ Namespace Customers
             Dim ID As Integer
             Dim Code As String
             Dim Name As String
+            Dim Logo As String
             Dim EntityKindLT As Integer
             Dim HasVessels As Boolean
             Dim HasDepartments As Boolean
@@ -18,9 +19,9 @@ Namespace Customers
         Private mobjAlerts As New Alerts.Collection
 
         Public Overrides Function ToString() As String
-            With mudtProps
-                Return .Code & " " & .Name
-            End With
+
+            Return Code & " " & Name
+
         End Function
 
         Public ReadOnly Property ID() As Integer
@@ -37,10 +38,14 @@ Namespace Customers
 
         Public ReadOnly Property Name() As String
             Get
-                Name = mudtProps.Name
+                Name = mudtProps.Name.ToUpper
             End Get
         End Property
-
+        Public ReadOnly Property Logo As String
+            Get
+                Return mudtProps.Logo.ToUpper
+            End Get
+        End Property
         Public ReadOnly Property EntityKindLT() As Integer
             Get
                 EntityKindLT = mudtProps.EntityKindLT
@@ -78,11 +83,12 @@ Namespace Customers
             End Get
         End Property
 
-        Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String, ByVal pEntityKindLT As Integer, ByVal pAlert As String, ByVal pGalileoTrackingCode As String)
+        Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String, ByVal pLogo As String, ByVal pEntityKindLT As Integer, ByVal pAlert As String, ByVal pGalileoTrackingCode As String)
             With mudtProps
                 .ID = pID
                 .Code = pCode
                 .Name = pName
+                .Logo = pLogo
                 .EntityKindLT = pEntityKindLT
                 .Alert = pAlert.Trim
                 .GalileoTrackingCode = pGalileoTrackingCode
@@ -121,7 +127,7 @@ Namespace Customers
             End With
             With pobjReader
                 If pobjReader.Read Then
-                    SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
+                    SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("Logo")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
                     .Close()
                 End If
             End With
@@ -136,6 +142,7 @@ Namespace Customers
                     PrepareClientSelectCommand = " SELECT TFEntities.Id " &
                                " ,TFEntities.Code" &
                                " ,TFEntities.Name " &
+                               " ,TFEntities.Logo" &
                                " ,TFEntityCategories.TFEntityKindLT " &
                                " ,ISNULL(DealCodes.Code, '') AS GalileoTrackingCode " &
                                " FROM [TravelForceCosmos].[dbo].[TFEntities] " &
@@ -151,6 +158,7 @@ Namespace Customers
                     PrepareClientSelectCommand = " Select [Account_Id] As Id " &
                                                 " ,[Account_Abbriviation] AS Code " &
                                                 " ,[Account_Name] AS Name " &
+                                                " ,[Account_Name] AS Logo " &
                                                 " ,526 AS TFEntityKindLT " &
                                                 " ,'' AS GalileoTrackingCode " &
                                                 " From [Disco_Instone_EU].[dbo].[Company] " &
@@ -177,7 +185,7 @@ Namespace Customers
                 Dim pItem As CustomerItem
 
                 For Each pItem In mAllCustomer.Values
-                    If pItem.Code.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or pItem.Name.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Then
+                    If pItem.Code.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or pItem.Name.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or pItem.Logo.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Then
                         MyBase.Add(pItem.ID, pItem)
                     End If
                 Next
@@ -226,6 +234,7 @@ Namespace Customers
                     PrepareClientSelectCommand = " SELECT TFEntities.Id " &
                                " ,TFEntities.Code" &
                                " ,TFEntities.Name " &
+                               " ,TFEntities.Logo " &
                                " ,TFEntityCategories.TFEntityKindLT " &
                                " ,ISNULL(DealCodes.Code, '') AS GalileoTrackingCode " &
                                " FROM [TravelForceCosmos].[dbo].[TFEntities] " &
@@ -241,6 +250,7 @@ Namespace Customers
                     PrepareClientSelectCommand = "SELECT Company.[Account_Id] AS Id " &
                                                  " ,[Account_Abbriviation] AS Code " &
                                                  " ,[Account_Name] AS Name " &
+                                                 " ,[Account_Name] AS Logo " &
                                                  " ,526 AS TFEntityKindLT" &
                                                  " ,'' AS GalileoTrackingCode " &
                                                  " From [Disco_Instone_EU].[dbo].[Company] " &
@@ -273,7 +283,7 @@ Namespace Customers
             With pobjReader
                 Do While .Read
                     pobjClass = New CustomerItem
-                    pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
+                    pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("Logo")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
                     MyBase.Add(pobjClass.ID, pobjClass)
                 Loop
                 .Close()

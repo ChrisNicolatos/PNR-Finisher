@@ -1,8 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Public Class frmPNR
-    Private Const VersionText As String = "Athens PNR Finisher (12/10/2018 12:31) "
-    Private Const OptionPriceOptimizer As Boolean = False ' This blocks users' access to Price Optimiser until it is ready
+    Private Const VersionText As String = "Athens PNR Finisher (18/10/2018 16:30) "
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
@@ -33,6 +32,7 @@ Public Class frmPNR
     Private mOSMPax As New osmPax.PaxCollection
     Private mOSMAgents As New osmVessels.EmailCollection
     Private mOSMAgentIndex As Integer = -1
+    Private mfrmOptimiser As frmPriceOptimiser
 
     Private mItnFromDate As Date
     Private mItnToDate As Date
@@ -56,12 +56,25 @@ Public Class frmPNR
         End Try
     End Sub
     Private Sub ShowPriceOptimiser()
-
-        If OptionPriceOptimizer Then
-            If Not MySettings Is Nothing Then
+        If Not MySettings Is Nothing Then
+            If MySettings.PriceOptimiser Then
                 If MySettings.GDSPcc <> "" And MySettings.GDSUser <> "" Then
-                    Dim pFrm As New frmPriceOptimiser(MySettings.GDSPcc, MySettings.GDSUser)
-                    pFrm.Show()
+                    Dim pPCC As String = MySettings.GDSPcc
+                    Dim pUserId As String = MySettings.GDSUser
+                    ' for testing only
+                    'pPCC = "ATHG42100"
+                    'pUserId = "1234EK"
+                    'pPCC = "750B"
+                    'pUserId = "051244"
+                    Dim pDownsell As New DownsellCollection
+                    If pDownsell.CountNonVerified(pPCC, pUserId) > 0 Then
+                        If mfrmOptimiser Is Nothing OrElse mfrmOptimiser.IsDisposed Then
+                            mfrmOptimiser = New frmPriceOptimiser
+                        End If
+                        mfrmOptimiser.DisplayItems(pPCC, pUserId)
+                        mfrmOptimiser.Show()
+                        mfrmOptimiser.BringToFront()
+                    End If
                 End If
             End If
         End If
@@ -69,7 +82,6 @@ Public Class frmPNR
     Private Sub ClearForm()
 
         Try
-
             mobjCustomerSelected = New Customers.CustomerItem
             mobjSubDepartmentSelected = New SubDepartments.Item
             mobjCRMSelected = New CRM.Item
@@ -113,7 +125,11 @@ Public Class frmPNR
             cmdPNRWriteWithDocs.Enabled = False
             cmdPNROnlyDocs.Enabled = False
             cmdPriceOptimiser.Enabled = False
-            cmdPriceOptimiser.Visible = OptionPriceOptimizer
+            If Not MySettings Is Nothing AndAlso MySettings.PriceOptimiser Then
+                cmdPriceOptimiser.Visible = True
+            Else
+                cmdPriceOptimiser.Visible = False
+            End If
 
             mobjPNR.ExistingElements.Clear()
 
@@ -136,8 +152,16 @@ Public Class frmPNR
             ' read PNR and Exit are always enabled
             cmdPNRRead1APNR.Enabled = True
             cmdExit.Enabled = True
-
-            cmdAdmin.Enabled = MySettings.Administrator
+            cmdAdmin.Enabled = False
+            cmdPriceOptimiser.Enabled = False
+            cmdPriceOptimiser.Visible = False
+            If Not MySettings Is Nothing Then
+                cmdAdmin.Enabled = MySettings.Administrator
+                If MySettings.PriceOptimiser And mflgReadPNR Then
+                    cmdPriceOptimiser.Enabled = True
+                End If
+            End If
+            cmdPriceOptimiser.Visible = cmdPriceOptimiser.Enabled
             cmdAdmin.Visible = cmdAdmin.Enabled
 
             ' customer based entries are enabled if a PNR has been read and there is data available
@@ -159,7 +183,6 @@ Public Class frmPNR
 
             ' Update is enabled if a PNR has been read and if mandatory fields have been entered
             cmdPNRWrite.Enabled = mflgReadPNR
-            cmdPriceOptimiser.Enabled = (OptionPriceOptimizer And mflgReadPNR)
 
             ' Customer is always needed
 
@@ -378,9 +401,8 @@ Public Class frmPNR
                 End If
             End If
         Catch ex As Exception
-            Throw New Exception("DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As PNR_Finisher.GDSExisting.Item)" & vbCrLf & ex.Message)
+            Throw New Exception("DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As GDSExisting.Item)" & vbCrLf & ex.Message)
         End Try
-
     End Sub
     Private Sub DisplayOldCustomProperty(ByRef txtText As TextBox, ByVal Item As GDSExisting.Item)
         Try
@@ -530,6 +552,10 @@ Public Class frmPNR
             mflgLoading = True
             Text = VersionText
             dgvApis.VirtualMode = False
+            If Not MySettings Is Nothing AndAlso MySettings.PriceOptimiser Then
+                mfrmOptimiser = New frmPriceOptimiser
+            End If
+            SetEnabled()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         Finally
@@ -1133,6 +1159,7 @@ Public Class frmPNR
 
         Try
             PNRWrite(True, False)
+            ShowPriceOptimiser()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try

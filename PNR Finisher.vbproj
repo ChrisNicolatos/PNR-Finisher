@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>48</ApplicationRevision>
+    <ApplicationRevision>49</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -129,6 +129,8 @@
     <Compile Include="Classes\ConditionalGDSEntry.vb" />
     <Compile Include="Classes\Config_GDSReferences.vb" />
     <Compile Include="Classes\DBUser.vb" />
+    <Compile Include="Classes\DownsellCollection.vb" />
+    <Compile Include="Classes\DownsellItem.vb" />
     <Compile Include="Classes\GDS1G_ReadRaw.vb" />
     <Compile Include="Classes\GDSExisting.vb" />
     <Compile Include="Classes\GDSNew.vb" />

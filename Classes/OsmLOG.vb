@@ -9,6 +9,7 @@ Friend Class OsmLOG
     Private mflgNoPortAgent As Boolean
     Private mstrSignedBy As String
     Private mstrAgentName As String
+    Private mintSignatory As Integer
     Public Sub CreatePDF(ByVal AgentName As String, ByRef pPNR As GDSReadPNR)
 
         mobjPNR = pPNR
@@ -51,9 +52,12 @@ Friend Class OsmLOG
 
         Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
+        Dim pSignature As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "crn sign.jpg")
+        Dim pSignatureGif As Image = Image.GetInstance(pSignature)
         Dim pDoc As New Document(PageSize.A4, 36, 36, 36, 36)
         Dim pArial11 As Font = FontFactory.GetFont("arial", 11, FontStyle.Regular)
         Dim pArial11b As Font = FontFactory.GetFont("arial", 11, FontStyle.Bold)
+        Dim pArial11bu As Font = FontFactory.GetFont("arial", 11, FontStyle.Bold And FontStyle.Underline)
         Dim pArial12 As Font = FontFactory.GetFont("arial", 12, FontStyle.Regular)
         Dim pArial16b As Font = FontFactory.GetFont("arial", 16, FontStyle.Bold)
 
@@ -93,12 +97,24 @@ Friend Class OsmLOG
         pDoc.Add(AddParagraph("We confirm that " & mobjPNR.ClientName & " will cover all expenses that may occur in connection with our employee's travel.", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph("If you need any further information, please contact our employer as stated below.", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph("Sincerely,", pArial11, 0, 14, "Left"))
-        pDoc.Add(AddParagraph(mstrSignedBy, pArial11, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("Crewing", pArial11, 0, 14, "Left"))
-        pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("OSM Crew Management Limited", pArial11b, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("Address: OSM HOUSE, 22 Amathountos Avenue Agios Tychonas 4532 Limassol, Cyprus", pArial11, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("Phone: +357 25 33 55 01", pArial11, 0, 0, "Left"))
+        If mintSignatory = 2 Then
+            pSignatureGif.ScalePercent(50)
+            pDoc.Add(pSignatureGif)
+            pDoc.Add(AddParagraph("Cherryl Rose Omnes Nemenzo", pArial11bu, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Crewing Support Manager", pArial11, 0, 14, "Left"))
+            pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("OSM Maritime Services Inc.", pArial11b, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Address: OSM bldg, 479 Pedro Gil Street, Ermita, Manila", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Phone: (632) 523-88-71 to 75", pArial11, 0, 0, "Left"))
+        Else
+            pDoc.Add(AddParagraph(mstrSignedBy, pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Crewing", pArial11, 0, 14, "Left"))
+            pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("OSM Crew Management Limited", pArial11b, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Address: OSM HOUSE, 22 Amathountos Avenue Agios Tychonas 4532 Limassol, Cyprus", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Phone: +357 25 33 55 01", pArial11, 0, 0, "Left"))
+        End If
+
 
         pDoc.Close()
 
@@ -107,9 +123,12 @@ Friend Class OsmLOG
 
         Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
+        Dim pSignature As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "crn sign.jpg")
+        Dim pSignatureGif As Image = Image.GetInstance(pSignature)
         Dim pDoc As New Document(PageSize.A4, 36, 36, 36, 36)
         Dim pArial11 As Font = FontFactory.GetFont("arial", 11, FontStyle.Regular)
         Dim pArial11b As Font = FontFactory.GetFont("arial", 11, FontStyle.Bold)
+        Dim pArial11bu As Font = FontFactory.GetFont("arial", 11, FontStyle.Bold And FontStyle.Underline)
         Dim pArial12 As Font = FontFactory.GetFont("arial", 12, FontStyle.Regular)
         Dim pArial16b As Font = FontFactory.GetFont("arial", 16, FontStyle.Bold)
 
@@ -142,12 +161,23 @@ Friend Class OsmLOG
         pDoc.Add(AddParagraph("Por favor, dê-lhe toda a assistência possível, a fim de que ele deve chegar ao seu destino com o mínimo de atraso possível. Nós garantir que, no entanto, que será responsável para pagar todas as suas despesas de repatriamento, se as Autoridades Portuárias recusar a sua entrada no " & mobjPNR.VesselName & " por qualquer motivo.", pArial11, 0, 0, "Left"))
         pDoc.Add(AddParagraph("Agradecendo antecipadamente.", pArial11, 0, 14, "Left"))
         pDoc.Add(AddParagraph("Com os melhores cumprimentos.", pArial11, 0, 14, "Left"))
-        pDoc.Add(AddParagraph(mstrSignedBy, pArial11, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("Crewing", pArial11, 0, 14, "Left"))
-        pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("OSM Crew Management Limited", pArial11b, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("Address: OSM HOUSE, 22 Amathountos Avenue Agios Tychonas 4532 Limassol, Cyprus", pArial11, 0, 0, "Left"))
-        pDoc.Add(AddParagraph("Phone: +357 25 33 55 01", pArial11, 0, 0, "Left"))
+        If mintSignatory = 2 Then
+            pSignatureGif.ScalePercent(50)
+            pDoc.Add(pSignatureGif)
+            pDoc.Add(AddParagraph("Cherryl Rose Omnes Nemenzo", pArial11bu, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Crewing Support Manager", pArial11, 0, 14, "Left"))
+            pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("OSM Maritime Services Inc.", pArial11b, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Address: OSM bldg, 479 Pedro Gil Street, Ermita, Manila", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Phone: (632) 523-88-71 to 75", pArial11, 0, 0, "Left"))
+        Else
+            pDoc.Add(AddParagraph(mstrSignedBy, pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Crewing", pArial11, 0, 14, "Left"))
+            pDoc.Add(AddParagraph("On behalf of", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("OSM Crew Management Limited", pArial11b, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Address: OSM HOUSE, 22 Amathountos Avenue Agios Tychonas 4532 Limassol, Cyprus", pArial11, 0, 0, "Left"))
+            pDoc.Add(AddParagraph("Phone: +357 25 33 55 01", pArial11, 0, 0, "Left"))
+        End If
 
         pDoc.Close()
 
@@ -395,6 +425,7 @@ Friend Class OsmLOG
             mflgNoPortAgent = pFrm.NoPortAgent
             mobjPortAgent = pFrm.PortAgent
             mstrSignedBy = pFrm.SignedBy
+            mintSignatory = pFrm.SignatoryType
             pFrm.Close()
             Dim pStatus As String = CreateDocs()
             MessageBox.Show(pStatus, "Create PDF File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information)
