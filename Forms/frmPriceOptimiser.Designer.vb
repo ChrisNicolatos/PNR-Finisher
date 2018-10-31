@@ -34,6 +34,8 @@ Partial Class frmPriceOptimiser
         Me.mnuOptimiserOpenInGDS = New System.Windows.Forms.ToolStripMenuItem()
         Me.lblPCCUser = New System.Windows.Forms.Label()
         Me.cmdRefresh = New System.Windows.Forms.Button()
+        Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
+        Me.mnuOptimiserCopyData = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.dgvPNRs, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.mnuOptimiser.SuspendLayout()
         Me.SuspendLayout()
@@ -65,14 +67,14 @@ Partial Class frmPriceOptimiser
         Me.dgvPNRs.ReadOnly = True
         Me.dgvPNRs.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect
         Me.dgvPNRs.ShowEditingIcon = False
-        Me.dgvPNRs.Size = New System.Drawing.Size(1413, 274)
+        Me.dgvPNRs.Size = New System.Drawing.Size(1450, 274)
         Me.dgvPNRs.TabIndex = 1
         '
         'mnuOptimiser
         '
-        Me.mnuOptimiser.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOptimiserPNR, Me.ToolStripSeparator1, Me.mnuOptimiserIgnore, Me.mnuOptimiserActioned, Me.ToolStripMenuItem1, Me.mnuOptimiserOpenInGDS})
+        Me.mnuOptimiser.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuOptimiserPNR, Me.ToolStripSeparator1, Me.mnuOptimiserIgnore, Me.mnuOptimiserActioned, Me.ToolStripMenuItem1, Me.mnuOptimiserOpenInGDS, Me.ToolStripSeparator2, Me.mnuOptimiserCopyData})
         Me.mnuOptimiser.Name = "mnuOptimiser"
-        Me.mnuOptimiser.Size = New System.Drawing.Size(261, 107)
+        Me.mnuOptimiser.Size = New System.Drawing.Size(261, 157)
         '
         'mnuOptimiserPNR
         '
@@ -127,11 +129,22 @@ Partial Class frmPriceOptimiser
         Me.cmdRefresh.Text = "Refresh"
         Me.cmdRefresh.UseVisualStyleBackColor = True
         '
+        'ToolStripSeparator2
+        '
+        Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(257, 6)
+        '
+        'mnuOptimiserCopyData
+        '
+        Me.mnuOptimiserCopyData.Name = "mnuOptimiserCopyData"
+        Me.mnuOptimiserCopyData.Size = New System.Drawing.Size(260, 22)
+        Me.mnuOptimiserCopyData.Text = "Copy data"
+        '
         'frmPriceOptimiser
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1437, 342)
+        Me.ClientSize = New System.Drawing.Size(1474, 342)
         Me.Controls.Add(Me.cmdRefresh)
         Me.Controls.Add(Me.lblPCCUser)
         Me.Controls.Add(Me.dgvPNRs)
@@ -157,4 +170,6 @@ Partial Class frmPriceOptimiser
     Friend WithEvents mnuOptimiserPNR As ToolStripTextBox
     Friend WithEvents ToolStripSeparator1 As ToolStripSeparator
     Friend WithEvents cmdRefresh As Button
+    Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
+    Friend WithEvents mnuOptimiserCopyData As ToolStripMenuItem
 End Class

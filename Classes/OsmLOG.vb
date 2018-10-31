@@ -3,9 +3,9 @@ Option Explicit On
 Imports iTextSharp.text.pdf
 Imports iTextSharp.text
 Imports System.IO
-Friend Class OsmLOG
+Friend Class OSMLog
     Private mobjPNR As GDSReadPNR
-    Private mobjPortAgent As osmVessels.emailItem
+    Private mobjPortAgent As OSMEmailItem
     Private mflgNoPortAgent As Boolean
     Private mstrSignedBy As String
     Private mstrAgentName As String
@@ -24,7 +24,7 @@ Friend Class OsmLOG
 
         CreateDocs = ""
         If MySettings.OSMLoGPerPax Then
-            For Each pPax As GDSPax.GDSPaxItem In mobjPNR.Passengers.Values
+            For Each pPax As GDSPaxItem In mobjPNR.Passengers.Values
                 pFileName = GetPDFFileName(mobjPNR.RequestedPNR & "-" & pPax.ElementNo & pPax.LastName)
                 MakePDFDocument(MySettings.OSMLoGLanguage, pFileName, pstrTextCrewMembers, pPax)
                 CreateDocs &= pFileName & vbCrLf
@@ -39,7 +39,7 @@ Friend Class OsmLOG
         End If
 
     End Function
-    Private Sub MakePDFDocument(ByVal LoGLanguage As Utilities.EnumLoGLanguage, ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+    Private Sub MakePDFDocument(ByVal LoGLanguage As Utilities.EnumLoGLanguage, ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPaxItem = Nothing)
 
         Select Case LoGLanguage
             Case Utilities.EnumLoGLanguage.Brazil
@@ -48,7 +48,7 @@ Friend Class OsmLOG
                 PDFDocument(pFileName, CrewMembersText, pPax)
         End Select
     End Sub
-    Private Sub PDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+    Private Sub PDFDocument(ByVal pFileName As String, ByVal CrewMembersText As String, Optional ByRef pPax As GDSPaxItem = Nothing)
 
         Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
@@ -119,7 +119,7 @@ Friend Class OsmLOG
         pDoc.Close()
 
     End Sub
-    Private Sub PDFDocumentLangBrazil(ByVal pFileName As String, Optional ByRef pPax As GDSPax.GDSPaxItem = Nothing)
+    Private Sub PDFDocumentLangBrazil(ByVal pFileName As String, Optional ByRef pPax As GDSPaxItem = Nothing)
 
         Dim pLogoFile As String = System.IO.Path.Combine(UtilitiesDB.MyConfigPath, "OSM Maritime logo.png")
         Dim gif As Image = Image.GetInstance(pLogoFile)
@@ -202,7 +202,7 @@ Friend Class OsmLOG
         AddParagraph = x2
 
     End Function
-    Private Function MakePaxTable(ByRef pPassengers As GDSPax.GDSPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+    Private Function MakePaxTable(ByRef pPassengers As GDSPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
 
         Dim Table As New PdfPTable(2) With {
             .LockedWidth = False,
@@ -212,7 +212,7 @@ Friend Class OsmLOG
         }
 
         Dim pPosition As Boolean = False
-        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
+        For Each pPax As GDSPaxItem In pPassengers.Values
             If pPax.IdNo <> "" Then
                 pPosition = True
                 Exit For
@@ -228,7 +228,7 @@ Friend Class OsmLOG
             Table.AddCell(AddCell(" ", pHeaderFont))
         End If
 
-        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
+        For Each pPax As GDSPaxItem In pPassengers.Values
             Table.AddCell(AddCell(pPax.PaxName, pFont))
             Table.AddCell(AddCell(pPax.IdNo, pFont))
         Next pPax
@@ -236,7 +236,7 @@ Friend Class OsmLOG
         MakePaxTable = Table
 
     End Function
-    Private Function MakePaxTable(ByRef pPax As GDSPax.GDSPaxItem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+    Private Function MakePaxTable(ByRef pPax As GDSPaxItem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
 
         Dim Table As New PdfPTable(2) With {
             .LockedWidth = False,
@@ -262,7 +262,7 @@ Friend Class OsmLOG
         MakePaxTable = Table
 
     End Function
-    Private Function MakePaxTableLangBrazil(ByRef pPassengers As GDSPax.GDSPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+    Private Function MakePaxTableLangBrazil(ByRef pPassengers As GDSPaxColl, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
 
         Dim Table As New PdfPTable(2) With {
             .LockedWidth = False,
@@ -270,9 +270,9 @@ Friend Class OsmLOG
             .SpacingBefore = 14,
             .SpacingAfter = 14
         }
-        Dim pobjPaxApis As New PaxApisDB.Collection
+        Dim pobjPaxApis As New ApisPaxCollection
         Dim pPosition As Boolean = False
-        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
+        For Each pPax As GDSPaxItem In pPassengers.Values
             If pPax.IdNo <> "" Then
                 pPosition = True
                 Exit For
@@ -282,7 +282,7 @@ Friend Class OsmLOG
         Dim widths() As Single = {1, 1}
         Table.SetWidths(widths)
 
-        For Each pPax As GDSPax.GDSPaxItem In pPassengers.Values
+        For Each pPax As GDSPaxItem In pPassengers.Values
             'Sobrenome: Carlos Naia
             Table.AddCell(AddCell("Sobrenome:", pFont))
             Table.AddCell(AddCell(pPax.LastName, pFont))
@@ -292,7 +292,7 @@ Friend Class OsmLOG
             Table.AddCell(AddCell("Posição:", pFont))
             Table.AddCell(AddCell(pPax.IdNo, pFont))
             If mobjPNR.SSRDocsExists Then
-                For Each pDocs As PaxApisDB.Item In mobjPNR.SSRDocsCollection.Values
+                For Each pDocs As ApisPaxItem In mobjPNR.SSRDocsCollection.Values
                     If pDocs.Surname.Replace(" ", "") = pPax.LastName.Replace(" ", "") And pPax.Initial.Replace(" ", "").StartsWith(pDocs.FirstName.Replace(" ", "")) Then
                         'Nacionalidade: Portuguese
                         Table.AddCell(AddCell("Nacionalidade:", pFont))
@@ -321,7 +321,7 @@ Friend Class OsmLOG
         MakePaxTableLangBrazil = Table
 
     End Function
-    Private Function MakePaxTableLangBrazil(ByRef pPax As GDSPax.GDSPaxItem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
+    Private Function MakePaxTableLangBrazil(ByRef pPax As GDSPaxItem, ByVal pFont As Font, ByVal pHeaderFont As Font) As PdfPTable
 
         Dim Table As New PdfPTable(2) With {
             .LockedWidth = False,
@@ -343,7 +343,7 @@ Friend Class OsmLOG
         Table.AddCell(AddCell("Posição:", pFont))
         Table.AddCell(AddCell(pPax.IdNo, pFont))
         If mobjPNR.SSRDocsExists Then
-            For Each pDocs As PaxApisDB.Item In mobjPNR.SSRDocsCollection.Values
+            For Each pDocs As ApisPaxItem In mobjPNR.SSRDocsCollection.Values
                 If pDocs.Surname = pPax.LastName And pDocs.FirstName = pPax.Initial Then
                     'Nacionalidade: Portuguese
                     Table.AddCell(AddCell("Nacionalidade:", pFont))
@@ -367,7 +367,7 @@ Friend Class OsmLOG
         MakePaxTableLangBrazil = Table
 
     End Function
-    Private Function MakeSegTable(ByRef pSegs As GDSSeg.GDSSegColl, ByVal pFont As Font) As PdfPTable
+    Private Function MakeSegTable(ByRef pSegs As GDSSegCollection, ByVal pFont As Font) As PdfPTable
 
         Dim pWidths(6) As Single
         Dim pVBFont As New Drawing.Font(pFont.Familyname, pFont.Size, If(pFont.IsBold, FontStyle.Bold, FontStyle.Regular))
@@ -380,7 +380,7 @@ Friend Class OsmLOG
             .SpacingBefore = 14,
             .SpacingAfter = 14
         }
-        For Each pSeg As GDSSeg.GDSSegItem In pSegs.Values
+        For Each pSeg As GDSSegItem In pSegs.Values
             With pSeg
 
                 pWidths(0) = Math.Max(pWidths(0), g.MeasureString(.Airline, pVBFont).Width)
@@ -396,7 +396,7 @@ Friend Class OsmLOG
 
         Table.SetWidths(pWidths)
 
-        For Each pSeg As GDSSeg.GDSSegItem In pSegs.Values
+        For Each pSeg As GDSSegItem In pSegs.Values
             With pSeg
                 Table.AddCell(AddCell(.Airline, pFont))
                 Table.AddCell(AddCell(.FlightNo, pFont))

@@ -27,7 +27,7 @@ Friend Class GDSNumberParser
 
         With mudtProps
             .ParseType = 1
-            .TicketNumberText = Trim(Value)
+            .TicketNumberText = Value.Trim
             .isValid = False
         End With
 
@@ -97,8 +97,8 @@ Friend Class GDSNumberParser
                 .DocumentNumber = 0
                 .StockType = 1
 
-                pintEndOfString = Len(.TicketNumberText)
-                For i = 1 To Len(.TicketNumberText)
+                pintEndOfString = .TicketNumberText.Length
+                For i = 1 To .TicketNumberText.Length
                     pflgOK = False
                     pstrTemp = Mid(.TicketNumberText, i, 1)
                     If pstrTemp >= "0" And pstrTemp <= "9" Then
@@ -182,8 +182,8 @@ Friend Class GDSNumberParser
                 If pintConjFrom > 0 And pintConjTo >= pintConjFrom Then
                     pstrTemp = Mid(.TicketNumberText, pintConjFrom, pintConjTo - pintConjFrom + 1)
                     pstrTemp2 = pstrTicket
-                    If Len(pstrTemp) <= Len(pstrTemp2) Then
-                        Mid(pstrTemp2, Len(pstrTemp2) - Len(pstrTemp) + 1, Len(pstrTemp)) = pstrTemp
+                    If pstrTemp.Length <= pstrTemp2.Length Then
+                        Mid(pstrTemp2, pstrTemp2.Length - pstrTemp.Length + 1, pstrTemp.Length) = pstrTemp
                         pcurrDoc2 = Utilities.myCurr(pstrTemp2)
                         If pcurrDoc2 > .DocumentNumber Then
                             .Books = CInt(pcurrDoc2 - .DocumentNumber + 1)

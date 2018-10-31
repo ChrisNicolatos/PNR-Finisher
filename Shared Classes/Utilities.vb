@@ -63,16 +63,16 @@
         Dim pintPoint As Short
         Dim pintComma As Short
 
-        Do While Not IsNumeric(Right(StringToParse, 1)) And Len(StringToParse) > 0
-            StringToParse = Left(StringToParse, Len(StringToParse) - 1)
+        Do While Not IsNumeric(Right(StringToParse, 1)) And StringToParse.Length > 0
+            StringToParse = Left(StringToParse, StringToParse.Length - 1)
         Loop
-        StringToParse = Trim(StringToParse)
+        StringToParse = StringToParse.Trim
         pintPoint = InStr(StringToParse, My.Application.Culture.NumberFormat.CurrencyGroupSeparator)
         pintComma = InStr(StringToParse, My.Application.Culture.NumberFormat.CurrencyDecimalSeparator)
         If pintPoint > pintComma Then
-            If Len(StringToParse) > 2 Then
-                If Mid(StringToParse, Len(StringToParse) - 2, 1) = My.Application.Culture.NumberFormat.CurrencyGroupSeparator Then
-                    Mid(StringToParse, Len(StringToParse) - 2, 1) = My.Application.Culture.NumberFormat.CurrencyDecimalSeparator
+            If StringToParse.Length > 2 Then
+                If Mid(StringToParse, StringToParse.Length - 2, 1) = My.Application.Culture.NumberFormat.CurrencyGroupSeparator Then
+                    Mid(StringToParse, StringToParse.Length - 2, 1) = My.Application.Culture.NumberFormat.CurrencyDecimalSeparator
                 End If
             End If
         End If
@@ -84,7 +84,7 @@
             myCurr = CDec(StringToParse)
         Else
             myCurr = 0
-            For i = 1 To Len(StringToParse)
+            For i = 1 To StringToParse.Length
                 If IsNumeric(Mid(StringToParse, 1, i)) Then
                     myCurr = CDec(Mid(StringToParse, 1, i))
                 Else

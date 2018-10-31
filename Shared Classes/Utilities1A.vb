@@ -130,7 +130,18 @@ Friend Class Utilities1A
         End Try
 
     End Function
-    Public Shared Sub PrepareLineNumbers1A(ByVal ExistingItem As GDSExisting.Item, ByRef pLineNumbers() As Integer)
+    Public Shared Function Equipment(ByRef pSegment As Object) As String
+        Try
+            Equipment = pSegment.Equipment
+            If Equipment Is Nothing Then
+                Equipment = ""
+            End If
+        Catch ex As Exception
+            Equipment = ""
+        End Try
+
+    End Function
+    Public Shared Sub PrepareLineNumbers1A(ByVal ExistingItem As GDSExistingItem, ByRef pLineNumbers() As Integer)
         If ExistingItem.Exists Then
             ReDim Preserve pLineNumbers(pLineNumbers.GetUpperBound(0) + 1)
             pLineNumbers(pLineNumbers.GetUpperBound(0)) = ExistingItem.LineNumber

@@ -1,7 +1,7 @@
 ﻿Option Strict Off
 Option Explicit On
 Public Class frmPNR
-    Private Const VersionText As String = "Athens PNR Finisher (18/10/2018 16:30) "
+    Private Const VersionText As String = "Athens PNR Finisher (30/10/2018 14:30) "
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
@@ -14,23 +14,23 @@ Public Class frmPNR
     Private mflgReadPNR As Boolean
     Private mintMaxString As Integer = 80
 
-    Private mobjAirlinePoints As New AirlinePoints.Collection
-    Private mobjAirlineNotes As New AirlineNotes.Collection
+    Private mobjAirlinePoints As New AirlinePointsCollection
+    Private mobjAirlineNotes As New AirlineNotesCollection
     Private mstrAirlineAlert As String
-    Private mobjConditionalEntry As New ConditionalGDSEntry.Collection
+    Private mobjConditionalEntry As New ConditionalGDSEntryCollection
 
-    Private mobjCustomerSelected As Customers.CustomerItem
-    Private mobjCustomers As New Customers.CustomerCollection
+    Private mobjCustomerSelected As CustomerItem
+    Private mobjCustomers As New CustomerCollection
 
-    Private mobjSubDepartmentSelected As SubDepartments.Item
-    Private mobjCRMSelected As CRM.Item
-    Private mobjVesselSelected As Vessels.Item
-    Private mobjAveragePrice As New AveragePrice.Collection
-    Private mobjGender As New PaxApisDB.GenderCollection
+    Private mobjSubDepartmentSelected As SubDepartmentItem
+    Private mobjCRMSelected As CRMItem
+    Private mobjVesselSelected As VesselItem
+    Private mobjAveragePrice As New AveragePriceCollection
+    Private mobjGender As New ReferenceGenderCollection
     Private mudtPaxNames() As PaxNamesPos
 
-    Private mOSMPax As New osmPax.PaxCollection
-    Private mOSMAgents As New osmVessels.EmailCollection
+    Private mOSMPax As New OSMPaxCollection
+    Private mOSMAgents As New OSMEmailCollection
     Private mOSMAgentIndex As Integer = -1
     Private mfrmOptimiser As frmPriceOptimiser
 
@@ -63,7 +63,7 @@ Public Class frmPNR
                     Dim pUserId As String = MySettings.GDSUser
                     ' for testing only
                     'pPCC = "ATHG42100"
-                    'pUserId = "1234EK"
+                    'pUserId = "1011KZ"
                     'pPCC = "750B"
                     'pUserId = "051244"
                     Dim pDownsell As New DownsellCollection
@@ -82,10 +82,10 @@ Public Class frmPNR
     Private Sub ClearForm()
 
         Try
-            mobjCustomerSelected = New Customers.CustomerItem
-            mobjSubDepartmentSelected = New SubDepartments.Item
-            mobjCRMSelected = New CRM.Item
-            mobjVesselSelected = New Vessels.Item
+            mobjCustomerSelected = New CustomerItem
+            mobjSubDepartmentSelected = New SubDepartmentItem
+            mobjCRMSelected = New CRMItem
+            mobjVesselSelected = New VesselItem
 
             lblPNR.Text = ""
             lblPax.Text = ""
@@ -146,7 +146,7 @@ Public Class frmPNR
 
     Private Sub SetEnabled()
 
-        Dim pProps As CustomProperties.Item
+        Dim pProps As CustomPropertiesItem
 
         Try
             ' read PNR and Exit are always enabled
@@ -205,28 +205,65 @@ Public Class frmPNR
                 If mobjPNR.NewElements.CustomerCode.GDSCommand <> "" And lstCRM.Items.Count > 0 And mobjPNR.NewElements.CRMCode.GDSCommand = "" Then
                     txtCRM.BackColor = Color.Pink
                 End If
-                If mobjPNR.NewElements.BookedBy.GDSCommand = "" And cmbBookedby.Enabled Then
-                    pProps = CType(cmbBookedby.Tag, CustomProperties.Item)
-                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
-                        cmdPNRWrite.Enabled = False
+
+                If mobjPNR.NewElements.BookedBy.GDSCommand = "" Then
+                    lblBookedByHighlight.Text = ""
+                    If cmbBookedby.Enabled Then
+                        pProps = CType(cmbBookedby.Tag, CustomPropertiesItem)
+                        If Not pProps Is Nothing Then
+                            lblBookedByHighlight.Text = pProps.Label
+                            If pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                                cmdPNRWrite.Enabled = False
+                            End If
+                        End If
                     End If
                 End If
-                If mobjPNR.NewElements.CostCentre.GDSCommand = "" And cmbCostCentre.Enabled Then
-                    pProps = CType(cmbCostCentre.Tag, CustomProperties.Item)
-                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
-                        cmdPNRWrite.Enabled = False
+                If mobjPNR.NewElements.CostCentre.GDSCommand = "" Then
+                    lblCostCentreHighlight.Text = ""
+                    If cmbCostCentre.Enabled Then
+                        pProps = CType(cmbCostCentre.Tag, CustomPropertiesItem)
+                        If Not pProps Is Nothing Then
+                            lblCostCentreHighlight.Text = pProps.Label
+                            If pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                                cmdPNRWrite.Enabled = False
+                            End If
+                        End If
                     End If
                 End If
-                If mobjPNR.NewElements.ReasonForTravel.GDSCommand = "" And cmbReasonForTravel.Enabled Then
-                    pProps = CType(cmbReasonForTravel.Tag, CustomProperties.Item)
-                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
-                        cmdPNRWrite.Enabled = False
+                If mobjPNR.NewElements.Department.GDSCommand = "" Then
+                    lblDepartmentHighlight.Text = ""
+                    If cmbDepartment.Enabled Then
+                        pProps = CType(cmbDepartment.Tag, CustomPropertiesItem)
+                        If Not pProps Is Nothing Then
+                            lblDepartmentHighlight.Text = pProps.Label
+                            If pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                                cmdPNRWrite.Enabled = False
+                            End If
+                        End If
                     End If
                 End If
-                If mobjPNR.NewElements.TRId.GDSCommand = "" And txtTrId.Enabled Then
-                    pProps = CType(txtTrId.Tag, CustomProperties.Item)
-                    If Not pProps Is Nothing AndAlso pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
-                        cmdPNRWrite.Enabled = False
+                If mobjPNR.NewElements.ReasonForTravel.GDSCommand = "" Then
+                    lblReasonForTravelHighLight.Text = ""
+                    If cmbReasonForTravel.Enabled Then
+                        pProps = CType(cmbReasonForTravel.Tag, CustomPropertiesItem)
+                        If Not pProps Is Nothing Then
+                            lblReasonForTravelHighLight.Text = pProps.Label
+                            If pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                                cmdPNRWrite.Enabled = False
+                            End If
+                        End If
+                    End If
+                End If
+                If mobjPNR.NewElements.TRId.GDSCommand = "" Then
+                    lblTRIDHighLight.Text = ""
+                    If txtTrId.Enabled Then
+                        pProps = CType(txtTrId.Tag, CustomPropertiesItem)
+                        If Not pProps Is Nothing Then
+                            lblTRIDHighLight.Text = pProps.Label
+                            If pProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
+                                cmdPNRWrite.Enabled = False
+                            End If
+                        End If
                     End If
                 End If
             End If
@@ -254,7 +291,7 @@ Public Class frmPNR
         End Try
 
     End Sub
-    Private Sub SetLabelColor(ByRef TextLabel As Label, ByVal CustomProps As CustomProperties.Item)
+    Private Sub SetLabelColor(ByRef TextLabel As Label, ByVal CustomProps As CustomPropertiesItem)
         Try
             If TextLabel.Enabled Then
                 If Not CustomProps Is Nothing AndAlso CustomProps.RequiredType = Utilities.CustomPropertyRequiredType.PropertyReqToSave Then
@@ -344,22 +381,22 @@ Public Class frmPNR
             End With
 
             If pstrCustomerCode <> "" Then
-                Dim pCustomer As New Customers.CustomerItem
+                Dim pCustomer As New CustomerItem
                 pCustomer.Load(pstrCustomerCode)
                 txtCustomer.Text = pCustomer.Code
                 If pintSubDepartment <> 0 Then
-                    Dim pSub As New SubDepartments.Item
+                    Dim pSub As New SubDepartmentItem
                     pSub.Load(pintSubDepartment)
                     txtSubdepartment.Text = pSub.Code & " " & pSub.Name
                 End If
                 If pstrCRM.Length > 0 Then
-                    Dim pSub As New CRM.Item
+                    Dim pSub As New CRMItem
                     pSub.Load(pstrCRM)
                     txtCRM.Text = pSub.Code & " " & pSub.Name
                 End If
 
                 If pstrVesselName <> "" Then
-                    Dim pVessel As New Vessels.Item
+                    Dim pVessel As New VesselItem
                     If pVessel.Load(pstrCustomerCode, pstrVesselName) Then
                         mobjPNR.NewElements.VesselNameForPNR.Clear()
                         mobjPNR.NewElements.VesselFlagForPNR.Clear()
@@ -384,7 +421,7 @@ Public Class frmPNR
         End Try
 
     End Sub
-    Private Sub DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As GDSExisting.Item)
+    Private Sub DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As GDSExistingItem)
         Try
             If Item.Key <> "" Then
                 If cmbList.DropDownStyle = ComboBoxStyle.DropDown Then
@@ -404,7 +441,7 @@ Public Class frmPNR
             Throw New Exception("DisplayOldCustomProperty(ByRef cmbList As ComboBox, ByVal Item As GDSExisting.Item)" & vbCrLf & ex.Message)
         End Try
     End Sub
-    Private Sub DisplayOldCustomProperty(ByRef txtText As TextBox, ByVal Item As GDSExisting.Item)
+    Private Sub DisplayOldCustomProperty(ByRef txtText As TextBox, ByVal Item As GDSExistingItem)
         Try
             txtText.Text = Item.Key
         Catch ex As Exception
@@ -436,26 +473,28 @@ Public Class frmPNR
             Dim pFound As Boolean = False
             lstAirlineEntries.Items.Clear()
 
-            For Each pSeg As GDSSeg.GDSSegItem In mobjPNR.Segments.Values
-                mobjAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline, mobjPNR.GDSCode)
-                For Each pItem As AirlinePoints.Item In mobjAirlinePoints.Values
-                    pFound = False
-                    For i As Integer = 0 To lstAirlineEntries.Items.Count - 1
-                        If lstAirlineEntries.Items(i).ToString = pItem.ToString Then
-                            pFound = True
-                            Exit For
+            If mobjCustomerSelected.ID <> 0 Then
+                For Each pSeg As GDSSegItem In mobjPNR.Segments.Values
+                    mobjAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline, mobjPNR.GDSCode)
+                    For Each pItem As AirlinePointsItem In mobjAirlinePoints.Values
+                        pFound = False
+                        For i As Integer = 0 To lstAirlineEntries.Items.Count - 1
+                            If lstAirlineEntries.Items(i).ToString = pItem.ToString Then
+                                pFound = True
+                                Exit For
+                            End If
+                        Next
+                        If Not pFound Then
+                            lstAirlineEntries.Items.Add(pItem, True)
                         End If
                     Next
-                    If Not pFound Then
-                        lstAirlineEntries.Items.Add(pItem, True)
-                    End If
                 Next
-            Next
+            End If
 
             If mflgReadPNR Then
-                For Each pSeg As GDSSeg.GDSSegItem In mobjPNR.Segments.Values
+                For Each pSeg As GDSSegItem In mobjPNR.Segments.Values
                     mobjAirlineNotes.Load(pSeg.Airline, mobjPNR.GDSCode)
-                    For Each pItem As AirlineNotes.Item In mobjAirlineNotes.Values
+                    For Each pItem As AirlineNotesItem In mobjAirlineNotes.Values
                         With pItem
                             If Not .Seaman Or Not mobjVesselSelected Is Nothing Then
                                 Dim pGDSText As String = .GDSText
@@ -514,7 +553,7 @@ Public Class frmPNR
 
                 If Not mobjCustomerSelected Is Nothing And Not mobjVesselSelected Is Nothing Then
                     mobjConditionalEntry.Load(MySettings.PCCBackOffice, mobjCustomerSelected.ID, mobjVesselSelected.Name)
-                    For Each pItem As ConditionalGDSEntry.Item In mobjConditionalEntry.Values
+                    For Each pItem As ConditionalGDSEntryItem In mobjConditionalEntry.Values
                         Dim pGDSCommand As String = ""
                         If mSelectedPNRGDSCode = Utilities.EnumGDSCode.Amadeus Then
                             pGDSCommand = pItem.ConditionalEntry1A
@@ -731,7 +770,7 @@ Public Class frmPNR
             mobjCustomers.Load(SearchString)
 
             lstCustomers.Items.Clear()
-            For Each pCustomer As Customers.CustomerItem In mobjCustomers.Values
+            For Each pCustomer As CustomerItem In mobjCustomers.Values
                 If SearchString = "" Or pCustomer.ToString.ToUpper.Contains(SearchString.ToUpper) Then
                     lstCustomers.Items.Add(pCustomer)
                 End If
@@ -740,7 +779,7 @@ Public Class frmPNR
             If lstCustomers.Items.Count = 1 Then
                 Try
                     mflgLoading = True
-                    Dim pCust As Customers.CustomerItem = CType(lstCustomers.Items(0), Customers.CustomerItem)
+                    Dim pCust As CustomerItem = CType(lstCustomers.Items(0), CustomerItem)
                     SelectCustomer(pCust)
                     txtCustomer.Text = lstCustomers.Items(0).ToString
                 Catch ex As Exception
@@ -758,7 +797,7 @@ Public Class frmPNR
     Private Sub PopulateSubdepartmentsList(ByVal SearchString As String)
 
         Try
-            Dim pobjSubDepartments As New SubDepartments.Collection
+            Dim pobjSubDepartments As New SubDepartmentCollection
 
             If SearchString = "" Then
                 mobjSubDepartmentSelected = Nothing
@@ -769,7 +808,7 @@ Public Class frmPNR
             If Not mobjCustomerSelected Is Nothing Then
                 pobjSubDepartments.Load(mobjCustomerSelected.ID)
 
-                For Each pSubDepartment As SubDepartments.Item In pobjSubDepartments.Values
+                For Each pSubDepartment As SubDepartmentItem In pobjSubDepartments.Values
                     If SearchString = "" Or pSubDepartment.ToString.ToUpper.Contains(SearchString.ToUpper) Then
                         lstSubDepartments.Items.Add(pSubDepartment)
                     End If
@@ -796,7 +835,7 @@ Public Class frmPNR
     Private Sub PopulateCRMList(ByVal SearchString As String)
 
         Try
-            Dim pobjCRM As New CRM.Collection
+            Dim pobjCRM As New CRMCollection
 
             If SearchString = "" Then
                 mobjCRMSelected = Nothing
@@ -807,7 +846,7 @@ Public Class frmPNR
             If Not mobjCustomerSelected Is Nothing Then
                 pobjCRM.Load(mobjCustomerSelected.ID)
 
-                For Each pCRM As CRM.Item In pobjCRM.Values
+                For Each pCRM As CRMItem In pobjCRM.Values
                     If SearchString = "" Or pCRM.ToString.ToUpper.Contains(SearchString.ToUpper) Then
                         lstCRM.Items.Add(pCRM)
                     End If
@@ -833,7 +872,7 @@ Public Class frmPNR
     Private Sub PopulateVesselsList()
 
         Try
-            Dim pobjVessels As New Vessels.Collection
+            Dim pobjVessels As New VesselCollection
 
             lstVessels.Items.Clear()
 
@@ -841,7 +880,7 @@ Public Class frmPNR
 
                 pobjVessels.Load(mobjCustomerSelected.ID)
 
-                For Each pVessel As Vessels.Item In pobjVessels.Values
+                For Each pVessel As VesselItem In pobjVessels.Values
                     If mobjPNR.NewElements.VesselName.TextRequested = "" Or pVessel.ToString.ToUpper.Contains(mobjPNR.NewElements.VesselName.TextRequested.ToUpper) Then
                         lstVessels.Items.Add(pVessel)
                     End If
@@ -878,7 +917,7 @@ Public Class frmPNR
             txtTrId.Enabled = False
 
             If Not mobjCustomerSelected Is Nothing Then
-                For Each pProp As CustomProperties.Item In mobjCustomerSelected.CustomerProperties.Values
+                For Each pProp As CustomPropertiesItem In mobjCustomerSelected.CustomerProperties.Values
                     If pProp.CustomPropertyID = Utilities.EnumCustomPropertyID.BookedBy Then
                         PrepareCustomProperty(cmbBookedby, pProp)
                     ElseIf pProp.CustomPropertyID = Utilities.EnumCustomPropertyID.Department Then
@@ -898,7 +937,7 @@ Public Class frmPNR
 
     End Sub
 
-    Private Sub PrepareCustomProperty(ByRef cmbCombo As ComboBox, ByRef pProp As CustomProperties.Item)
+    Private Sub PrepareCustomProperty(ByRef cmbCombo As ComboBox, ByRef pProp As CustomPropertiesItem)
 
         Try
             cmbCombo.Enabled = True
@@ -918,7 +957,7 @@ Public Class frmPNR
         End Try
 
     End Sub
-    Private Sub PrepareCustomProperty(ByRef txtText As TextBox, ByRef pProp As CustomProperties.Item)
+    Private Sub PrepareCustomProperty(ByRef txtText As TextBox, ByRef pProp As CustomPropertiesItem)
 
         Try
             txtText.Enabled = True
@@ -942,7 +981,7 @@ Public Class frmPNR
 
     End Sub
 
-    Private Sub SelectCustomer(ByVal pCustomer As Customers.CustomerItem)
+    Private Sub SelectCustomer(ByVal pCustomer As CustomerItem)
 
         Try
             'TODO
@@ -1029,7 +1068,7 @@ Public Class frmPNR
 
     End Sub
 
-    Private Sub SelectSubDepartment(ByVal pSubDepartment As SubDepartments.Item)
+    Private Sub SelectSubDepartment(ByVal pSubDepartment As SubDepartmentItem)
 
         Try
             mobjSubDepartmentSelected = pSubDepartment
@@ -1043,7 +1082,7 @@ Public Class frmPNR
 
     End Sub
 
-    Private Sub SelectCRM(ByVal pCRM As CRM.Item)
+    Private Sub SelectCRM(ByVal pCRM As CRMItem)
 
         Try
             mobjCRMSelected = pCRM
@@ -1060,7 +1099,7 @@ Public Class frmPNR
 
     End Sub
 
-    Private Sub SelectVessel(ByVal pVessel As Vessels.Item)
+    Private Sub SelectVessel(ByVal pVessel As VesselItem)
 
         Try
             mobjVesselSelected = pVessel
@@ -1079,7 +1118,7 @@ Public Class frmPNR
         Try
             If lstCustomers.SelectedIndex >= 0 Then
                 mflgLoading = True
-                Dim pCust As Customers.CustomerItem = CType(lstCustomers.SelectedItem, Customers.CustomerItem)
+                Dim pCust As CustomerItem = CType(lstCustomers.SelectedItem, CustomerItem)
                 SelectCustomer(pCust)
                 txtCustomer.Text = lstCustomers.SelectedItem.ToString
             End If
@@ -1703,7 +1742,7 @@ td {
                         pString.AppendLine("<u>" & pobjPax.PaxName & "</u><br />")
                     End If
 
-                    For Each tkt As GDSTickets.GDSTicketItem In .Tickets.Values
+                    For Each tkt As GDSTicketItem In .Tickets.Values
                         If tkt.Pax.Trim = pobjPax.PaxName.Trim Then
                             If tkt.TicketType = "PAX" Then
                                 Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.Substring(0, tkt.Pax.Length - 2).Trim)
@@ -2211,7 +2250,7 @@ td {
                 If MySettings Is Nothing Then
                     InitSettings()
                 End If
-                Dim pSelectedItem As osmVessels.VesselGroupItem
+                Dim pSelectedItem As OSMVesselGroupItem
                 pSelectedItem = cmbOSMVesselGroup.SelectedItem
                 MySettings.OSMVesselGroup = pSelectedItem.Id
                 UtilitiesOSM.OSMRefreshVessels(lstOSMVessels, chkOSMVesselInUse.Checked)
@@ -2226,14 +2265,14 @@ td {
         Try
             Dim pstrEmail As String = ""
 
-            For Each pSelectedAgent As osmVessels.emailItem In lstOSMAgents.SelectedItems
+            For Each pSelectedAgent As OSMEmailItem In lstOSMAgents.SelectedItems
                 If pstrEmail <> "" Then
                     pstrEmail &= "; "
                 End If
                 pstrEmail &= pSelectedAgent.ToString
             Next
 
-            For Each pEmailTO As osmVessels.emailItem In lstOSMToEmail.Items
+            For Each pEmailTO As OSMEmailItem In lstOSMToEmail.Items
                 If pstrEmail <> "" Then
                     pstrEmail &= "; "
                 End If
@@ -2252,7 +2291,7 @@ td {
         Try
             Dim pstrEmail As String = ""
 
-            For Each pEmailTO As osmVessels.emailItem In lstOSMCCEmail.Items
+            For Each pEmailTO As OSMEmailItem In lstOSMCCEmail.Items
                 If pstrEmail <> "" Then
                     pstrEmail &= "; "
                 End If
@@ -2328,7 +2367,7 @@ td {
             lblOSMVessel.Text = ""
             txtOSMAgentsFilter.Clear()
 
-            For Each pVessel As osmVessels.VesselItem In lstOSMVessels.SelectedItems
+            For Each pVessel As OSMVesselItem In lstOSMVessels.SelectedItems
                 If lblOSMVessel.Text <> "" Then
                     lblOSMVessel.Text &= " / "
                 End If
@@ -2358,11 +2397,11 @@ td {
 
             xDoctext &= "<b>ATPI GRIFFINSTONE GREECE</b><br><br>"
 
-            For Each pSelectedAgent As osmVessels.emailItem In lstOSMAgents.SelectedItems
+            For Each pSelectedAgent As OSMEmailItem In lstOSMAgents.SelectedItems
                 xDoctext &= "TO         : " & pSelectedAgent.Name & " / " & pSelectedAgent.Details & "<br>"
             Next
 
-            For Each pEmail As osmVessels.emailItem In lstOSMToEmail.Items
+            For Each pEmail As OSMEmailItem In lstOSMToEmail.Items
                 If lstOSMVessels.SelectedItems.Count > 1 Then
                     xDoctext &= "TO         : " & pEmail.Name & If(pEmail.Details <> "", " / " & pEmail.Details, "") & If(pEmail.VesselName <> "", "(" & pEmail.VesselName & ")", "") & "<br>"
                 Else
@@ -2372,16 +2411,16 @@ td {
 
             xDoctext &= "<br>"
             xDoctext &= "CC         : OSM CYPRUS<br>"
-            For Each pEmail As osmVessels.emailItem In lstOSMCCEmail.Items
+            For Each pEmail As OSMEmailItem In lstOSMCCEmail.Items
                 xDoctext &= "CC         : " & pEmail.Name & If(pEmail.Details <> "", " / " & pEmail.Details, "") & "<br>"
             Next
             xDoctext &= "CC         : 3rd party applicable<br>"
             xDoctext &= "<br>"
-            xDoctext &= "<br>If more information is required please contact ATPI Greece and copy travel vessel IMO no@osm.biz<br><br>"
+            xDoctext &= "<br>If more information is required please contact ATPI Greece and copy vessel's IMO email address.<br><br>"
             xDoctext &= "DATE/REF   : " & Format(Now, "dd/MM/yyyy") & "<br><br><br>"
             Dim pTempSubject As String = ""
 
-            For Each pVessel As osmVessels.VesselItem In lstOSMVessels.SelectedItems
+            For Each pVessel As OSMVesselItem In lstOSMVessels.SelectedItems
                 If pTempSubject <> "" Then
                     pTempSubject &= " / "
                 End If
@@ -2404,7 +2443,7 @@ td {
 
             For i As Integer = 0 To dgvOSMPax.Rows.Count - 1
                 Dim pId As Integer = CInt(dgvOSMPax.Rows(i).Cells(0).Value)
-                Dim pPax As osmPax.Pax = mOSMPax(pId)
+                Dim pPax As OSMPaxItem = mOSMPax(pId)
                 Select Case CStr(dgvOSMPax.Rows(i).Cells("JoinerLeaver").Value)
                     Case "ONSIGNER"
                         If ShowFullPaxDetails Then
@@ -2521,7 +2560,7 @@ td {
         Try
             mOSMPax.Load(txtOSMPax.Text)
             dgvOSMPax.Rows.Clear()
-            For Each iPax As osmPax.Pax In mOSMPax.Values
+            For Each iPax As OSMPaxItem In mOSMPax.Values
                 Dim pId As New DataGridViewTextBoxCell
                 Dim pLastName As New DataGridViewTextBoxCell
                 Dim pFirstName As New DataGridViewTextBoxCell
@@ -2666,7 +2705,7 @@ td {
     Private Sub cmdItnFormatOSMLoG_Click(sender As Object, e As EventArgs) Handles cmdItnFormatOSMLoG.Click
         Try
             If mobjPNR.Segments.Count > 0 And mobjPNR.Passengers.Count > 0 Then
-                Dim pOSMLoG = New OsmLOG
+                Dim pOSMLoG = New OSMLog
                 pOSMLoG.CreatePDF(MySettings.AgentName, mobjPNR)
             Else
                 MessageBox.Show("PNR must have passengers and segments to produce a Letter of Guarantee")
@@ -2724,13 +2763,13 @@ td {
             lstOSMAgents.Items.Clear()
             mOSMAgentIndex = -1
             If txtOSMAgentsFilter.Text.Trim = "" Then
-                For Each pAgent As osmVessels.emailItem In mOSMAgents.Values
+                For Each pAgent As OSMEmailItem In mOSMAgents.Values
                     lstOSMAgents.Items.Add(pAgent)
                 Next
             Else
                 Dim pFilter() As String = txtOSMAgentsFilter.Text.ToUpper.Trim.Split({"|"}, StringSplitOptions.RemoveEmptyEntries)
 
-                For Each pAgent As osmVessels.emailItem In mOSMAgents.Values
+                For Each pAgent As OSMEmailItem In mOSMAgents.Values
                     For i As Integer = 0 To pFilter.GetUpperBound(0)
                         If pAgent.ToString.ToUpper.IndexOf(pFilter(i).Trim) >= 0 Then
                             lstOSMAgents.Items.Add(pAgent)
@@ -2758,7 +2797,7 @@ td {
         Dim pflgBirthDateOK As Boolean = False
         Dim pflgPassportNumberOK As Boolean = False
         Dim pstrErrorText As String = ""
-        pflgPassportNumberOK = (Trim(Row.Cells("PassportNumber").Value).Length > 0)
+        pflgPassportNumberOK = (CStr(Row.Cells("PassportNumber").Value).Trim.Length > 0)
         If Not Date.TryParse(Row.Cells("Birthdate").Value, pdteDate) Then
             pdteDate = Utilities.DateFromIATA(Row.Cells("Birthdate").Value)
             If pdteDate > Date.MinValue Then
@@ -2778,7 +2817,7 @@ td {
             mflgExpiryDateOK = False
         End If
         pflgGenderFound = False
-        For Each pGenderItem As PaxApisDB.ReferenceItem In mobjGender.Values
+        For Each pGenderItem As ReferenceItem In mobjGender.Values
             If CStr(Row.Cells("Gender").Value) = pGenderItem.Code Then
                 pflgGenderFound = True
                 Exit For
@@ -2843,10 +2882,10 @@ td {
             cmdAPISEditPax.Enabled = False
         Else
             txtPNRApis.Visible = False
-            Dim pobjPaxApis As New PaxApisDB.Collection
+            Dim pobjPaxApis As New ApisPaxCollection
             dgvApis.Rows.Clear()
-            For Each pobjPax As GDSPax.GDSPaxItem In mobjPNR.Passengers.Values
-                Dim pobjPaxItem As New PaxApisDB.Item(pobjPax.LastName, pobjPax.Initial)
+            For Each pobjPax As GDSPaxItem In mobjPNR.Passengers.Values
+                Dim pobjPaxItem As New ApisPaxItem(pobjPax.LastName, pobjPax.Initial)
                 pobjPaxApis.Read(pobjPax.LastName, UtilitiesAPIS.APISModifyFirstName(pobjPax.Initial))
                 If pobjPaxApis.Count = 0 Then
                     UtilitiesAPIS.APISAddRow(dgvApis, pobjPax.ElementNo, pobjPax.LastName, pobjPax.Initial, "", "", "", Date.MinValue, "", Date.MinValue)
@@ -2929,4 +2968,5 @@ td {
         ShowPriceOptimiser()
 
     End Sub
+
 End Class

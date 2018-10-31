@@ -5,7 +5,6 @@ Friend Class GDSUser
         Dim GDSCode As Utilities.EnumGDSCode
         Dim PCC As String
         Dim User As String
-        <CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId:="pGDS")>
         Private Sub New(ByVal pGDS As String)
             GDSCode = Utilities.EnumGDSCode.Unknown
             PCC = ""
@@ -13,7 +12,8 @@ Friend Class GDSUser
         End Sub
     End Structure
     Private WithEvents mobjSession1A As k1aHostToolKit.HostSession
-    Private mobjSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
+    '    Private mobjSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
+    Private mobjSession1G As Travelport.TravelData.Factory.GalileoDesktopFactory
     Private mudtProps As New ClassProps
     Private mstrResponse As String
     Public Sub New(ByVal pGDSCode As Utilities.EnumGDSCode)
@@ -63,6 +63,8 @@ Friend Class GDSUser
     Private Sub Read1GUser()
         Try
 
+            mobjSession1G = New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
+
             Dim pSession As Travelport.TravelData.SessionInformation = mobjSession1G.GetSessionInformation
 
             mudtProps.User = pSession.ActiveArea.SignOnIdentifier.Trim
@@ -90,7 +92,7 @@ Friend Class GDSUser
     End Sub
     Public ReadOnly Property GDSCode As Utilities.EnumGDSCode
         Get
-            GDSCode = mudtProps.GDSCode
+            Return mudtProps.GDSCode
         End Get
     End Property
     Public ReadOnly Property GDSCodeAbbreviation As String
@@ -107,12 +109,12 @@ Friend Class GDSUser
     End Property
     Public ReadOnly Property PCC As String
         Get
-            PCC = mudtProps.PCC.ToUpper
+            Return mudtProps.PCC.ToUpper
         End Get
     End Property
     Public ReadOnly Property User As String
         Get
-            User = mudtProps.User.ToUpper
+            Return mudtProps.User.ToUpper
         End Get
     End Property
     Private Sub mobjSession_ReceivedResponse(ByRef newResponse As k1aHostToolKit.CHostResponse) Handles mobjSession1A.ReceivedResponse

@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>49</ApplicationRevision>
+    <ApplicationRevision>58</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -122,33 +122,93 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\AirlineNotes.vb" />
-    <Compile Include="Classes\AirlinePoints.vb" />
-    <Compile Include="Classes\AirlinePoints1G.vb" />
-    <Compile Include="Classes\Alerts.vb" />
-    <Compile Include="Classes\ConditionalGDSEntry.vb" />
-    <Compile Include="Classes\Config_GDSReferences.vb" />
+    <Compile Include="Classes\AirlineNotesCollection.vb" />
+    <Compile Include="Classes\AirlineNotesItem.vb" />
+    <Compile Include="Classes\AirlinePointsCollection.vb" />
+    <Compile Include="Classes\AirlinePointsItem.vb" />
+    <Compile Include="Classes\AlertsCollection.vb" />
+    <Compile Include="Classes\AlertsItem.vb" />
+    <Compile Include="Classes\ApisPaxCollection.vb" />
+    <Compile Include="Classes\ApisPaxItem.vb" />
+    <Compile Include="Classes\AveragePriceCollection.vb" />
+    <Compile Include="Classes\AveragePriceItem.vb" />
+    <Compile Include="Classes\BackOfficeCollection.vb" />
+    <Compile Include="Classes\BackOfficeItem.vb" />
+    <Compile Include="Classes\CloseOffEntriesCollection.vb" />
+    <Compile Include="Classes\CloseOffEntriesItem.vb" />
+    <Compile Include="Classes\ConditionalGDSEntryCollection.vb" />
+    <Compile Include="Classes\ConditionalGDSEntryItem.vb" />
+    <Compile Include="Classes\ConfigGDSReferenceCollection.vb" />
+    <Compile Include="Classes\ConfigGDSReferenceItem.vb" />
+    <Compile Include="Classes\CostCentreLookupCollection.vb" />
+    <Compile Include="Classes\CostCentreLookupItem.vb" />
+    <Compile Include="Classes\CRMCollection.vb" />
+    <Compile Include="Classes\CRMItem.vb" />
+    <Compile Include="Classes\CustomerCollection.vb" />
+    <Compile Include="Classes\CustomerCollectionAll.vb" />
+    <Compile Include="Classes\CustomerGroupCollection.vb" />
+    <Compile Include="Classes\CustomerGroupCollectionAll.vb" />
+    <Compile Include="Classes\CustomerGroupItem.vb" />
+    <Compile Include="Classes\CustomerItem.vb" />
+    <Compile Include="Classes\CustomPropertiesCollection.vb" />
+    <Compile Include="Classes\CustomPropertiesItem.vb" />
+    <Compile Include="Classes\CustomPropertiesXMLValues.vb" />
     <Compile Include="Classes\DBUser.vb" />
+    <Compile Include="Classes\DICollection.vb" />
+    <Compile Include="Classes\DIItem.vb" />
     <Compile Include="Classes\DownsellCollection.vb" />
     <Compile Include="Classes\DownsellItem.vb" />
-    <Compile Include="Classes\GDS1G_ReadRaw.vb" />
-    <Compile Include="Classes\GDSExisting.vb" />
-    <Compile Include="Classes\GDSNew.vb" />
+    <Compile Include="Classes\EMailCollection.vb" />
+    <Compile Include="Classes\EMailItem.vb" />
+    <Compile Include="Classes\FrequentFlyerCollection.vb" />
+    <Compile Include="Classes\FrequentFlyerItem.vb" />
+    <Compile Include="Classes\GDSCollection.vb" />
+    <Compile Include="Classes\GDSExistingCollection.vb" />
+    <Compile Include="Classes\GDSExistingItem.vb" />
+    <Compile Include="Classes\GDSItem.vb" />
+    <Compile Include="Classes\GDSNewCollection.vb" />
+    <Compile Include="Classes\GDSNewItem.vb" />
+    <Compile Include="Classes\GDSPaxCollection.vb" />
+    <Compile Include="Classes\GDSPaxItem.vb" />
     <Compile Include="Classes\GDSReadPNR.vb" />
-    <Compile Include="Classes\GDSTickets.vb" />
+    <Compile Include="Classes\GDSReadPNR1G.vb" />
+    <Compile Include="Classes\GDSSegCollection.vb" />
+    <Compile Include="Classes\GDSSegItem.vb" />
+    <Compile Include="Classes\GDSTicketCollection.vb" />
+    <Compile Include="Classes\GDSTicketItem.vb" />
     <Compile Include="Classes\GDSUser.vb" />
-    <Compile Include="Classes\BackOffice.vb" />
-    <Compile Include="Classes\CloseOffEntries.vb" />
     <Compile Include="Classes\Config.vb" />
-    <Compile Include="Classes\CRM.vb" />
-    <Compile Include="Classes\Customers.vb" />
-    <Compile Include="Classes\CustomProperties.vb" />
     <Compile Include="Classes\ExportDataGrid.vb" />
-    <Compile Include="Classes\FrequentFlyer.vb" />
-    <Compile Include="Classes\GDS.vb" />
     <Compile Include="Classes\GreekToLatin.vb" />
+    <Compile Include="Classes\OpenSegmentCollection.vb" />
+    <Compile Include="Classes\OpenSegmentItem.vb" />
+    <Compile Include="Classes\OptionQueueCollection.vb" />
+    <Compile Include="Classes\OptionQueueItem.vb" />
+    <Compile Include="Classes\OSMEmailCollection.vb" />
+    <Compile Include="Classes\OSMEmailItem.vb" />
+    <Compile Include="Classes\OSMPaxCollection.vb" />
+    <Compile Include="Classes\OSMPaxItem.vb" />
+    <Compile Include="Classes\OSMVesselCollection.vb" />
+    <Compile Include="Classes\OSMVesselGroupCollection.vb" />
+    <Compile Include="Classes\OSMVesselGroupItem.vb" />
+    <Compile Include="Classes\OSMVesselItem.vb" />
+    <Compile Include="Classes\OSMVessel_VesselGroupCollection.vb" />
+    <Compile Include="Classes\OSMVessel_VesselGroupItem.vb" />
+    <Compile Include="Classes\PhoneNumbersCollection.vb" />
+    <Compile Include="Classes\PhoneNumbersItem.vb" />
     <Compile Include="Classes\PNRFinisherTransactions.vb" />
+    <Compile Include="Classes\ReferenceCountriesCollection.vb" />
+    <Compile Include="Classes\ReferenceGenderCollection.vb" />
+    <Compile Include="Classes\ReferenceItem.vb" />
+    <Compile Include="Classes\ReferenceSalutationsCollection.vb" />
+    <Compile Include="Classes\SSRCollection.vb" />
+    <Compile Include="Classes\SSRitem.vb" />
+    <Compile Include="Classes\SubDepartmentCollection.vb" />
+    <Compile Include="Classes\SubDepartmentItem.vb" />
+    <Compile Include="Classes\TicketElementItem.vb" />
     <Compile Include="Classes\TQT.vb" />
+    <Compile Include="Classes\VesselCollection.vb" />
+    <Compile Include="Classes\VesselItem.vb" />
     <Compile Include="Forms\frmPriceOptimiser.Designer.vb">
       <DependentUpon>frmPriceOptimiser.vb</DependentUpon>
     </Compile>
@@ -164,14 +224,8 @@
     <Compile Include="Shared Classes\Airlines.vb" />
     <Compile Include="Shared Classes\Airport.vb" />
     <Compile Include="Classes\GDSNumberParser.vb" />
-    <Compile Include="Classes\GDSPax.vb" />
-    <Compile Include="Classes\GDSSeg.vb" />
     <Compile Include="Classes\ItnRTBDoc.vb" />
-    <Compile Include="Classes\OsmLOG.vb" />
-    <Compile Include="Classes\osmVessels.vb" />
-    <Compile Include="Classes\AveragePrice.vb" />
-    <Compile Include="Classes\SubDepartments.vb" />
-    <Compile Include="Classes\Vessels.vb" />
+    <Compile Include="Classes\OSMLog.vb" />
     <Compile Include="Forms\frmAdmin.Designer.vb">
       <DependentUpon>frmAdmin.vb</DependentUpon>
     </Compile>
@@ -244,7 +298,6 @@
     <Compile Include="Forms\frmVesselForPNR.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Classes\PaxApisDB.vb" />
     <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Shared Classes\Utilities.vb" />
     <Compile Include="Shared Classes\modPNR.vb" />
@@ -263,7 +316,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Classes\osmPax.vb" />
     <Compile Include="Shared Classes\Utilities1A.vb" />
     <Compile Include="Shared Classes\UtilitiesAPIS.vb" />
     <Compile Include="Shared Classes\UtilitiesDB.vb" />

@@ -1,7 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 Namespace GDS
-    Friend Class GDSItem
+    Public Class GDSItem
         Private Structure ClassProps
             Dim Id As Integer
             Dim GDSName As String
@@ -31,7 +31,7 @@ Namespace GDS
             End With
         End Sub
     End Class
-    Friend Class GDSCollection
+    Public Class GDSCollection
         Inherits Collections.Generic.Dictionary(Of Integer, GDSItem)
         Public Sub Load()
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR)

@@ -1,254 +1,254 @@
 ﻿Option Strict On
 Option Explicit On
 Namespace GDSExisting
-    Friend Class Item
-        Private Structure ExistingItemClass
+    'Public Class GDSExistingItem
+    '    Private Structure ExistingItemClass
 
-            Dim Exists As Boolean
-            Dim LineNumber As Integer
-            Dim Category As String
-            Dim RawText As String
-            Dim Key As String
+    '        Dim Exists As Boolean
+    '        Dim LineNumber As Integer
+    '        Dim Category As String
+    '        Dim RawText As String
+    '        Dim Key As String
 
-            Friend Sub Clear()
-                Exists = False
-                LineNumber = 0
-                Category = ""
-                RawText = ""
-                Key = ""
-            End Sub
+    '        Friend Sub Clear()
+    '            Exists = False
+    '            LineNumber = 0
+    '            Category = ""
+    '            RawText = ""
+    '            Key = ""
+    '        End Sub
 
-        End Structure
-        Private mudtProps As ExistingItemClass
+    '    End Structure
+    '    Private mudtProps As ExistingItemClass
 
-        Public ReadOnly Property Exists As Boolean
-            Get
-                Exists = mudtProps.Exists
-            End Get
-        End Property
+    '    Public ReadOnly Property Exists As Boolean
+    '        Get
+    '            Exists = mudtProps.Exists
+    '        End Get
+    '    End Property
 
-        Public ReadOnly Property LineNumber As Integer
-            Get
-                LineNumber = mudtProps.LineNumber
-            End Get
-        End Property
-        Public ReadOnly Property Category As String
-            Get
-                Category = mudtProps.Category
-            End Get
-        End Property
-        Public ReadOnly Property RawText As String
-            Get
-                RawText = mudtProps.RawText
-            End Get
-        End Property
-        Public ReadOnly Property Key As String
-            Get
-                Key = mudtProps.Key
-            End Get
-        End Property
-        Public Sub SetValues(ByVal pExists As Boolean, ByVal pLineNumber As Integer, ByVal pCategory As String, ByVal pRawText As String, ByVal pKey As String)
-            With mudtProps
-                .Exists = pExists
-                .LineNumber = pLineNumber
-                .Category = pCategory
-                .RawText = pRawText
-                .Key = pKey
-            End With
-        End Sub
-        Friend Sub Clear()
-            mudtProps.Clear()
-        End Sub
-    End Class
+    '    Public ReadOnly Property LineNumber As Integer
+    '        Get
+    '            LineNumber = mudtProps.LineNumber
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property Category As String
+    '        Get
+    '            Category = mudtProps.Category
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property RawText As String
+    '        Get
+    '            RawText = mudtProps.RawText
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property Key As String
+    '        Get
+    '            Key = mudtProps.Key
+    '        End Get
+    '    End Property
+    '    Public Sub SetValues(ByVal pExists As Boolean, ByVal pLineNumber As Integer, ByVal pCategory As String, ByVal pRawText As String, ByVal pKey As String)
+    '        With mudtProps
+    '            .Exists = pExists
+    '            .LineNumber = pLineNumber
+    '            .Category = pCategory
+    '            .RawText = pRawText
+    '            .Key = pKey
+    '        End With
+    '    End Sub
+    '    Friend Sub Clear()
+    '        mudtProps.Clear()
+    '    End Sub
+    'End Class
 
-    Friend Class Collection
-        Private mobjOpenSegment As New Item
-        Private mobjPhoneElement As New Item
-        Private mobjAgentElement As New Item
-        Private mobjEmailElement As New Item
-        Private mobjTicketElement As New Item
-        Private mobjOptionQueueElement As New Item
-        Private mobjAOH As New Item
-        Private mobjAgentID As New Item
-        Private mobjSavingsElement As New Item
-        Private mobjLossElement As New Item
+    'Public Class GDSExistingCollection
+    '    Private mobjOpenSegment As New GDSExistingItem
+    '    Private mobjPhoneElement As New GDSExistingItem
+    '    Private mobjAgentElement As New GDSExistingItem
+    '    Private mobjEmailElement As New GDSExistingItem
+    '    Private mobjTicketElement As New GDSExistingItem
+    '    Private mobjOptionQueueElement As New GDSExistingItem
+    '    Private mobjAOH As New GDSExistingItem
+    '    Private mobjAgentID As New GDSExistingItem
+    '    Private mobjSavingsElement As New GDSExistingItem
+    '    Private mobjLossElement As New GDSExistingItem
 
-        Private mobjCustomerCodeAI As New Item
-        Private mobjCustomerCode As New Item
-        Private mobjCustomerName As New Item
-        Private mobjSubDepartmentCode As New Item
-        Private mobjSubDepartmentName As New Item
-        Private mobjCRMCode As New Item
-        Private mobjCRMName As New Item
-        Private mobjVesselName As New Item
-        Private mobjVesselFlag As New Item
-        Private mobjVesselOSI As New Item
-        Private mobjReference As New Item
-        Private mobjBookedBy As New Item
-        Private mobjDepartment As New Item
-        Private mobjReasonForTravel As New Item
-        Private mobjCostCentre As New Item
-        Private mobjTRId As New Item
+    '    Private mobjCustomerCodeAI As New GDSExistingItem
+    '    Private mobjCustomerCode As New GDSExistingItem
+    '    Private mobjCustomerName As New GDSExistingItem
+    '    Private mobjSubDepartmentCode As New GDSExistingItem
+    '    Private mobjSubDepartmentName As New GDSExistingItem
+    '    Private mobjCRMCode As New GDSExistingItem
+    '    Private mobjCRMName As New GDSExistingItem
+    '    Private mobjVesselName As New GDSExistingItem
+    '    Private mobjVesselFlag As New GDSExistingItem
+    '    Private mobjVesselOSI As New GDSExistingItem
+    '    Private mobjReference As New GDSExistingItem
+    '    Private mobjBookedBy As New GDSExistingItem
+    '    Private mobjDepartment As New GDSExistingItem
+    '    Private mobjReasonForTravel As New GDSExistingItem
+    '    Private mobjCostCentre As New GDSExistingItem
+    '    Private mobjTRId As New GDSExistingItem
 
-        Public ReadOnly Property OpenSegment As Item
-            Get
-                OpenSegment = mobjOpenSegment
-            End Get
-        End Property
-        Public ReadOnly Property PhoneElement As Item
-            Get
-                PhoneElement = mobjPhoneElement
-            End Get
-        End Property
-        Public ReadOnly Property AgentElement As Item
-            Get
-                AgentElement = mobjAgentElement
-            End Get
-        End Property
-        Public ReadOnly Property EmailElement As Item
-            Get
-                EmailElement = mobjEmailElement
-            End Get
-        End Property
-        Public ReadOnly Property TicketElement As Item
-            Get
-                TicketElement = mobjTicketElement
-            End Get
-        End Property
-        Public ReadOnly Property OptionQueueElement As Item
-            Get
-                OptionQueueElement = mobjOptionQueueElement
-            End Get
-        End Property
-        Public ReadOnly Property AOH As Item
-            Get
-                AOH = mobjAOH
-            End Get
-        End Property
-        Public ReadOnly Property AgentID As Item
-            Get
-                AgentID = mobjAgentID
-            End Get
-        End Property
-        Public ReadOnly Property SavingsElement As Item
-            Get
-                SavingsElement = mobjSavingsElement
-            End Get
-        End Property
-        Public ReadOnly Property LossElement As Item
-            Get
-                LossElement = mobjLossElement
-            End Get
-        End Property
-        Public ReadOnly Property CustomerCodeAI As Item
-            Get
-                Return mobjCustomerCodeAI
-            End Get
-        End Property
-        Public ReadOnly Property CustomerCode As Item
-            Get
-                CustomerCode = mobjCustomerCode
-            End Get
-        End Property
-        Public ReadOnly Property CustomerName As Item
-            Get
-                CustomerName = mobjCustomerName
-            End Get
-        End Property
-        Public ReadOnly Property SubDepartmentCode As Item
-            Get
-                SubDepartmentCode = mobjSubDepartmentCode
-            End Get
-        End Property
-        Public ReadOnly Property SubDepartmentName As Item
-            Get
-                SubDepartmentName = mobjSubDepartmentName
-            End Get
-        End Property
-        Public ReadOnly Property CRMCode As Item
-            Get
-                CRMCode = mobjCRMCode
-            End Get
-        End Property
-        Public ReadOnly Property CRMName As Item
-            Get
-                CRMName = mobjCRMName
-            End Get
-        End Property
-        Public ReadOnly Property VesselName As Item
-            Get
-                VesselName = mobjVesselName
-            End Get
-        End Property
-        Public ReadOnly Property VesselFlag As Item
-            Get
-                VesselFlag = mobjVesselFlag
-            End Get
-        End Property
-        Public ReadOnly Property VesselOSI As Item
-            Get
-                VesselOSI = mobjVesselOSI
-            End Get
-        End Property
-        Public ReadOnly Property Reference As Item
-            Get
-                Reference = mobjReference
-            End Get
-        End Property
-        Public ReadOnly Property BookedBy As Item
-            Get
-                BookedBy = mobjBookedBy
-            End Get
-        End Property
-        Public ReadOnly Property Department As Item
-            Get
-                Department = mobjDepartment
-            End Get
-        End Property
-        Public ReadOnly Property ReasonForTravel As Item
-            Get
-                ReasonForTravel = mobjReasonForTravel
-            End Get
-        End Property
-        Public ReadOnly Property CostCentre As Item
-            Get
-                CostCentre = mobjCostCentre
-            End Get
-        End Property
-        Public ReadOnly Property TRId As Item
-            Get
-                TRId = mobjTRId
-            End Get
-        End Property
-        Public Sub Clear()
-            mobjOpenSegment.Clear()
-            mobjPhoneElement.Clear()
-            mobjAgentElement.Clear()
-            mobjEmailElement.Clear()
-            mobjTicketElement.Clear()
-            mobjOptionQueueElement.Clear()
-            mobjAOH.Clear()
-            mobjAgentID.Clear()
-            mobjSavingsElement.Clear()
-            mobjLossElement.Clear()
+    '    Public ReadOnly Property OpenSegment As GDSExistingItem
+    '        Get
+    '            OpenSegment = mobjOpenSegment
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property PhoneElement As GDSExistingItem
+    '        Get
+    '            PhoneElement = mobjPhoneElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property AgentElement As GDSExistingItem
+    '        Get
+    '            AgentElement = mobjAgentElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property EmailElement As GDSExistingItem
+    '        Get
+    '            EmailElement = mobjEmailElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property TicketElement As GDSExistingItem
+    '        Get
+    '            TicketElement = mobjTicketElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property OptionQueueElement As GDSExistingItem
+    '        Get
+    '            OptionQueueElement = mobjOptionQueueElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property AOH As GDSExistingItem
+    '        Get
+    '            AOH = mobjAOH
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property AgentID As GDSExistingItem
+    '        Get
+    '            AgentID = mobjAgentID
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property SavingsElement As GDSExistingItem
+    '        Get
+    '            SavingsElement = mobjSavingsElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property LossElement As GDSExistingItem
+    '        Get
+    '            LossElement = mobjLossElement
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property CustomerCodeAI As GDSExistingItem
+    '        Get
+    '            Return mobjCustomerCodeAI
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property CustomerCode As GDSExistingItem
+    '        Get
+    '            CustomerCode = mobjCustomerCode
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property CustomerName As GDSExistingItem
+    '        Get
+    '            CustomerName = mobjCustomerName
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property SubDepartmentCode As GDSExistingItem
+    '        Get
+    '            SubDepartmentCode = mobjSubDepartmentCode
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property SubDepartmentName As GDSExistingItem
+    '        Get
+    '            SubDepartmentName = mobjSubDepartmentName
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property CRMCode As GDSExistingItem
+    '        Get
+    '            CRMCode = mobjCRMCode
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property CRMName As GDSExistingItem
+    '        Get
+    '            CRMName = mobjCRMName
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property VesselName As GDSExistingItem
+    '        Get
+    '            VesselName = mobjVesselName
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property VesselFlag As GDSExistingItem
+    '        Get
+    '            VesselFlag = mobjVesselFlag
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property VesselOSI As GDSExistingItem
+    '        Get
+    '            VesselOSI = mobjVesselOSI
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property Reference As GDSExistingItem
+    '        Get
+    '            Reference = mobjReference
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property BookedBy As GDSExistingItem
+    '        Get
+    '            BookedBy = mobjBookedBy
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property Department As GDSExistingItem
+    '        Get
+    '            Department = mobjDepartment
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property ReasonForTravel As GDSExistingItem
+    '        Get
+    '            ReasonForTravel = mobjReasonForTravel
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property CostCentre As GDSExistingItem
+    '        Get
+    '            CostCentre = mobjCostCentre
+    '        End Get
+    '    End Property
+    '    Public ReadOnly Property TRId As GDSExistingItem
+    '        Get
+    '            TRId = mobjTRId
+    '        End Get
+    '    End Property
+    '    Public Sub Clear()
+    '        mobjOpenSegment.Clear()
+    '        mobjPhoneElement.Clear()
+    '        mobjAgentElement.Clear()
+    '        mobjEmailElement.Clear()
+    '        mobjTicketElement.Clear()
+    '        mobjOptionQueueElement.Clear()
+    '        mobjAOH.Clear()
+    '        mobjAgentID.Clear()
+    '        mobjSavingsElement.Clear()
+    '        mobjLossElement.Clear()
 
-            mobjCustomerCodeAI.Clear()
-            mobjCustomerCode.Clear()
-            mobjCustomerName.Clear()
-            mobjSubDepartmentCode.Clear()
-            mobjSubDepartmentName.Clear()
-            mobjCRMCode.Clear()
-            mobjCRMName.Clear()
-            mobjVesselName.Clear()
-            mobjVesselFlag.Clear()
-            mobjVesselOSI.Clear()
-            mobjReference.Clear()
-            mobjBookedBy.Clear()
-            mobjDepartment.Clear()
-            mobjReasonForTravel.Clear()
-            mobjCostCentre.Clear()
-        End Sub
+    '        mobjCustomerCodeAI.Clear()
+    '        mobjCustomerCode.Clear()
+    '        mobjCustomerName.Clear()
+    '        mobjSubDepartmentCode.Clear()
+    '        mobjSubDepartmentName.Clear()
+    '        mobjCRMCode.Clear()
+    '        mobjCRMName.Clear()
+    '        mobjVesselName.Clear()
+    '        mobjVesselFlag.Clear()
+    '        mobjVesselOSI.Clear()
+    '        mobjReference.Clear()
+    '        mobjBookedBy.Clear()
+    '        mobjDepartment.Clear()
+    '        mobjReasonForTravel.Clear()
+    '        mobjCostCentre.Clear()
+    '    End Sub
 
-    End Class
+    'End Class
 
 End Namespace

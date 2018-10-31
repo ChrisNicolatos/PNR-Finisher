@@ -12,7 +12,7 @@
         dgvApis.Columns.Add("Gender", "Gender")
         dgvApis.Columns.Add("ExpiryDate", "Expiry Date")
     End Sub
-    Public Shared Sub APISAddRow(ByRef dgvApis As DataGridView, ByVal PaxItem As PaxApisDB.Item)
+    Public Shared Sub APISAddRow(ByRef dgvApis As DataGridView, ByVal PaxItem As ApisPaxItem)
         Dim dgvRow As New DataGridViewRow With {
             .DefaultCellStyle = dgvApis.RowsDefaultCellStyle
         }
@@ -70,10 +70,10 @@
         dgvApis.Rows.Add(dgvRow)
     End Sub
     Public Shared Function APISModifyFirstName(ByVal FirstName As String) As String
-        Dim pSalutations As New PaxApisDB.SalutationsCollection
+        Dim pSalutations As New ReferenceSalutationsCollection
         Dim pintFindPos As Integer
-        FirstName = Trim(FirstName)
-        For Each pItem As PaxApisDB.ReferenceItem In pSalutations.Values
+        FirstName = FirstName.Trim
+        For Each pItem As ReferenceItem In pSalutations.Values
             pintFindPos = FirstName.IndexOf(pItem.Code)
             If pintFindPos > 0 And pintFindPos = FirstName.Length - pItem.Code.Length Then
                 FirstName = FirstName.Substring(0, pintFindPos).Trim

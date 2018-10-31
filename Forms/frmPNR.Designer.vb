@@ -57,6 +57,7 @@ Partial Class frmPNR
         Me.lblCostCentreHighlight = New System.Windows.Forms.Label()
         Me.tabPNR = New System.Windows.Forms.TabControl()
         Me.tabPageFinisher = New System.Windows.Forms.TabPage()
+        Me.cmdPriceOptimiser = New System.Windows.Forms.Button()
         Me.lstAirlineEntries = New System.Windows.Forms.CheckedListBox()
         Me.txtTrId = New System.Windows.Forms.TextBox()
         Me.lblTRIDHighLight = New System.Windows.Forms.Label()
@@ -158,7 +159,6 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
-        Me.cmdPriceOptimiser = New System.Windows.Forms.Button()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -543,6 +543,15 @@ Partial Class frmPNR
         Me.tabPageFinisher.TabIndex = 0
         Me.tabPageFinisher.Text = "PNR Finisher"
         Me.tabPageFinisher.UseVisualStyleBackColor = True
+        '
+        'cmdPriceOptimiser
+        '
+        Me.cmdPriceOptimiser.Location = New System.Drawing.Point(512, 6)
+        Me.cmdPriceOptimiser.Name = "cmdPriceOptimiser"
+        Me.cmdPriceOptimiser.Size = New System.Drawing.Size(116, 35)
+        Me.cmdPriceOptimiser.TabIndex = 49
+        Me.cmdPriceOptimiser.Text = "Price Optimiser"
+        Me.cmdPriceOptimiser.UseVisualStyleBackColor = True
         '
         'lstAirlineEntries
         '
@@ -1648,15 +1657,6 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.TabIndex = 0
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
-        '
-        'cmdPriceOptimiser
-        '
-        Me.cmdPriceOptimiser.Location = New System.Drawing.Point(512, 6)
-        Me.cmdPriceOptimiser.Name = "cmdPriceOptimiser"
-        Me.cmdPriceOptimiser.Size = New System.Drawing.Size(116, 35)
-        Me.cmdPriceOptimiser.TabIndex = 49
-        Me.cmdPriceOptimiser.Text = "Price Optimiser"
-        Me.cmdPriceOptimiser.UseVisualStyleBackColor = True
         '
         'frmPNR
         '

@@ -1,8 +1,8 @@
 ﻿Friend Class frmAPISPaxSelect
-    Dim mobjPaxApis As New PaxApisDB.Collection
-    Dim mobjPaxItem As PaxApisDB.Item
+    Dim mobjPaxApis As New ApisPaxCollection
+    Dim mobjPaxItem As ApisPaxItem
 
-    Public Sub New(ByVal PaxId As Short, ByVal PaxSurname As String, ByVal PaxFirstName As String, ByVal PaxCollection As PaxApisDB.Collection)
+    Public Sub New(ByVal PaxId As Short, ByVal PaxSurname As String, ByVal PaxFirstName As String, ByVal PaxCollection As ApisPaxCollection)
 
         ' This call is required by the designer.
         InitializeComponent()
@@ -20,12 +20,12 @@
         UtilitiesAPIS.APISPrepareGrid(dgvPax)
         dgvPax.Rows.Clear()
 
-        For Each pPax As PaxApisDB.Item In mobjPaxApis.Values
+        For Each pPax As ApisPaxItem In mobjPaxApis.Values
             UtilitiesAPIS.APISAddRow(dgvPax, pPax)
         Next
         EnableSelection()
     End Sub
-    Public ReadOnly Property SelectedPassenger As PaxApisDB.Item
+    Public ReadOnly Property SelectedPassenger As ApisPaxItem
         Get
             SelectedPassenger = mobjPaxItem
         End Get

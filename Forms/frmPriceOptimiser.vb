@@ -45,6 +45,11 @@ Public Class frmPriceOptimiser
                 .Visible = False
             }
             .Columns.Add(pId)
+            Dim pDateLogged As New DataGridViewTextBoxColumn With {
+                .Name = "DateFound",
+                .HeaderText = "DateFound"
+            }
+            .Columns.Add(pDateLogged)
             Dim pPCC As New DataGridViewTextBoxColumn With {
                 .Name = "PCC",
                 .HeaderText = "PCC"
@@ -115,6 +120,9 @@ Public Class frmPriceOptimiser
             Dim pId As New DataGridViewTextBoxCell With {
                 .Value = 0
             }
+            Dim pDateLogged As New DataGridViewTextBoxCell With {
+                .Value = Format(pItem.DateLogged, "dd/MM HH:mm")
+            }
             Dim pPCC As New DataGridViewTextBoxCell With {
                 .Value = pItem.PCC
             }
@@ -147,6 +155,7 @@ Public Class frmPriceOptimiser
             }
             Dim pRow As New DataGridViewRow
             pRow.Cells.Add(pId)
+            pRow.Cells.Add(pDateLogged)
             pRow.Cells.Add(pPCC)
             pRow.Cells.Add(pUser)
             pRow.Cells.Add(pPNR)
@@ -188,8 +197,8 @@ Public Class frmPriceOptimiser
             If pResponse.Length > 0 Then
                 MessageBox.Show(pResponse)
             Else
-                mobjDownsell.IgnorePNR(pText(0), pText(1), "OPENED")
-                LoadDGV()
+                'mobjDownsell.IgnorePNR(pText(0), pText(1), "OPENED")
+                'LoadDGV()
                 SwitchWindows()
             End If
         End If
@@ -206,9 +215,9 @@ Public Class frmPriceOptimiser
     Private Sub SetSelectedPNR()
         Dim pText As String = ""
         If Not dgvPNRs.SelectedRows Is Nothing AndAlso dgvPNRs.SelectedRows.Count > 0 Then
-            pText = dgvPNRs.SelectedRows(0).Cells(1).Value & "-" & dgvPNRs.SelectedRows(0).Cells(3).Value
+            pText = dgvPNRs.SelectedRows(0).Cells("PCC").Value & "-" & dgvPNRs.SelectedRows(0).Cells("PNR").Value
         ElseIf Not dgvPNRs.SelectedCells Is Nothing AndAlso dgvPNRs.SelectedCells.Count > 0 Then
-            pText = dgvPNRs.Rows(dgvPNRs.SelectedCells(0).RowIndex).Cells(3).Value
+            pText = dgvPNRs.Rows(dgvPNRs.SelectedCells("Id").RowIndex).Cells("PNR").Value
         Else
             pText = ""
         End If
@@ -251,6 +260,22 @@ Public Class frmPriceOptimiser
             DisplayItems(mstrPCC, mstrUserID)
         Catch ex As Exception
             MessageBox.Show(ex.Message)
+        End Try
+
+    End Sub
+
+    Private Sub mnuOptimiserCopyData_Click(sender As Object, e As EventArgs) Handles mnuOptimiserCopyData.Click
+        Try
+
+            dgvPNRs.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText
+            dgvPNRs.MultiSelect = True
+            dgvPNRs.SelectAll()
+            Dim dgvDataObj As DataObject = dgvPNRs.GetClipboardContent
+            Clipboard.SetDataObject(dgvDataObj)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        Finally
+            dgvPNRs.MultiSelect = False
         End Try
 
     End Sub

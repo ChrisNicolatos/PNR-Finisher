@@ -3,7 +3,7 @@
     Private Sub CmdSave_Click(sender As Object, e As EventArgs) Handles cmdSave.Click
 
         Try
-            Dim pVessel As New osmVessels.VesselItem With {
+            Dim pVessel As New OSMVesselItem With {
                 .VesselName = txtVesselname.Text.Trim
             }
             pVessel.Update()

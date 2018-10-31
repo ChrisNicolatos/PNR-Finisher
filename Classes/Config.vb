@@ -52,7 +52,7 @@ Friend Class Config
     Private mobjGDSUser As GDSUser
     Private mflgIsDirtyPCC As Boolean
     Private mflgIsDirtyUser As Boolean
-    Private mGDSReferences As New Config_GDSReferences.Collection
+    Private mGDSReferences As New ConfigGDSReferenceCollection
     Public Sub New()
 
     End Sub

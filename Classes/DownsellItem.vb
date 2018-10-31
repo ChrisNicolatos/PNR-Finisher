@@ -5,6 +5,7 @@
         Dim GDS As String
         Dim PNR As String
         Dim UserGdsId As String
+        Dim DateLogged As Date
         Dim DownsellDecision As String
         Dim PaxName As String
         Dim Itinerary As String
@@ -38,6 +39,11 @@
     Public ReadOnly Property UserGdsId As String
         Get
             Return mudtProps.UserGdsId
+        End Get
+    End Property
+    Public ReadOnly Property DateLogged As Date
+        Get
+            Return mudtProps.DateLogged
         End Get
     End Property
     Public ReadOnly Property DownsellDecision As String
@@ -81,7 +87,7 @@
         End Get
     End Property
     Public Sub SetValues(ByVal pOwnPNR As Integer, ByVal pPCC As String, ByVal pGDS As String, ByVal pPNR As String _
-                          , ByVal pUserGdsId As String, ByVal pDownsellDecision As String _
+                          , ByVal pUserGdsId As String, ByVal pDateLogged As Date, ByVal pDownsellDecision As String _
                           , ByVal pPaxName As String, ByVal pItinerary As String _
                           , ByVal pTotal As Decimal, ByVal pDownsellTotal As Decimal, ByVal pFareBasis As String, ByVal pDownsellFareBasis As String _
                           , ByVal pGDSCommand As String)
@@ -91,6 +97,7 @@
             .GDS = pGDS
             .PNR = pPNR
             .UserGdsId = pUserGdsId
+            .DateLogged = pDateLogged
             .DownsellDecision = pDownsellDecision
             .PaxName = pPaxName
             .Itinerary = pItinerary

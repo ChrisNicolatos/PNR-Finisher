@@ -22,13 +22,13 @@
     End Sub
     Private Sub DisplayGrids()
 
-        Dim pGDSColl As New GDS.GDSCollection
-        Dim pBackOfficeColl As New BackOffice.BackOfficeCollection
+        Dim pGDSColl As New GDSCollection
+        Dim pBackOfficeColl As New BackOfficeCollection
 
         pGDSColl.Load()
         pBackOfficeColl.Load()
 
-        For Each pItem As GDS.GDSItem In pGDSColl.Values
+        For Each pItem As GDSItem In pGDSColl.Values
             Dim pRow As New DataGridViewRow
             Dim pIdCell As New DataGridViewTextBoxCell With {
                 .Value = pItem.Id
@@ -41,7 +41,7 @@
             dgvGDS.Rows.Add(pRow)
         Next
         dgvGDS.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells)
-        For Each pItem As BackOffice.BackOfficeItem In pBackOfficeColl.Values
+        For Each pItem As BackOfficeItem In pBackOfficeColl.Values
             Dim pRow As New DataGridViewRow
             Dim pIdCell As New DataGridViewTextBoxCell With {
                 .Value = pItem.Id

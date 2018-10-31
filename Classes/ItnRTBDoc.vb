@@ -97,7 +97,7 @@ Friend Class ItnRTBDoc
             Try
                 Dim pString As New System.Text.StringBuilder
                 Dim pAirlineLocator As String = ""
-                Dim pobjSeg As GDSSeg.GDSSegItem
+                Dim pobjSeg As GDSSegItem
                 pString.Clear()
                 With mobjPNR
 
@@ -133,9 +133,9 @@ Friend Class ItnRTBDoc
                             Case 2
                                 pHeader.Append("Origin " & StrDup(.MaxAirportNameLength - 1, " ") & "Destination" & StrDup(.MaxAirportNameLength - 5, " "))
                             Case 3
-                                pHeader.Append("Origin " & StrDup(.MaxCityNameLength - 5, " ") & "Destination" & StrDup(.MaxCityNameLength - 9, " "))
+                                pHeader.Append("Origin " & StrDup(.MaxAirportShortNameLength - 5, " ") & "Destination" & StrDup(.MaxAirportShortNameLength - 9, " "))
                             Case 4
-                                pHeader.Append("Origin " & StrDup(.MaxCityNameLength - 1, " ") & "Destination" & StrDup(.MaxCityNameLength - 5, " "))
+                                pHeader.Append("Origin " & StrDup(.MaxAirportShortNameLength - 1, " ") & "Destination" & StrDup(.MaxAirportShortNameLength - 5, " "))
                         End Select
                         pHeader.Append("Dep   ")
                         pHeader.Append("Arr   ")
@@ -172,15 +172,15 @@ Friend Class ItnRTBDoc
                     End If
 
                     Dim iSegCount As Integer = 0
-                    Dim pPrevOff As String = ""
+                    'Dim pPrevOff As String = ""
                     For Each pobjSeg In .Segments.Values
                         iSegCount = iSegCount + 1
-                        If iSegCount > 1 And pPrevOff <> pobjSeg.BoardPoint Then
-                            Dim pSegChange As New System.Text.StringBuilder
-                            pSegChange.Append("** CHANGE OF AIRPORT **")
-                            pString.AppendLine(pSegChange.ToString)
-                        End If
-                        pPrevOff = pobjSeg.OffPoint
+                        'If iSegCount > 1 And pPrevOff <> pobjSeg.BoardPoint Then
+                        '    Dim pSegChange As New System.Text.StringBuilder
+                        '    pSegChange.Append("** CHANGE OF AIRPORT **")
+                        '    pString.AppendLine(pSegChange.ToString)
+                        'End If
+                        'pPrevOff = pobjSeg.OffPoint
                         Dim pSeg As New System.Text.StringBuilder
 
                         If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
@@ -222,10 +222,12 @@ Friend Class ItnRTBDoc
                                 End If
                                 pSeg.Append("    " & mobjPNR.AllowanceForSegment(pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.Airline)) ', ""))
                                 If pAirlineLocator.IndexOf(pobjSeg.AirlineLocator.Trim) = -1 Then
-                                    If pAirlineLocator <> "" Then
-                                        pAirlineLocator &= " - "
+                                    If pAirlineLocator = "" Then
+                                        pAirlineLocator = "AIRLINE REF: " & pobjSeg.AirlineLocator.Trim '& "(" & pobjSeg.Airline & " " & pobjSeg.AirlineName & ")"
+                                    Else
+                                        pAirlineLocator &= vbCrLf & "             " & pobjSeg.AirlineLocator.Trim '& "(" & pobjSeg.Airline & " " & pobjSeg.AirlineName & ")"
                                     End If
-                                    pAirlineLocator &= pobjSeg.AirlineLocator.Trim
+                                    '                                    pAirlineLocator &= pobjSeg.AirlineLocator.Trim & "(" & pobjSeg.Airline & " " & pobjSeg.AirlineName & ")"
                                 End If
                             End If
                         Else
@@ -244,11 +246,11 @@ Friend Class ItnRTBDoc
                                     pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportName.PadRight(.MaxAirportNameLength + 1, " "c).Substring(0, .MaxAirportNameLength + 1) & " " &
                                                 pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportName.PadRight(.MaxAirportNameLength + 1, " "c).Substring(0, .MaxAirportNameLength + 1) & " ")
                                 Case 3 'city name
-                                    pSeg.Append(pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " " &
-                                                pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " ")
+                                    pSeg.Append(pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " " &
+                                                pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " ")
                                 Case 4 'code and city
-                                    pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " " &
-                                                pobjSeg.OffPoint & " " & pobjSeg.OffPointCityName.PadRight(.MaxCityNameLength + 1, " "c).Substring(0, .MaxCityNameLength + 1) & " ")
+                                    pSeg.Append(pobjSeg.BoardPoint & " " & pobjSeg.BoardAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " " &
+                                                pobjSeg.OffPoint & " " & pobjSeg.OffPointAirportShortName.PadRight(.MaxAirportShortNameLength + 1, " "c).Substring(0, .MaxAirportShortNameLength + 1) & " ")
                             End Select
                             If pobjSeg.Text.Length > 35 AndAlso pobjSeg.Text.Substring(35, 4) = "FLWN" Then
                                 pSeg.Append("FLWN")
@@ -272,6 +274,9 @@ Friend Class ItnRTBDoc
                         End If
 
                         pString.AppendLine(pSeg.ToString)
+                        If pobjSeg.Equipment = "TRN" Then
+                            pString.AppendLine("             ***     TRAIN     ****  ")
+                        End If
 
                         If Not MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
                             If pobjSeg.OperatedBy <> "" Then
@@ -296,7 +301,7 @@ Friend Class ItnRTBDoc
                         If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
                             pString.AppendLine("ATPI REF   : " & .GDSAbbreviation & "/" & .RequestedPNR)
                             If pAirlineLocator <> "" Then
-                                pString.AppendLine("AIRLINE REF: " & pAirlineLocator)
+                                pString.AppendLine(pAirlineLocator)
                             End If
                         Else
 
@@ -344,7 +349,7 @@ Friend Class ItnRTBDoc
                             For Each pobjPax In .Passengers.Values
                                 pString.AppendLine()
                                 pString.AppendLine(pobjPax.PaxName)
-                                For Each tkt As GDSTickets.GDSTicketItem In .Tickets.Values
+                                For Each tkt As GDSTicketItem In .Tickets.Values
                                     If tkt.Pax.Trim = pobjPax.PaxName.Trim Or tkt.Pax.Trim.StartsWith(pobjPax.PaxName.Trim) Or pobjPax.PaxName.Trim.StartsWith(tkt.Pax.Trim) Then
                                         Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.Substring(0, tkt.Pax.Length - 2).Trim)
                                         If pFF <> "" Then
@@ -352,7 +357,7 @@ Friend Class ItnRTBDoc
                                         End If
                                         If tkt.Document > 0 Then
                                             pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "ETICKET NUMBER: ") _
-                                                           & tkt.IssuingAirline & "-" & tkt.Document & " " & tkt.AirlineCode & " " & pFF)
+                                                           & tkt.IssuingAirline & "-" & tkt.Document & " " & tkt.AirlineCode & " " & Airlines.AirlineName(tkt.AirlineCode) & pFF)
                                         Else
                                             pString.AppendLine(pFF)
 
@@ -361,7 +366,7 @@ Friend Class ItnRTBDoc
                                 Next
                             Next
                         Else
-                            For Each tkt As GDSTickets.GDSTicketItem In .Tickets.Values
+                            For Each tkt As GDSTicketItem In .Tickets.Values
                                 If tkt.eTicket Then
                                     If MySettings.ShowPaxSegPerTkt Then
 
@@ -457,8 +462,8 @@ Friend Class ItnRTBDoc
                     If .HasSegments Then
                         Dim pDepTime As String = ""
                         Dim pArrTime As String = ""
-                        For Each pobjPax As GDSPax.GDSPaxItem In .Passengers.Values
-                            For Each pSeg As GDSSeg.GDSSegItem In .Segments.Values
+                        For Each pobjPax As GDSPaxItem In .Passengers.Values
+                            For Each pSeg As GDSSegItem In .Segments.Values
                                 If pSeg.Text.Substring(35, 4) = "FLWN" Then
                                     pDepTime = "FLOWN"
                                     pArrTime = "FLOWN"

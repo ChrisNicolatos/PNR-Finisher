@@ -1,8 +1,8 @@
 ﻿Imports System.ComponentModel
 
 Public Class frmAPISPax
-    Private WithEvents mobjPax As New PaxApisDB.Item
-    Private mobjCountries As New PaxApisDB.CountriesCollection
+    Private WithEvents mobjPax As New ApisPaxItem
+    Private mobjCountries As New ReferenceCountriesCollection
     Private Sub cmdSave_Click(sender As Object, e As EventArgs) Handles cmdSave.Click
 
         mobjPax.Insert()
@@ -26,11 +26,11 @@ Public Class frmAPISPax
         txtNationality.AutoCompleteCustomSource.Clear()
         txtPassportIssuingCountry.AutoCompleteCustomSource.Clear()
 
-        Dim pGender As New PaxApisDB.GenderCollection
-        For Each pItem As PaxApisDB.ReferenceItem In pGender.Values
+        Dim pGender As New ReferenceGenderCollection
+        For Each pItem As ReferenceItem In pGender.Values
             cmbGender.Items.Add(pItem)
         Next
-        For Each pItem As PaxApisDB.ReferenceItem In mobjCountries.Values
+        For Each pItem As ReferenceItem In mobjCountries.Values
             txtNationality.AutoCompleteCustomSource.Add(pItem.ToString)
             txtPassportIssuingCountry.AutoCompleteCustomSource.Add(pItem.ToString)
         Next
@@ -46,7 +46,7 @@ Public Class frmAPISPax
     End Sub
     Private Sub cmbGender_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cmbGender.SelectedIndexChanged
         If Not cmbGender.SelectedItem Is Nothing Then
-            Dim pItem As PaxApisDB.ReferenceItem = cmbGender.SelectedItem
+            Dim pItem As ReferenceItem = cmbGender.SelectedItem
             mobjPax.Gender = pItem.Code
         End If
     End Sub

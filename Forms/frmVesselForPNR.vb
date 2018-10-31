@@ -40,14 +40,14 @@
 
     Private Sub txtVesselName_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtVesselName.TextChanged
 
-        mstrVesselName = Trim(txtVesselName.Text)
+        mstrVesselName = txtVesselName.Text.Trim
         ShowEnabled()
 
     End Sub
 
     Private Sub txtRegistration_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtRegistration.TextChanged
 
-        mstrRegistration = Trim(txtRegistration.Text)
+        mstrRegistration = txtRegistration.Text.Trim
         ShowEnabled()
 
     End Sub

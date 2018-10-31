@@ -61,6 +61,7 @@ Public Class DownsellCollection
                           ,doGDS
                           ,doPNR
                           ,doUserGdsId
+                          ,doDateLogged
                           ,doDownsellDecision
                           ,doPaxName
                           ,doItinerary
@@ -80,6 +81,7 @@ SELECT DISTINCT 2 AS OwnPNR
       ,doGDS
       ,doPNR
       ,doUserGdsId
+      ,doDateLogged
       ,doDownsellDecision
       ,doPaxName
       ,doItinerary
@@ -89,18 +91,18 @@ SELECT DISTINCT 2 AS OwnPNR
       ,doDownsellFareBasis
       ,doGDSCommand
   FROM AmadeusReports.dbo.DownsellPNRLog
-  WHERE ISNULL(doVerifiedbyUser, 0) = 0 AND doPCC + '|' + doUserGdsId in (
+  WHERE ISNULL(doVerifiedbyUser, 0) = 0 AND (doPCC + '|' + doUserGdsId in (
   SELECT  pfPCC + '|' + pfUser AS UserKey
   FROM AmadeusReports.dbo.PNRFinisherUserName
   LEFT JOIN AmadeusReports.dbo.PNRFinisherUsers
   ON pfnID = pfUsername_fk
-  WHERE pfnUserTeamleaderID_fk = (SELECT PU.pfUserName_fk FROM AmadeusReports.dbo.PNRFinisherUsers PU WHERE PU.pfPCC = @PCC AND PU.pfUser = @UserID)
+  WHERE pfnUserTeamleaderID_fk = (SELECT PU.pfUserName_fk FROM AmadeusReports.dbo.PNRFinisherUsers PU WHERE PU.pfPCC = @PCC AND PU.pfUser = @UserID))
    OR (SELECT pfnIsAdministrator
   FROM AmadeusReports.dbo.PNRFinisherUsers
   LEFT JOIN AmadeusReports.dbo.PNRFinisherUserName
   ON pfUserName_fk = pfnID
   WHERE pfPCC = @PCC AND pfUser = @UserID)=1)
- ORDER BY OwnPNR,doPCC,doUserGdsId"
+  ORDER BY OwnPNR,doPCC,doUserGdsId"
                 pobjReader = .ExecuteReader
             End With
 
@@ -109,7 +111,7 @@ SELECT DISTINCT 2 AS OwnPNR
                     pID += 1
                     pobjClass = New DownsellItem
                     pobjClass.SetValues(CInt(.Item("OwnPNR")), CStr(.Item("doPCC")), CStr(.Item("doGDS")), CStr(.Item("doPNR")) _
-                    , CStr(.Item("doUserGdsId")), CStr(.Item("doDownsellDecision")) _
+                    , CStr(.Item("doUserGdsId")), CDate(.Item("doDateLogged")), CStr(.Item("doDownsellDecision")) _
                           , CStr(.Item("doPaxName")), CStr(.Item("doItinerary")), CDec(.Item("doTotal")), CDec(.Item("doDownsellTotal")) _
                           , CStr(.Item("doFareBasis")), CStr(.Item("doDownsellFareBasis")), CStr(.Item("doGDSCommand")))
                     MyBase.Add(pID, pobjClass)

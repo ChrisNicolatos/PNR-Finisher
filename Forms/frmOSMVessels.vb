@@ -1,7 +1,7 @@
 ﻿Public Class frmOSMVessels
 
-    Private mOSMSelectedVessel As osmVessels.VesselItem
-    Private mOSMSelectedEmail As osmVessels.emailItem
+    Private mOSMSelectedVessel As OSMVesselItem
+    Private mOSMSelectedEmail As OSMEmailItem
 
     Private Sub frmOSMVessels_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -105,7 +105,7 @@
 
     Private Sub cmdOSMAddToEmail_Click(sender As Object, e As EventArgs) Handles cmdOSMAddToEmail.Click
 
-        mOSMSelectedEmail = New osmVessels.emailItem("TO", mOSMSelectedVessel.Id)
+        mOSMSelectedEmail = New OSMEmailItem("TO", mOSMSelectedVessel.Id)
         DisplaySelectedEmail()
         CheckValid()
 
@@ -113,7 +113,7 @@
 
     Private Sub cmdOSMAddCCEmail_Click(sender As Object, e As EventArgs) Handles cmdOSMAddCCEmail.Click
 
-        mOSMSelectedEmail = New osmVessels.emailItem("CC", mOSMSelectedVessel.Id)
+        mOSMSelectedEmail = New OSMEmailItem("CC", mOSMSelectedVessel.Id)
         DisplaySelectedEmail()
         CheckValid()
 
@@ -184,7 +184,7 @@
 
     Private Sub lstVesselGroup_ItemCheck(sender As Object, e As ItemCheckEventArgs) Handles lstVesselGroup.ItemCheck
 
-        Dim pItem As osmVessels.Vessel_VesselGroupItem = lstVesselGroup.Items(e.Index)
+        Dim pItem As OSMVessel_VesselGroupItem = lstVesselGroup.Items(e.Index)
         pItem.Exists = e.NewValue
 
     End Sub

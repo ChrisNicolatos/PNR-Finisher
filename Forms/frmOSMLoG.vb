@@ -1,7 +1,7 @@
 ﻿Friend Class frmOSMLoG
     Private mflgLoading As Boolean
-    Private mOSMAgents As New osmVessels.EmailCollection
-    Private mobjAgent As osmVessels.emailItem
+    Private mOSMAgents As New OSMEmailCollection
+    Private mobjAgent As OSMEmailItem
     Private mOSMAgentIndex As Integer = -1
     Private mobjPNR As GDSReadPNR
 
@@ -14,7 +14,7 @@
         mobjPNR = pPNR
 
     End Sub
-    Public ReadOnly Property PortAgent As osmVessels.emailItem
+    Public ReadOnly Property PortAgent As OSMEmailItem
         Get
             PortAgent = mobjAgent
         End Get
@@ -76,12 +76,12 @@
             Else
                 lblPax.Text = .Passengers.Count & " Passenger" & vbCrLf
             End If
-            For Each pPax As GDSPax.GDSPaxItem In .Passengers.Values
+            For Each pPax As GDSPaxItem In .Passengers.Values
                 lblPax.Text &= pPax.ElementNo & ". " & pPax.PaxName & vbCrLf
             Next
 
             lblSegs.Text = ""
-            For Each pSeg As GDSSeg.GDSSegItem In .Segments.Values
+            For Each pSeg As GDSSegItem In .Segments.Values
                 With pSeg
                     lblSegs.Text &= .Airline & " " & .FlightNo.PadLeft(5) & " " & .DepartureDateIATA.PadLeft(6) & " " & .BoardPoint & " " & .OffPoint & " " & Format(.DepartTime, "HHmm") & vbCrLf
                 End With
@@ -99,7 +99,7 @@
         mOSMAgents.Load()
         mOSMAgentIndex = -1
         lstPortAgent.Items.Clear()
-        For Each pAgent As osmVessels.emailItem In mOSMAgents.Values
+        For Each pAgent As OSMEmailItem In mOSMAgents.Values
             lstPortAgent.Items.Add(pAgent)
         Next
 
@@ -159,13 +159,13 @@
             lstPortAgent.Items.Clear()
             mOSMAgentIndex = -1
             If txtOSMAgentsFilter.Text.Trim = "" Then
-                For Each pAgent As osmVessels.emailItem In mOSMAgents.Values
+                For Each pAgent As OSMEmailItem In mOSMAgents.Values
                     lstPortAgent.Items.Add(pAgent)
                 Next
             Else
                 Dim pFilter() As String = txtOSMAgentsFilter.Text.ToUpper.Trim.Split({"|"}, StringSplitOptions.RemoveEmptyEntries)
 
-                For Each pAgent As osmVessels.emailItem In mOSMAgents.Values
+                For Each pAgent As OSMEmailItem In mOSMAgents.Values
                     For i As Integer = 0 To pFilter.GetUpperBound(0)
                         If pAgent.ToString.ToUpper.IndexOf(pFilter(i).Trim) >= 0 Then
                             lstPortAgent.Items.Add(pAgent)

@@ -1,6 +1,6 @@
 ﻿Public Class frmOSMAgents
 
-    Private mOSMSelectedEmail As osmVessels.emailItem
+    Private mOSMSelectedEmail As OSMEmailItem
 
     Private Sub frmOSMVessels_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
@@ -85,7 +85,7 @@
 
     Private Sub cmdOSMAddAgent_Click(sender As Object, e As EventArgs) Handles cmdOSMAddAgent.Click
 
-        mOSMSelectedEmail = New osmVessels.emailItem("AGENT")
+        mOSMSelectedEmail = New OSMEmailItem("AGENT")
         DisplaySelectedEmail()
         CheckValid()
 

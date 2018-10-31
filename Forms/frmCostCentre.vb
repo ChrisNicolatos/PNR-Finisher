@@ -1,12 +1,12 @@
 ﻿Public Class frmCostCentre
 
-    Private mobjCustomers As Customers.CustomerCollection
-    Private mobjCustomerGroups As Customers.CustomerGroupCollection
+    Private mobjCustomers As CustomerCollection
+    Private mobjCustomerGroups As CustomerGroupCollection
     Private SearchString As String = ""
     Private mflgLoading As Boolean = False
-    Private mobjCustomerSelected As Customers.CustomerItem
-    Private mobjCustomerGroupSelected As Customers.CustomerGroupItem
-    Private mobjCostCentres As New CustomProperties.CostCentreLookupCollection
+    Private mobjCustomerSelected As CustomerItem
+    Private mobjCustomerGroupSelected As CustomerGroupItem
+    Private mobjCostCentres As New CostCentreLookupCollection
 
     Private mSearchString As String = ""
 
@@ -49,10 +49,10 @@
 
     Private Sub LoadCustomers()
 
-        mobjCustomers = New Customers.CustomerCollection
+        mobjCustomers = New CustomerCollection
         mobjCustomers.Load("")
         lstCustomers.Items.Clear()
-        For Each pCustomer As Customers.CustomerItem In mobjCustomers.Values
+        For Each pCustomer As CustomerItem In mobjCustomers.Values
             If SearchString = "" Or pCustomer.ToString.ToUpper.Contains(SearchString.ToUpper) Then
                 lstCustomers.Items.Add(pCustomer)
             End If
@@ -73,7 +73,7 @@
         mobjCustomers.Load(pSearchString)
 
         lstCustomers.Items.Clear()
-        For Each pCustomer As Customers.CustomerItem In mobjCustomers.Values
+        For Each pCustomer As CustomerItem In mobjCustomers.Values
             If pSearchString = "" Or pCustomer.ToString.ToUpper.Contains(pSearchString.ToUpper) Then
                 lstCustomers.Items.Add(pCustomer)
             End If
@@ -94,7 +94,7 @@
 
     End Sub
 
-    Private Sub SelectCustomer(ByVal pCustomer As Customers.CustomerItem)
+    Private Sub SelectCustomer(ByVal pCustomer As CustomerItem)
         'TODO
         mobjCustomerSelected = pCustomer
         txtCustomer.Text = pCustomer.ToString
@@ -123,7 +123,7 @@
             .Columns.Add(pName)
             .Columns.Add(pLogo)
         End With
-        For Each pCC As CustomProperties.CostCentreLookupItem In mobjCostCentres.Values
+        For Each pCC As CostCentreLookupItem In mobjCostCentres.Values
             If mSearchString = "" Then
                 dgvCostCentres.Rows.Add(pCC.CostCentre, pCC.VesselName, pCC.Code, pCC.OldCode, pCC.ClientName, pCC.ClientLogo)
             Else
@@ -167,10 +167,10 @@
     End Sub
     Private Sub LoadCustomerGroups()
 
-        mobjCustomerGroups = New Customers.CustomerGroupCollection
+        mobjCustomerGroups = New CustomerGroupCollection
         mobjCustomerGroups.Load(txtCustomerGroup.Text)
         lstCustomerGroup.Items.Clear()
-        For Each pGroup As Customers.CustomerGroupItem In mobjCustomerGroups.Values
+        For Each pGroup As CustomerGroupItem In mobjCustomerGroups.Values
             If SearchString = "" Or pGroup.ToString.ToUpper.Contains(SearchString.ToUpper) Then
                 lstCustomerGroup.Items.Add(pGroup)
             End If
@@ -182,7 +182,7 @@
         mobjCustomers.Load(pSearchString)
 
         lstCustomers.Items.Clear()
-        For Each pCustomerGroup As Customers.CustomerGroupItem In mobjCustomerGroups.Values
+        For Each pCustomerGroup As CustomerGroupItem In mobjCustomerGroups.Values
             If pSearchString = "" Or pCustomerGroup.ToString.ToUpper.Contains(pSearchString.ToUpper) Then
                 lstCustomerGroup.Items.Add(pCustomerGroup)
             End If
@@ -203,7 +203,7 @@
 
     End Sub
 
-    Private Sub SelectCustomerGroup(ByVal pCustomerGroup As Customers.CustomerGroupItem)
+    Private Sub SelectCustomerGroup(ByVal pCustomerGroup As CustomerGroupItem)
         'TODO
         mobjCustomerGroupSelected = pCustomerGroup
         txtCustomerGroup.Text = pCustomerGroup.ToString
