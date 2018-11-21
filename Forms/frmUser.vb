@@ -49,14 +49,14 @@
     Private Sub DisplayUser()
         If mobjDBUser.GDS = Utilities.EnumGDSCode.Amadeus Then
             lblGDS.Text = "Amadeus"
-            Label3.Text = "Queue for time limit (TK TL)"
-            Label4.Text = "Queue for reminder (OP)"
-            Label6.Text = "Enter queue numbers without Q (e.g. 72, 72C4)"
+            lblQForTimeLimit.Text = "Queue for time limit (TK TL)"
+            lblQForReminder.Text = "Queue for reminder (OP)"
+            lblQHint.Text = "Enter queue numbers without Q (e.g. 72, 72C4)"
         ElseIf mobjDBUser.GDS = Utilities.EnumGDSCode.Galileo Then
             lblGDS.Text = "Galileo"
-            Label3.Text = "Queue for time limit (T.TAU)"
-            Label4.Text = "Queue for reminder (RB.)"
-            Label6.Text = "Enter queue numbers without Q (e.g. 72, 72*C4)"
+            lblQForTimeLimit.Text = "Queue for time limit (T.TAU)"
+            lblQForReminder.Text = "Queue for reminder (RB.)"
+            lblQHint.Text = "Enter queue numbers without Q (e.g. 72, 72*C4)"
         Else
             lblGDS.Text = "UNKNOWN"
         End If

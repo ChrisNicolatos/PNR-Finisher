@@ -3,8 +3,6 @@ Option Explicit On
 Imports k1aHostToolKit
 
 Public Class GDSReadPNR
-    Public Event ReadStatus(ByRef Status As Short, ByRef StatusDescription As String)
-    Public Event TerminalCommandSent(ByVal TerminalCommand As String)
     Private Structure LineNumbers
         Dim Category As String
         Dim LineNumber As Integer
@@ -28,14 +26,6 @@ Public Class GDSReadPNR
             isNew = True
         End Sub
     End Structure
-    'Private Structure TQTProps
-    '    Dim TQTElement As Integer
-    '    Dim Segment As Integer
-    '    Dim Itin As String
-    '    Dim Allowance As String
-    '    Dim Pax As String
-    '    Dim Status As String
-    'End Structure
     Private WithEvents mobjSession1A As k1aHostToolKit.HostSession
     Private mobjPNR1A As s1aPNR.PNR
     Private mobjSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
@@ -44,6 +34,7 @@ Public Class GDSReadPNR
     Private mobjPassengers As New GDSPaxColl
     Private mobjSegments As New GDSSegCollection
     Private mobjTickets As New GDSTicketCollection
+    Private mobjItinRemarks As New GDSItineraryRemarksCollection
 
     Private mobjFrequentFlyer As New FrequentFlyerCollection
     Private mobjNumberParser As New GDSNumberParser
@@ -53,8 +44,8 @@ Public Class GDSReadPNR
     Private mGDSCode As Utilities.EnumGDSCode
 
     Private mudtProps As ClassProps
-    Private mudtTQT() As TQT
-    Private mudtAllowance() As TQT
+    Private mudtTQT() As TQTItem
+    Private mudtAllowance() As TQTItem
 
     Private mstrPNRResponse As String
     Private mstrPNRNumber As String
@@ -76,13 +67,10 @@ Public Class GDSReadPNR
     Private mstrVesselName As String
     Private mstrBookedBy As String
     Private mstrCC As String
-    Private mstrCLNAI As String
     Private mstrCLN As String
     Private mstrCLA As String
-    Private mstrTRId As String
     Private mflgCancelError As Boolean
 
-    Private mintStatus As Short
     Private mstrStatus As String
 
     Public Sub New()
@@ -91,6 +79,7 @@ Public Class GDSReadPNR
         mobjPassengers.Clear()
         mobjSegments.Clear()
         mobjTickets.Clear()
+        mobjItinRemarks.Clear()
 
         mobjFrequentFlyer.Clear()
 
@@ -99,9 +88,9 @@ Public Class GDSReadPNR
 
         mudtProps.Clear()
         ReDim mudtTQT(0)
-        mudtTQT(0) = New TQT
+        mudtTQT(0) = New TQTItem
         ReDim mudtAllowance(0)
-        mudtAllowance(0) = New TQT
+        mudtAllowance(0) = New TQTItem
 
         mstrPNRResponse = ""
         mstrPNRNumber = ""
@@ -126,7 +115,6 @@ Public Class GDSReadPNR
         mstrCLA = ""
         mflgCancelError = False
 
-        mintStatus = 0
         mstrStatus = ""
     End Sub
 
@@ -151,6 +139,7 @@ Public Class GDSReadPNR
                 For i As Integer = 1 To mudtAllowance.GetUpperBound(0)
                     If mudtAllowance(i).Itin = Origin & " " & Airline & " " & Destination Then
                         AllowanceForSegment = mudtAllowance(i).Allowance
+                        Exit For
                     End If
                 Next
             End If
@@ -246,9 +235,10 @@ Public Class GDSReadPNR
     End Property
     Public ReadOnly Property Tickets() As GDSTicketCollection
         Get
-            Tickets = mobjTickets
+            Return mobjTickets
         End Get
     End Property
+
     Public ReadOnly Property FrequentFlyerNumber(ByVal Airline As String, ByVal PaxName As String) As String
         Get
             FrequentFlyerNumber = ""
@@ -390,6 +380,11 @@ Public Class GDSReadPNR
             NewPNR = mflgNewPNR
         End Get
     End Property
+    Public ReadOnly Property ItineraryRemarks As GDSItineraryRemarksCollection
+        Get
+            Return mobjItinRemarks
+        End Get
+    End Property
     Public Function RetrievePNRsFromQueue(ByVal Queue As String) As String
 
         Dim pobjHostSessions As k1aHostToolKit.HostSessions
@@ -426,9 +421,7 @@ Public Class GDSReadPNR
 
 
         Catch ex As Exception
-            mintStatus = 999
             mstrStatus = Err.Description
-            RaiseEvent ReadStatus(mintStatus, mstrStatus)
 
             If CancelError Then
                 Throw New Exception("RetrivePNRsFromQueue()" & vbCrLf & mstrStatus)
@@ -458,7 +451,7 @@ Public Class GDSReadPNR
         ElseIf mGDSCode = Utilities.EnumGDSCode.Galileo Then
             Read = Read1G()
         Else
-            Throw New Exception("ReadPNR.Read()" & vbCrLf & "NO GDS Specified")
+            Throw New Exception("GDSReadPNR.Read()" & vbCrLf & "NO GDS Specified")
         End If
     End Function
     Private Function Read1A(ByVal PNR As String, ByVal ForReportOnly As Boolean) As Boolean
@@ -483,22 +476,16 @@ Public Class GDSReadPNR
             End If
 
             If Read1A Then
-                mintStatus = 0
                 mstrStatus = "Amadeus read " & PNR & " OK"
             Else
-                mintStatus = 1
                 mstrStatus = "Amadeus " & PNR & " not found"
             End If
             mobjSession1A.SendSpecialKey(512 + 282) '(k1aHostConstantsLib.AmaKeyValues.keySHIFT + k1aHostConstantsLib.AmaKeyValues.keyPause)
             mobjSession1A.Send("RT")
-            RaiseEvent ReadStatus(mintStatus, mstrStatus)
         Catch ex As Exception
-            mintStatus = 999
             mstrStatus = Err.Description
-            RaiseEvent ReadStatus(mintStatus, mstrStatus)
-
             If CancelError Then
-                Throw New Exception("ReadPNR()" & vbCrLf & mstrStatus)
+                Throw New Exception("GDSReadPNR.Read1A()" & vbCrLf & mstrStatus)
             End If
         End Try
 
@@ -507,7 +494,7 @@ Public Class GDSReadPNR
     Private Function Read1A() As String
 
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.Read1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.Read1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         Dim Sessions As k1aHostToolKit.HostSessions
@@ -545,10 +532,12 @@ Public Class GDSReadPNR
                     GetTicketElement1A()
                     GetOptionQueueElement1A()
                     GetVesselOSI1A()
-                    GetSSR1A()
+                    GetSSR1ADocs()
                     GetAI1A()
                     GetRM1A()
                     GetTickets1A()
+                    GetItinRemarks1A()
+
                     If mobjPNR1A.RawResponse.IndexOf("***  NHP  ***") >= 0 Then
                         Read1A = "               ***  NHP  ***"
                     Else
@@ -561,7 +550,7 @@ Public Class GDSReadPNR
                 Throw New Exception("Please start Amadeus and retry")
             End If
         Catch ex As Exception
-            Throw New Exception("Read1A()" & vbCrLf & ex.Message)
+            Throw New Exception("GDSReadPNR.Read1A()" & vbCrLf & ex.Message)
         End Try
     End Function
     Private Sub ReadPNR1G(ByVal PNR As String)
@@ -572,20 +561,19 @@ Public Class GDSReadPNR
             mudtProps.RequestedPNR = PNR
             Read1G()
         Catch ex As Exception
-            Throw New Exception(ex.Message)
+            Throw New Exception("GDSReadPNR.ReadPNR1G()" & vbCrLf & ex.Message)
         End Try
     End Sub
     Private Function Read1G() As String
         mobjPNR1GRaw = New GDSReadPNR1G
         Dim pResponse As ObjectModel.ReadOnlyCollection(Of String) = mobjSession1G.SendTerminalCommand("*R")
-        Dim pX = mobjSession1G.GetSessionInformation.ActiveArea.CurrentPnrHaveData
-        If pResponse(0).Length > 0 Then
 
-        End If
-        If pResponse(0).Length > 5 AndAlso pResponse(0).Substring(6, 1) = "/" Then
+        If pResponse.Count > 0 AndAlso pResponse(0).Length > 5 AndAlso pResponse(0).Substring(6, 1) = "/" Then
             mudtProps.RequestedPNR = pResponse(0).Substring(0, 6)
-        ElseIf pResponse(1).Length > 5 AndAlso pResponse(1).Substring(6, 1) = "/" Then
+        ElseIf pResponse.Count > 1 AndAlso pResponse(1).Length > 5 AndAlso pResponse(1).Substring(6, 1) = "/" Then
             mudtProps.RequestedPNR = pResponse(1).Substring(0, 6)
+        ElseIf pResponse.Count > 2 AndAlso pResponse(2).Length > 5 AndAlso pResponse(2).Substring(6, 1) = "/" Then
+            mudtProps.RequestedPNR = pResponse(2).Substring(0, 6)
         ElseIf Not pResponse(0).StartsWith(" ") Then
             Throw New Exception(pResponse(0))
         Else
@@ -597,6 +585,7 @@ Public Class GDSReadPNR
         End If
         Try
             mobjTickets = New GDSTicketCollection
+            mobjItinRemarks = New GDSItineraryRemarksCollection
             mstrVesselName = ""
             mstrBookedBy = ""
             mstrCC = ""
@@ -609,6 +598,7 @@ Public Class GDSReadPNR
             mobjPassengers = mobjPNR1GRaw.Passengers
             mobjSegments = mobjPNR1GRaw.Segments
             mobjFrequentFlyer = mobjPNR1GRaw.FrequentFlyers
+            mobjItinRemarks = mobjPNR1GRaw.ItineraryRemarks
             mstrItinerary = mobjSegments.Itinerary
             mdteDepartureDate = mobjPNR1GRaw.DepartureDate
             mflgExistsSegments = (mobjSegments.Count > 0)
@@ -627,16 +617,20 @@ Public Class GDSReadPNR
             GetRM1G()
 
         Catch ex As Exception
-            Throw New Exception("Read1G()" & vbCrLf & ex.Message)
+            Throw New Exception("GDSReadPNR.Read1G()" & vbCrLf & ex.Message)
         End Try
 
     End Function
     Public Sub PrepareNewGDSElements()
-        mobjNewGDSElements = New GDSNewCollection(OfficeOfResponsibility, DepartureDate, NumberOfPax, mGDSCode)
+        Try
+            mobjNewGDSElements = New GDSNewCollection(OfficeOfResponsibility, DepartureDate, NumberOfPax, mGDSCode)
+        Catch ex As Exception
+
+        End Try
     End Sub
     Private Function CheckDMI1A() As String
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.CheckDMI1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.CheckDMI1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         Try
@@ -658,7 +652,7 @@ Public Class GDSReadPNR
     Private Sub RemoveOldGDSEntries1A()
 
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.RemoveOldGDSEntries1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.RemoveOldGDSEntries1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         Dim pLineNumbers(0) As Integer
@@ -714,7 +708,7 @@ Public Class GDSReadPNR
     Private Sub RemoveOldGDSEntries1G()
 
         If mGDSCode <> Utilities.EnumGDSCode.Galileo Then
-            Throw New Exception("ReadPNR.RemoveOldGDSEntries1G()" & vbCrLf & "Selected GDS is not Galileo")
+            Throw New Exception("GDSReadPNR.RemoveOldGDSEntries1G()" & vbCrLf & "Selected GDS is not Galileo")
         End If
 
         Dim pLineNumbers(0) As LineNumbers
@@ -822,7 +816,7 @@ Public Class GDSReadPNR
     Public Sub SendGDSEntry1A(ByVal GDSEntry As String)
 
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.SendNewGDSEntries1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.SendNewGDSEntries1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         If GDSEntry <> "" Then
@@ -833,7 +827,7 @@ Public Class GDSReadPNR
     Public Sub SendGDSEntry1G(ByVal GDSEntry As String)
 
         If mGDSCode <> Utilities.EnumGDSCode.Galileo Then
-            Throw New Exception("ReadPNR.SendNewGDSEntries1G()" & vbCrLf & "Selected GDS is not Galileo")
+            Throw New Exception("GDSReadPNR.SendNewGDSEntries1G()" & vbCrLf & "Selected GDS is not Galileo")
         End If
 
         If GDSEntry <> "" Then
@@ -849,7 +843,7 @@ Public Class GDSReadPNR
         ElseIf mGDSCode = Utilities.EnumGDSCode.Galileo Then
             SendAllGDSEntries = SendAllGDSEntries1G(WritePNR, WriteDocs, mflgExpiryDateOK, dgvApis, AirlineEntries)
         Else
-            Throw New Exception("ReadPNR.SendAllGDSEntries()" & vbCrLf & "No GDS Selected")
+            Throw New Exception("GDSReadPNR.SendAllGDSEntries()" & vbCrLf & "No GDS Selected")
         End If
 
     End Function
@@ -887,8 +881,6 @@ Public Class GDSReadPNR
                 SendGDSElement1A(mobjNewGDSElements.ReasonForTravel)
                 SendGDSElement1A(mobjNewGDSElements.CostCentre)
                 SendGDSElement1A(mobjNewGDSElements.TRId)
-
-                Dim pAirlineEntries() As String = AirlineEntries.Text.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
 
                 For i As Integer = 0 To AirlineEntries.CheckedItems.Count - 1
                     If AirlineEntries.CheckedItems(i).ToString.Trim <> "" Then
@@ -970,14 +962,14 @@ Public Class GDSReadPNR
                 With dgvApis.Rows(i)
                     If .ErrorText.IndexOf("Birth") = -1 Then
                         Dim pobjItem As New ApisPaxItem(.Cells(0).Value, .Cells(1).Value, .Cells(2).Value,
-                                                       Utilities.DateFromIATA(.Cells(6).Value), .Cells(7).Value, .Cells(3).Value,
-                                                     .Cells(4).Value, Utilities.DateFromIATA(.Cells(8).Value), .Cells(5).Value)
+                                                       DateFromIATA(.Cells(6).Value), .Cells(7).Value, .Cells(3).Value,
+                                                     .Cells(4).Value, DateFromIATA(.Cells(8).Value), .Cells(5).Value)
 
                         pobjItem.Update(mflgExpiryDateOK)
                         pstrCommand = "SR DOCS YY HK1-P-" & pobjItem.IssuingCountry & "-" & pobjItem.PassportNumber & "-" & pobjItem.Nationality &
-                    "-" & Utilities.DateToIATA(pobjItem.BirthDate) & "-" & pobjItem.Gender & "-"
+                    "-" & DateToIATA(pobjItem.BirthDate) & "-" & pobjItem.Gender & "-"
                         If mflgExpiryDateOK Then
-                            pstrCommand &= Utilities.DateToIATA(pobjItem.ExpiryDate)
+                            pstrCommand &= DateToIATA(pobjItem.ExpiryDate)
                         Else
                             pstrCommand &= ""
                         End If
@@ -997,7 +989,7 @@ Public Class GDSReadPNR
     Private Sub APISUpdate1G(ByVal mflgExpiryDateOK As Boolean, dgvApis As DataGridView)
 
         If mGDSCode <> Utilities.EnumGDSCode.Galileo Then
-            Throw New Exception("ReadPNR.SendGDSElement1G()" & vbCrLf & "Selected GDS is not Galileo")
+            Throw New Exception("GDSReadPNR.APISUpdate1G()" & vbCrLf & "Selected GDS is not Galileo")
         End If
 
         Dim pstrCommand As String
@@ -1006,22 +998,22 @@ Public Class GDSReadPNR
                 With dgvApis.Rows(i)
                     If .ErrorText.IndexOf("Birth") = -1 Then
                         Dim pobjItem As New ApisPaxItem(.Cells(0).Value, .Cells(1).Value, .Cells(2).Value,
-                                                       Utilities.DateFromIATA(.Cells(6).Value), .Cells(7).Value, .Cells(3).Value,
-                                                     .Cells(4).Value, Utilities.DateFromIATA(.Cells(8).Value), .Cells(5).Value)
+                                                       DateFromIATA(.Cells(6).Value), .Cells(7).Value, .Cells(3).Value,
+                                                     .Cells(4).Value, DateFromIATA(.Cells(8).Value), .Cells(5).Value)
 
                         pobjItem.Update(mflgExpiryDateOK)
                         'SI.P1/SSRDOCSBAHK1/P/GB/S12345678/GB/12JUL76/M/23OCT16/SMITH/JOHN/RICHARD
                         pstrCommand = "SI.P" & pobjItem.Id & "/SSRDOCSYYHK1/P/" & pobjItem.IssuingCountry & "/" & pobjItem.PassportNumber & "/" & pobjItem.Nationality &
-                    "/" & Utilities.DateToIATA(pobjItem.BirthDate) & "/" & pobjItem.Gender & "/"
+                    "/" & DateToIATA(pobjItem.BirthDate) & "/" & pobjItem.Gender & "/"
                         If mflgExpiryDateOK Then
-                            pstrCommand &= Utilities.DateToIATA(pobjItem.ExpiryDate)
+                            pstrCommand &= DateToIATA(pobjItem.ExpiryDate)
                         Else
                             pstrCommand &= ""
                         End If
                         pstrCommand &= "/" & pobjItem.Surname & "/" & pobjItem.FirstName
                         For Each pElement As SSRitem In mobjPNR1GRaw.SSR.Values
                             If pElement.SSRCode = "DOCS" Then
-                                If pElement.LastName = pobjItem.Surname And pElement.PassportNumber = pobjItem.PassportNumber And pElement.DateOfBirth = Utilities.DateToIATA(pobjItem.BirthDate) Then
+                                If pElement.LastName = pobjItem.Surname And pElement.PassportNumber = pobjItem.PassportNumber And pElement.DateOfBirth = DateToIATA(pobjItem.BirthDate) Then
                                     pstrCommand = ""
                                     Exit For
                                 End If
@@ -1039,7 +1031,7 @@ Public Class GDSReadPNR
     End Sub
     Private Function CloseOffPNR1A() As String
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.CloseOffPNR1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.CloseOffPNR1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         Dim pCloseOffEntries As New CloseOffEntriesCollection
@@ -1061,7 +1053,7 @@ Public Class GDSReadPNR
     End Function
     Private Function CloseOffPNR1G() As String
         If mGDSCode <> Utilities.EnumGDSCode.Galileo Then
-            Throw New Exception("ReadPNR.CloseOffPNR1G()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.CloseOffPNR1G()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
         Dim pCloseOffEntries As New CloseOffEntriesCollection
         CloseOffPNR1G = ""
@@ -1104,7 +1096,7 @@ Public Class GDSReadPNR
     End Function
     Private Sub SendGDSElement1A(ByVal pElement As GDSNewItem)
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.SendGDSElement1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.SendGDSElement1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         If pElement.GDSCommand <> "" Then
@@ -1114,7 +1106,7 @@ Public Class GDSReadPNR
     End Sub
     Private Function SendGDSElement1G(ByVal pElement As GDSNewItem, ByVal ShowResponse As Boolean) As String
         If mGDSCode <> Utilities.EnumGDSCode.Galileo Then
-            Throw New Exception("ReadPNR.SendGDSElement1G()" & vbCrLf & "Selected GDS is not Galileo")
+            Throw New Exception("GDSReadPNR.SendGDSElement1G()" & vbCrLf & "Selected GDS is not Galileo")
         End If
         SendGDSElement1G = ""
         Dim pResponse As ObjectModel.ReadOnlyCollection(Of String)
@@ -1134,7 +1126,7 @@ Public Class GDSReadPNR
     End Function
     Private Sub SendGDSItemsNoDuplicate1A(ByVal pItemToSend As String)
         If mGDSCode <> Utilities.EnumGDSCode.Amadeus Then
-            Throw New Exception("ReadPNR.SendGDSAirlineItems1A()" & vbCrLf & "Selected GDS is not Amadeus")
+            Throw New Exception("GDSReadPNR.SendGDSItemsNoDuplicate1A()" & vbCrLf & "Selected GDS is not Amadeus")
         End If
 
         If pItemToSend.Length > 3 AndAlso pItemToSend.StartsWith("OS ") Then
@@ -1158,7 +1150,7 @@ Public Class GDSReadPNR
     End Sub
     Private Function SendGDSAirlineItems1G(ByVal pItemToSend As String) As String
         If mGDSCode <> Utilities.EnumGDSCode.Galileo Then
-            Throw New Exception("ReadPNR.SendGDSAirlineItems1G()" & vbCrLf & "Selected GDS is not Galileo")
+            Throw New Exception("GDSReadPNR.SendGDSAirlineItems1G()" & vbCrLf & "Selected GDS is not Galileo")
         End If
         SendGDSAirlineItems1G = ""
         Dim pResponse
@@ -1199,6 +1191,7 @@ Public Class GDSReadPNR
 
         mobjPNR1A = New s1aPNR.PNR
         mobjTickets = New GDSTicketCollection
+        mobjItinRemarks = New GDSItineraryRemarksCollection
         mstrVesselName = ""
         mstrBookedBy = ""
         mstrCC = ""
@@ -1221,7 +1214,6 @@ Public Class GDSReadPNR
                     GetPax1A()
                     GetSegs1A(ForReportOnly)
                     GetOtherServiceElements1A()
-                    GetAIElements1A()
                     GetRMElements1A()
                 Else
                     GetTQT1A()
@@ -1231,9 +1223,9 @@ Public Class GDSReadPNR
                     GetAutoTickets1A()
                     GetOtherServiceElements1A()
                     GetSSRElements1A()
-                    GetSSR1A()
-                    GetAIElements1A()
+                    GetSSR1ADocs()
                     GetRMElements1A()
+                    GetItinRemarks1A()
                 End If
                 RetrievePNR1A = True
             Else
@@ -1285,29 +1277,6 @@ Public Class GDSReadPNR
         End Try
 
     End Sub
-    'Private Sub GetOfficeOfResponsibility1G()
-    '    Try
-    '        mstrOfficeOfResponsibility = mobjPNR1G.CurrentAgencyPcc
-    '    Catch ex As Exception
-    '        mstrOfficeOfResponsibility = MySettings.GDSPcc
-    '    End Try
-    'End Sub
-    Private Sub GetGroup1AGDS()
-
-        mstrGroupName = ""
-        mintGroupNamesCount = 0
-
-        For Each pGroup As s1aPNR.GroupNameElement In mobjPNR1A.GroupNameElements
-            mstrGroupName = pGroup.GroupName
-            mintGroupNamesCount = pGroup.NbrOfAssignedNames + pGroup.NbrNamesMissing
-            Exit For
-        Next
-        If mobjPNR1A.GroupNameElements.Count > 1 Then
-            mstrGroupName &= "x" & mobjPNR1A.GroupNameElements.Count
-        End If
-
-    End Sub
-
     Private Sub GetGroup1A()
 
         mstrGroupName = ""
@@ -1570,12 +1539,11 @@ Public Class GDSReadPNR
                         If pTemp2.Length > 0 Then
                             pTemp2 &= vbCrLf
                         End If
-                        If pTemp(i).StartsWith(" ") Then
+                        If pTemp(i).Length > 25 AndAlso pTemp(i).Substring(0, 25).Replace(" ", "").Length = 18 AndAlso pTemp(i).StartsWith(Space(4)) AndAlso pTemp(i).Substring(10, 1) = " " AndAlso pTemp(i).Substring(12, 1) = " " Then
                             pTemp2 &= pTemp(i).Substring(0, 10) & " " & pTemp(i).Substring(13)
                         Else
                             pTemp2 &= pTemp(i)
                         End If
-
                     End If
                 Next
             End If
@@ -1584,7 +1552,7 @@ Public Class GDSReadPNR
 
     End Sub
 
-    Private Sub GetSSR1A()
+    Private Sub GetSSR1ADocs()
         mflgExistsSSRDocs = False
         mstrSSRDocs = ""
         mobjSSRDocs.Clear()
@@ -1614,14 +1582,6 @@ Public Class GDSReadPNR
             End With
         Next pobjSSR
     End Sub
-    Private Sub GetAIElements1A()
-        Dim pobjAIElement As s1aPNR.AccountingAIElement
-
-        For Each pobjAIElement In mobjPNR1A.AccountingAIElements
-            mstrCLNAI = pobjAIElement.AccountNo
-        Next
-
-    End Sub
     Private Sub GetRMElements1A()
 
         Dim pobjRMElement As s1aPNR.RemarkElement
@@ -1636,51 +1596,74 @@ Public Class GDSReadPNR
         Dim pintLen As Short
         Dim pstrText As String
         Dim pstrSplit() As String
+        Dim pFound As Boolean = False
+        pstrText = Element.ElementID & " " & Element.FreeFlow ' ConcatenateText(Element.Text)
 
-        pstrText = Element.ElementNo.ToString.PadLeft(3) & " " & Element.ElementID & " " & Element.FreeFlow ' ConcatenateText(Element.Text)
-        pintLen = pstrText.Length
-        pstrSplit = Split(Left(pstrText, pintLen), "/")
-        ' TODO - make necessary changes for Cyprus Discovery remarks
-
-        If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
-            If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
-                mstrCLA = pstrSplit(2)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCC")) Then
-                mstrCC = pstrSplit(2)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCLN")) Then
-                mstrCLN = pstrSplit(2)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextBBY")) Then
-                mstrBookedBy = pstrSplit(2)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
-                mstrVesselName = pstrSplit(2)
-            End If
-        ElseIf IsArray(pstrSplit) AndAlso pstrSplit.Length >= 1 Then
-            If pstrText.StartsWith(MySettings.GDSValue("TextTRID")) Then
-                mstrTRId = pstrSplit(1)
-            End If
-            'If pstrSplit(1) = "CC" Then
-            'ElseIf pstrSplit(1) = "CLN" Then
-            'ElseIf pstrSplit(1) = "BBY" Then
-            'End If
+        If pstrText.IndexOf(MySettings.GDSValue("TextCLA")) > -1 Then
+            mstrCLA = pstrText.Substring(pstrText.IndexOf(MySettings.GDSValue("TextCLA")) + MySettings.GDSValue("TextCLA").Length)
+            pFound = True
+        ElseIf pstrText.IndexOf(MySettings.GDSValue("TextCC")) > -1 Then
+            mstrCC = pstrText.Substring(pstrText.IndexOf(MySettings.GDSValue("TextCC")) + MySettings.GDSValue("TextCC").Length)
+            pFound = True
+        ElseIf pstrText.IndexOf(MySettings.GDSValue("TextCLN")) > -1 Then
+            mstrCLN = pstrText.Substring(pstrText.IndexOf(MySettings.GDSValue("TextCLN")) + MySettings.GDSValue("TextCLN").Length)
+            pFound = True
+        ElseIf pstrText.IndexOf(MySettings.GDSValue("TextBBY")) > -1 Then
+            mstrBookedBy = pstrText.Substring(pstrText.IndexOf(MySettings.GDSValue("TextBBY")) + MySettings.GDSValue("TextBBY").Length)
+            pFound = True
+        ElseIf pstrText.IndexOf(MySettings.GDSValue("TextVSL")) > -1 Then
+            mstrVesselName = pstrText.Substring(pstrText.IndexOf(MySettings.GDSValue("TextVSL")) + MySettings.GDSValue("TextVSL").Length)
+            pFound = True
+        ElseIf pstrText.IndexOf(MySettings.GDSValue("TextTRID")) > -1 Then
+            pFound = True
         End If
-        pstrSplit = Split(Left(pstrText, pintLen), "-")
-        If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
-            If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
-                mstrCLA = pstrSplit(1)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCC")) Then
-                mstrCC = pstrSplit(1)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCLN")) Then
-                mstrCLN = pstrSplit(1)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextBBY")) Then
-                mstrBookedBy = pstrSplit(1)
-            ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
-                mstrVesselName = pstrSplit(1)
+
+        If Not pFound Then
+            pintLen = pstrText.Length
+            pstrSplit = Split(Left(pstrText, pintLen), "/")
+
+            If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
+                If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
+                    mstrCLA = pstrSplit(2)
+                    pFound = True
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCC")) Then
+                    mstrCC = pstrSplit(2)
+                    pFound = True
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCLN")) Then
+                    mstrCLN = pstrSplit(2)
+                    pFound = True
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextBBY")) Then
+                    mstrBookedBy = pstrSplit(2)
+                    pFound = True
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
+                    mstrVesselName = pstrSplit(2)
+                    pFound = True
+                End If
+            ElseIf IsArray(pstrSplit) AndAlso pstrSplit.Length >= 1 Then
+                If pstrText.StartsWith(MySettings.GDSValue("TextTRID")) Then
+                    pFound = True
+                End If
+                '
             End If
-            'If pstrSplit(0).IndexOf("D,BOOKED") > 0 Then
-            '    mstrBookedBy = pstrSplit(1)
-            'ElseIf pstrSplit(0).IndexOf("D,AC") > 0 Then
-            '    mstrCLN = pstrSplit(1)
-            'End If
+
+        End If
+        If Not pFound Then
+            pstrSplit = Split(Left(pstrText, pintLen), "-")
+            If IsArray(pstrSplit) AndAlso pstrSplit.Length >= 2 Then
+                If pstrText.StartsWith(MySettings.GDSValue("TextCLA")) Then
+                    mstrCLA = pstrSplit(1)
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCC")) Then
+                    mstrCC = pstrSplit(1)
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextCLN")) Then
+                    mstrCLN = pstrSplit(1)
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextBBY")) Then
+                    mstrBookedBy = pstrSplit(1)
+                ElseIf pstrText.StartsWith(MySettings.GDSValue("TextVSL")) Then
+                    mstrVesselName = pstrSplit(1)
+                End If
+
+            End If
+
         End If
 
 
@@ -1765,12 +1748,17 @@ Public Class GDSReadPNR
     Private Sub GetRM1G()
         For Each pRemark As DIItem In mobjPNR1GRaw.DIElements.Values
             With pRemark
-                Dim pFullText As String = "DI." & .Category & "-" & .Remark
+                Dim pFullText As String = ""
+                If .Category = "FT" Then
+                    pFullText = "DI." & .Category & "-" & .Remark
+                ElseIf .Category = "AC ACCT" Then
+                    pFullText = "DI.AC-" & .Remark
+                End If
                 If pFullText.StartsWith(MySettings.GDSValue("TextAGT")) Then
                     mobjExistingGDSElements.AgentID.SetValues(True, .ElementNo, MySettings.GDSElement("TextAGT"), .Remark, pFullText.Substring(MySettings.GDSValue("TextAGT").Length))
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextBBY")) Then
                     Dim pBookedBy As String = pFullText.Substring(MySettings.GDSValue("TextBBY").Length)
-                    mstrBookedBy = .Remark.Substring(10)
+                    mstrBookedBy = pBookedBy ' .Remark.Substring(10)
                     mobjExistingGDSElements.BookedBy.SetValues(True, .ElementNo, MySettings.GDSElement("TextBBY"), .Remark, pBookedBy)
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextCC")) Then
                     mstrCC = .Remark.Substring(9)
@@ -1789,7 +1777,7 @@ Public Class GDSReadPNR
                     If mobjExistingGDSElements.CustomerCode.Exists Then
                         Throw New Exception("Please check PNR. Duplicate customer defined" & vbCrLf & mobjExistingGDSElements.CustomerCode.RawText & vbCrLf & .Remark)
                     Else
-                        mstrCLN = .Remark.Substring(10)
+                        mstrCLN = pCustomerCode
                         mobjExistingGDSElements.CustomerCode.SetValues(True, .ElementNo, MySettings.GDSElement("TextCLN"), .Remark, pCustomerCode)
                     End If
                 ElseIf pFullText.StartsWith(MySettings.GDSValue("TextCRA")) Then
@@ -1814,7 +1802,6 @@ Public Class GDSReadPNR
                 ElseIf pFullText.StartsWith("D,BOOKED") > 0 Then
                     mobjExistingGDSElements.BookedBy.SetValues(True, .ElementNo, "D,BOOKED", .Remark, "DI.")
                 ElseIf pFullText.StartsWith("D,AC") > 0 Then
-                    Dim pCustomerCode As String = .Remark.Substring(10)
                     If mobjExistingGDSElements.CustomerCode.Exists Then
                         Throw New Exception("Please check PNR. Duplicate customer defined" & vbCrLf & mobjExistingGDSElements.CustomerCode.RawText & vbCrLf & .Remark)
                     Else
@@ -1832,6 +1819,9 @@ Public Class GDSReadPNR
     End Sub
     Private Sub GetTickets1A()
         mobjTickets = New GDSTicketCollection(mobjPNR1A)
+    End Sub
+    Private Sub GetItinRemarks1A()
+        mobjItinRemarks.Load1A(mobjPNR1A)
     End Sub
     Private Sub GetPax1A()
 
@@ -1879,11 +1869,14 @@ Public Class GDSReadPNR
                 mobjSegments.AddItem(Utilities1A.airAirline1A(pobjSeg), Utilities1A.airBoardPoint1A(pobjSeg), Utilities1A.airClass1A(pobjSeg), Utilities1A.airDepartureDate1A(pobjSeg), Utilities1A.airArrivalDate1A(pobjSeg), pElementNo, Utilities1A.airFlightNo1A(pobjSeg), Utilities1A.airOffPoint1A(pobjSeg), Utilities1A.airStatus1A(pobjSeg), Utilities1A.airDepartTime1A(pobjSeg), Utilities1A.airArriveTime1A(pobjSeg), Utilities1A.Equipment(pobjSeg), Utilities1A.airText1A(pobjSeg), "")
             Else
                 Dim pSegDoTemp As k1aHostToolKit.CHostResponse = mobjSession1A.Send("DO" & pobjSeg.ElementNo)
-                Dim pSegDo As String = pSegDoTemp.Text
-                Do While pSegDo.IndexOf(")>") > 0
-                    pSegDoTemp = mobjSession1A.Send("MDR")
-                    pSegDo = pSegDo.Replace(")>" & vbCrLf, "") & pSegDoTemp.Text
-                Loop
+                Dim pSegDo As String = ""
+                If Not pSegDoTemp.Text Is Nothing Then
+                    pSegDo = pSegDoTemp.Text
+                    Do While pSegDo.IndexOf(")>") > 0
+                        pSegDoTemp = mobjSession1A.Send("MDR")
+                        pSegDo = pSegDo.Replace(")>" & vbCrLf, "") & pSegDoTemp.Text
+                    Loop
+                End If
                 mobjSegments.AddItem(Utilities1A.airAirline1A(pobjSeg), Utilities1A.airBoardPoint1A(pobjSeg), Utilities1A.airClass1A(pobjSeg), Utilities1A.airDepartureDate1A(pobjSeg), Utilities1A.airArrivalDate1A(pobjSeg), pElementNo, Utilities1A.airFlightNo1A(pobjSeg), Utilities1A.airOffPoint1A(pobjSeg), Utilities1A.airStatus1A(pobjSeg), Utilities1A.airDepartTime1A(pobjSeg), Utilities1A.airArriveTime1A(pobjSeg), Utilities1A.Equipment(pobjSeg), Utilities1A.airText1A(pobjSeg), pSegDo)
             End If
             If mSegsFirstElement = -1 Then
@@ -1998,7 +1991,7 @@ Public Class GDSReadPNR
                         If pstrSplit1(i).Length >= 13 Then
                             With mobjNumberParser
                                 If .TicketNumberText(pstrSplit1(i)) Then
-                                    mobjTickets.addTicket("FO", .StockType, .DocumentNumber, .Books, .AirlineNumber, .AirlineNumber, False, SegAssociations, PaxAssociations, pstrSplit2(2))
+                                    mobjTickets.addTicket("FO", .StockType, .DocumentNumber, .Books, .AirlineNumber, .AirlineNumber, False, SegAssociations, PaxAssociations, pstrSplit2(2), "")
                                 End If
                             End With
                         End If
@@ -2014,7 +2007,8 @@ Public Class GDSReadPNR
 
         Dim pstrSplit2() As String
         Dim pflgETicket As Boolean
-
+        Dim pstrTicketType As String = ""
+        Dim pstrServicesDescription As String = ""
         Try
 
             Dim SegAssociations As String = ""
@@ -2048,20 +2042,44 @@ Public Class GDSReadPNR
 
             Dim pstrSplit1() As String = Split(pstrText, "/")
             pflgETicket = False
+            pstrTicketType = ""
+            pstrServicesDescription = ""
 
             If IsArray(pstrSplit1) Then
 
                 pstrSplit2 = Split(pstrSplit1(0), " ")
-                If pstrSplit1.GetUpperBound(0) > 0 Then
-                    If pstrSplit1(1).Length = 4 And pstrSplit1(1).StartsWith("ET") Then
-                        pflgETicket = True
+                If pstrSplit1.GetUpperBound(0) >= 2 Then
+                    pstrTicketType = pstrSplit2(2)
+                    If pstrSplit1(1).Length = 4 Then
+                        If pstrSplit1(1).StartsWith("ET") Then
+                            pflgETicket = True
+                        ElseIf pstrSplit1(1).StartsWith("DT") Then
+                            For i1 As Integer = pstrSplit1.GetUpperBound(0) To 2 Step -1
+                                If pstrSplit1(i1).Length > 1 AndAlso pstrSplit1(i1).StartsWith("E") AndAlso IsNumeric(pstrSplit1(i1).Substring(1)) Then
+                                    Dim iElem As Integer = CInt(pstrSplit1(i1).Substring(1))
+                                    For Each objSSR As s1aPNR.SSRElement In mobjPNR1A.SSRElements
+                                        If objSSR.ElementNo = iElem Then
+                                            pstrTicketType = objSSR.Code
+                                            pstrServicesDescription = objSSR.Text.Trim
+                                            If pstrServicesDescription.IndexOf(pstrTicketType) > -1 Then
+                                                pstrServicesDescription = pstrServicesDescription.Substring(pstrServicesDescription.IndexOf(pstrTicketType) + pstrTicketType.Length)
+                                            End If
+                                            Do While pstrServicesDescription.IndexOf("  ") > -1
+                                                pstrServicesDescription = pstrServicesDescription.Replace("  ", " ")
+                                            Loop
+
+                                        End If
+                                    Next
+                                End If
+                            Next
+                        End If
                     End If
                 End If
                 If IsArray(pstrSplit2) Then
                     If pstrSplit2.GetUpperBound(0) >= 3 Then
                         With mobjNumberParser
                             If .TicketNumberText(pstrSplit2(3)) Then
-                                mobjTickets.addTicket("FA", .StockType, .DocumentNumber, .Books, .AirlineNumber, pstrSplit1(1).Substring(2, 2), pflgETicket, SegAssociations, PaxAssociations, pstrSplit2(2))
+                                mobjTickets.addTicket("FA", .StockType, .DocumentNumber, .Books, .AirlineNumber, pstrSplit1(1).Substring(2, 2), pflgETicket, SegAssociations, PaxAssociations, pstrTicketType, pstrServicesDescription)
                             End If
                         End With
                     End If
@@ -2091,7 +2109,7 @@ Public Class GDSReadPNR
         Dim pstrText As String
         Dim pstrSplit() As String
 
-        pstrText = Element.ElementNo.ToString.PadLeft(3) & " " & Element.Airline & " " & Element.ElementID & " " & Element.FreeFlow ' ConcatenateText(Element.Text)
+        pstrText = Element.ElementID & " " & Element.FreeFlow ' ConcatenateText(Element.Text)
         pintLen = pstrText.Length
 
         i = InStr(pstrText, "/SG")
@@ -2132,14 +2150,14 @@ Public Class GDSReadPNR
         Dim pTQT() As String = pTQTtext.Text.Split(vbCrLf.ToCharArray, StringSplitOptions.RemoveEmptyEntries)
 
         ReDim mudtAllowance(0)
-        mudtAllowance(0) = New TQT
+        mudtAllowance(0) = New TQTItem
         ReDim mudtTQT(0)
-        mudtTQT(0) = New TQT
+        mudtTQT(0) = New TQTItem
         If pTQT(0).StartsWith("T     P/S  NAME") Then
             For i As Integer = 1 To pTQT.GetUpperBound(0)
                 If pTQT(i).Length > 62 AndAlso pTQT(i).Substring(0) <> " " Then
                     ReDim Preserve mudtTQT(mudtTQT.GetUpperBound(0) + 1)
-                    mudtTQT(mudtTQT.GetUpperBound(0)) = New TQT
+                    mudtTQT(mudtTQT.GetUpperBound(0)) = New TQTItem
                     If pTQT(i).Substring(0, pTQT(i).IndexOf(" ")) <> pTQT(i - 1).Substring(0, pTQT(i - 1).IndexOf(" ")) AndAlso IsNumeric(pTQT(i).Substring(0, pTQT(i).IndexOf(" "))) Then
                         mudtTQT(mudtTQT.GetUpperBound(0)).TQTElement = pTQT(i).Substring(0, pTQT(i).IndexOf(" "))
                         Dim pSeg() As String
@@ -2156,7 +2174,7 @@ Public Class GDSReadPNR
                                 If pSeg1.GetUpperBound(0) = 1 Then
                                     For i2 As Integer = CInt(pSeg1(0)) + 1 To CInt(pSeg1(1))
                                         ReDim Preserve mudtTQT(mudtTQT.GetUpperBound(0) + 1)
-                                        mudtTQT(mudtTQT.GetUpperBound(0)) = New TQT With {
+                                        mudtTQT(mudtTQT.GetUpperBound(0)) = New TQTItem With {
                                             .TQTElement = mudtTQT(mudtTQT.GetUpperBound(0) - 1).TQTElement,
                                             .Segment = i2
                                         }
@@ -2196,7 +2214,7 @@ Public Class GDSReadPNR
                 If pTQT(i).Length > 1 AndAlso IsNumeric(pTQT(i).Substring(1, 1)) Then
                     If pTQT(i).Length > 60 Then
                         ReDim Preserve mudtAllowance(mudtAllowance.GetUpperBound(0) + 1)
-                        mudtAllowance(mudtAllowance.GetUpperBound(0)) = New TQT With {
+                        mudtAllowance(mudtAllowance.GetUpperBound(0)) = New TQTItem With {
                             .Itin = pTQT(i).Substring(5, 6) & " " & pTQT(i + 1).Substring(5, 3),
                             .Allowance = pTQT(i).Substring(60),
                             .Status = pTQT(i).Substring(30, 3)
@@ -2233,7 +2251,7 @@ Public Class GDSReadPNR
                 pstrTemp = Text.Substring(j - 1, 60)
                 j = j + 60
                 Do While j <= pintLen
-                    If Mid(Text, j, Math.Min(23, pintLen - j + 1)) & " " = " " & Mid(Text, j, Math.Min(23, pintLen - j + 1)) Then
+                    If Text.Substring(j - 1, Math.Min(23, pintLen - j + 1)) & " " = " " & Text.Substring(j - 1, Math.Min(23, pintLen - j + 1)) Then
                         j = j + 23
                         If j <= pintLen Then
                             pstrTemp &= Text.Substring(j - 1, 57)
@@ -2248,31 +2266,5 @@ Public Class GDSReadPNR
         End Try
 
     End Function
-
-    Private Sub mobjPNR1GRaw_TerminalCommandSent(TerminalCommand As String) Handles mobjPNR1GRaw.TerminalCommandSent
-        RaiseEvent TerminalCommandSent(TerminalCommand)
-    End Sub
-    'Private Sub GetPax1G()
-
-    '    Dim pobjPax As Travelport.TravelData.Person
-
-    '    mobjPassengers.Clear()
-
-    '    For Each pobjPax In mobjPNR1G.Passengers
-    '        With pobjPax
-    '            mobjPassengers.AddItem(.PassengerNumber, .FirstName, .LastName, If(IsNothing(.NameRemark), "", .NameRemark))
-    '        End With
-    '    Next pobjPax
-
-    'End Sub
-
-
-    'Private Function setRecordLocator1G() As String
-    '    Try
-    '        setRecordLocator1G = mobjPNR1G.RecordLocator
-    '    Catch ex As Exception
-    '        setRecordLocator1G = UCase(mudtProps.RequestedPNR)
-    '    End Try
-    'End Function
 
 End Class

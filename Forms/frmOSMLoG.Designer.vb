@@ -24,17 +24,17 @@ Partial Class frmOSMLoG
     Private Sub InitializeComponent()
         Me.optPerPax = New System.Windows.Forms.RadioButton()
         Me.optPerPNR = New System.Windows.Forms.RadioButton()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.fraLOGLayout = New System.Windows.Forms.GroupBox()
+        Me.fraReaonForTravel = New System.Windows.Forms.GroupBox()
         Me.optOnSignersBrazil = New System.Windows.Forms.RadioButton()
         Me.optOnSigners = New System.Windows.Forms.RadioButton()
         Me.optOffSigners = New System.Windows.Forms.RadioButton()
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.fraPortAgent = New System.Windows.Forms.GroupBox()
         Me.lblOSMMultipleSearchSeparator = New System.Windows.Forms.Label()
         Me.txtOSMAgentsFilter = New System.Windows.Forms.TextBox()
         Me.chkNoPortAgent = New System.Windows.Forms.CheckBox()
         Me.lstPortAgent = New System.Windows.Forms.ListBox()
-        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lblFileDestination = New System.Windows.Forms.Label()
         Me.txtFileDestination = New System.Windows.Forms.TextBox()
         Me.fileBrowser = New System.Windows.Forms.FolderBrowserDialog()
         Me.cmdFileDestination = New System.Windows.Forms.Button()
@@ -43,13 +43,23 @@ Partial Class frmOSMLoG
         Me.lblPax = New System.Windows.Forms.Label()
         Me.lblSegs = New System.Windows.Forms.Label()
         Me.txtSignedBy = New System.Windows.Forms.TextBox()
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
-        Me.optSignedBy = New System.Windows.Forms.RadioButton()
-        Me.optSignedByPHL = New System.Windows.Forms.RadioButton()
-        Me.GroupBox1.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
-        Me.GroupBox3.SuspendLayout()
-        Me.GroupBox4.SuspendLayout()
+        Me.fraSignedBy = New System.Windows.Forms.GroupBox()
+        Me.picSignature = New System.Windows.Forms.PictureBox()
+        Me.picLogo = New System.Windows.Forms.PictureBox()
+        Me.txtTelephone = New System.Windows.Forms.TextBox()
+        Me.txtCountry = New System.Windows.Forms.TextBox()
+        Me.txtPCArea = New System.Windows.Forms.TextBox()
+        Me.txtAddress = New System.Windows.Forms.TextBox()
+        Me.txtCompanyName = New System.Windows.Forms.TextBox()
+        Me.txtTitle = New System.Windows.Forms.TextBox()
+        Me.lstOfficeAddress = New System.Windows.Forms.ListBox()
+        Me.lblPNR = New System.Windows.Forms.Label()
+        Me.fraLOGLayout.SuspendLayout()
+        Me.fraReaonForTravel.SuspendLayout()
+        Me.fraPortAgent.SuspendLayout()
+        Me.fraSignedBy.SuspendLayout()
+        CType(Me.picSignature, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.picLogo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'optPerPax
@@ -74,28 +84,28 @@ Partial Class frmOSMLoG
         Me.optPerPNR.Text = "1 Letter for all the passengers"
         Me.optPerPNR.UseVisualStyleBackColor = True
         '
-        'GroupBox1
+        'fraLOGLayout
         '
-        Me.GroupBox1.Controls.Add(Me.optPerPax)
-        Me.GroupBox1.Controls.Add(Me.optPerPNR)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(216, 86)
-        Me.GroupBox1.TabIndex = 2
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "LoG layout"
+        Me.fraLOGLayout.Controls.Add(Me.optPerPax)
+        Me.fraLOGLayout.Controls.Add(Me.optPerPNR)
+        Me.fraLOGLayout.Location = New System.Drawing.Point(12, 12)
+        Me.fraLOGLayout.Name = "fraLOGLayout"
+        Me.fraLOGLayout.Size = New System.Drawing.Size(216, 86)
+        Me.fraLOGLayout.TabIndex = 2
+        Me.fraLOGLayout.TabStop = False
+        Me.fraLOGLayout.Text = "LoG layout"
         '
-        'GroupBox2
+        'fraReaonForTravel
         '
-        Me.GroupBox2.Controls.Add(Me.optOnSignersBrazil)
-        Me.GroupBox2.Controls.Add(Me.optOnSigners)
-        Me.GroupBox2.Controls.Add(Me.optOffSigners)
-        Me.GroupBox2.Location = New System.Drawing.Point(12, 104)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(216, 98)
-        Me.GroupBox2.TabIndex = 3
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Reason for travel"
+        Me.fraReaonForTravel.Controls.Add(Me.optOnSignersBrazil)
+        Me.fraReaonForTravel.Controls.Add(Me.optOnSigners)
+        Me.fraReaonForTravel.Controls.Add(Me.optOffSigners)
+        Me.fraReaonForTravel.Location = New System.Drawing.Point(12, 104)
+        Me.fraReaonForTravel.Name = "fraReaonForTravel"
+        Me.fraReaonForTravel.Size = New System.Drawing.Size(216, 98)
+        Me.fraReaonForTravel.TabIndex = 3
+        Me.fraReaonForTravel.TabStop = False
+        Me.fraReaonForTravel.Text = "Reason for travel"
         '
         'optOnSignersBrazil
         '
@@ -130,18 +140,18 @@ Partial Class frmOSMLoG
         Me.optOffSigners.Text = "Off signers"
         Me.optOffSigners.UseVisualStyleBackColor = True
         '
-        'GroupBox3
+        'fraPortAgent
         '
-        Me.GroupBox3.Controls.Add(Me.lblOSMMultipleSearchSeparator)
-        Me.GroupBox3.Controls.Add(Me.txtOSMAgentsFilter)
-        Me.GroupBox3.Controls.Add(Me.chkNoPortAgent)
-        Me.GroupBox3.Controls.Add(Me.lstPortAgent)
-        Me.GroupBox3.Location = New System.Drawing.Point(248, 19)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(418, 170)
-        Me.GroupBox3.TabIndex = 4
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Port Agent"
+        Me.fraPortAgent.Controls.Add(Me.lblOSMMultipleSearchSeparator)
+        Me.fraPortAgent.Controls.Add(Me.txtOSMAgentsFilter)
+        Me.fraPortAgent.Controls.Add(Me.chkNoPortAgent)
+        Me.fraPortAgent.Controls.Add(Me.lstPortAgent)
+        Me.fraPortAgent.Location = New System.Drawing.Point(248, 19)
+        Me.fraPortAgent.Name = "fraPortAgent"
+        Me.fraPortAgent.Size = New System.Drawing.Size(418, 170)
+        Me.fraPortAgent.TabIndex = 4
+        Me.fraPortAgent.TabStop = False
+        Me.fraPortAgent.Text = "Port Agent"
         '
         'lblOSMMultipleSearchSeparator
         '
@@ -178,19 +188,19 @@ Partial Class frmOSMLoG
         Me.lstPortAgent.Size = New System.Drawing.Size(391, 82)
         Me.lstPortAgent.TabIndex = 0
         '
-        'Label1
+        'lblFileDestination
         '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 287)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(79, 13)
-        Me.Label1.TabIndex = 5
-        Me.Label1.Text = "File Destination"
+        Me.lblFileDestination.AutoSize = True
+        Me.lblFileDestination.Location = New System.Drawing.Point(12, 394)
+        Me.lblFileDestination.Name = "lblFileDestination"
+        Me.lblFileDestination.Size = New System.Drawing.Size(79, 13)
+        Me.lblFileDestination.TabIndex = 5
+        Me.lblFileDestination.Text = "File Destination"
         '
         'txtFileDestination
         '
         Me.txtFileDestination.Enabled = False
-        Me.txtFileDestination.Location = New System.Drawing.Point(97, 283)
+        Me.txtFileDestination.Location = New System.Drawing.Point(97, 390)
         Me.txtFileDestination.Name = "txtFileDestination"
         Me.txtFileDestination.Size = New System.Drawing.Size(518, 20)
         Me.txtFileDestination.TabIndex = 6
@@ -198,7 +208,7 @@ Partial Class frmOSMLoG
         'cmdFileDestination
         '
         Me.cmdFileDestination.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.cmdFileDestination.Location = New System.Drawing.Point(621, 283)
+        Me.cmdFileDestination.Location = New System.Drawing.Point(621, 390)
         Me.cmdFileDestination.Name = "cmdFileDestination"
         Me.cmdFileDestination.Size = New System.Drawing.Size(45, 20)
         Me.cmdFileDestination.TabIndex = 7
@@ -207,7 +217,7 @@ Partial Class frmOSMLoG
         '
         'cmdCreatePDF
         '
-        Me.cmdCreatePDF.Location = New System.Drawing.Point(252, 426)
+        Me.cmdCreatePDF.Location = New System.Drawing.Point(252, 533)
         Me.cmdCreatePDF.Name = "cmdCreatePDF"
         Me.cmdCreatePDF.Size = New System.Drawing.Size(103, 23)
         Me.cmdCreatePDF.TabIndex = 8
@@ -216,7 +226,7 @@ Partial Class frmOSMLoG
         '
         'cmdExit
         '
-        Me.cmdExit.Location = New System.Drawing.Point(377, 426)
+        Me.cmdExit.Location = New System.Drawing.Point(377, 533)
         Me.cmdExit.Name = "cmdExit"
         Me.cmdExit.Size = New System.Drawing.Size(103, 23)
         Me.cmdExit.TabIndex = 9
@@ -228,7 +238,7 @@ Partial Class frmOSMLoG
         Me.lblPax.BackColor = System.Drawing.Color.Aqua
         Me.lblPax.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblPax.ForeColor = System.Drawing.Color.Blue
-        Me.lblPax.Location = New System.Drawing.Point(20, 322)
+        Me.lblPax.Location = New System.Drawing.Point(262, 429)
         Me.lblPax.Name = "lblPax"
         Me.lblPax.Size = New System.Drawing.Size(288, 89)
         Me.lblPax.TabIndex = 10
@@ -238,80 +248,146 @@ Partial Class frmOSMLoG
         Me.lblSegs.BackColor = System.Drawing.Color.Aqua
         Me.lblSegs.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblSegs.ForeColor = System.Drawing.Color.Blue
-        Me.lblSegs.Location = New System.Drawing.Point(366, 322)
+        Me.lblSegs.Location = New System.Drawing.Point(595, 429)
         Me.lblSegs.Name = "lblSegs"
         Me.lblSegs.Size = New System.Drawing.Size(288, 89)
         Me.lblSegs.TabIndex = 11
         '
         'txtSignedBy
         '
-        Me.txtSignedBy.Location = New System.Drawing.Point(97, 17)
+        Me.txtSignedBy.Location = New System.Drawing.Point(222, 19)
         Me.txtSignedBy.Name = "txtSignedBy"
-        Me.txtSignedBy.Size = New System.Drawing.Size(518, 20)
+        Me.txtSignedBy.Size = New System.Drawing.Size(420, 20)
         Me.txtSignedBy.TabIndex = 13
         '
-        'GroupBox4
+        'fraSignedBy
         '
-        Me.GroupBox4.Controls.Add(Me.optSignedByPHL)
-        Me.GroupBox4.Controls.Add(Me.optSignedBy)
-        Me.GroupBox4.Controls.Add(Me.txtSignedBy)
-        Me.GroupBox4.Location = New System.Drawing.Point(12, 202)
-        Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(651, 75)
-        Me.GroupBox4.TabIndex = 14
-        Me.GroupBox4.TabStop = False
-        Me.GroupBox4.Text = "Signed By"
+        Me.fraSignedBy.Controls.Add(Me.picSignature)
+        Me.fraSignedBy.Controls.Add(Me.picLogo)
+        Me.fraSignedBy.Controls.Add(Me.txtTelephone)
+        Me.fraSignedBy.Controls.Add(Me.txtCountry)
+        Me.fraSignedBy.Controls.Add(Me.txtPCArea)
+        Me.fraSignedBy.Controls.Add(Me.txtAddress)
+        Me.fraSignedBy.Controls.Add(Me.txtCompanyName)
+        Me.fraSignedBy.Controls.Add(Me.txtTitle)
+        Me.fraSignedBy.Controls.Add(Me.lstOfficeAddress)
+        Me.fraSignedBy.Controls.Add(Me.txtSignedBy)
+        Me.fraSignedBy.Location = New System.Drawing.Point(12, 202)
+        Me.fraSignedBy.Name = "fraSignedBy"
+        Me.fraSignedBy.Size = New System.Drawing.Size(877, 167)
+        Me.fraSignedBy.TabIndex = 14
+        Me.fraSignedBy.TabStop = False
+        Me.fraSignedBy.Text = "Signed By"
         '
-        'optSignedBy
+        'picSignature
         '
-        Me.optSignedBy.AutoSize = True
-        Me.optSignedBy.Location = New System.Drawing.Point(6, 19)
-        Me.optSignedBy.Name = "optSignedBy"
-        Me.optSignedBy.Size = New System.Drawing.Size(73, 17)
-        Me.optSignedBy.TabIndex = 14
-        Me.optSignedBy.TabStop = True
-        Me.optSignedBy.Text = "Signed By"
-        Me.optSignedBy.UseVisualStyleBackColor = True
+        Me.picSignature.Location = New System.Drawing.Point(661, 85)
+        Me.picSignature.Name = "picSignature"
+        Me.picSignature.Size = New System.Drawing.Size(210, 60)
+        Me.picSignature.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
+        Me.picSignature.TabIndex = 24
+        Me.picSignature.TabStop = False
         '
-        'optSignedByPHL
+        'picLogo
         '
-        Me.optSignedByPHL.AutoSize = True
-        Me.optSignedByPHL.Location = New System.Drawing.Point(6, 42)
-        Me.optSignedByPHL.Name = "optSignedByPHL"
-        Me.optSignedByPHL.Size = New System.Drawing.Size(250, 17)
-        Me.optSignedByPHL.TabIndex = 15
-        Me.optSignedByPHL.TabStop = True
-        Me.optSignedByPHL.Text = "PHL : Signed By Cherryl Rose Omnes Nemenzo"
-        Me.optSignedByPHL.UseVisualStyleBackColor = True
+        Me.picLogo.Location = New System.Drawing.Point(661, 19)
+        Me.picLogo.Name = "picLogo"
+        Me.picLogo.Size = New System.Drawing.Size(210, 60)
+        Me.picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
+        Me.picLogo.TabIndex = 23
+        Me.picLogo.TabStop = False
+        '
+        'txtTelephone
+        '
+        Me.txtTelephone.Location = New System.Drawing.Point(222, 139)
+        Me.txtTelephone.Name = "txtTelephone"
+        Me.txtTelephone.Size = New System.Drawing.Size(420, 20)
+        Me.txtTelephone.TabIndex = 22
+        '
+        'txtCountry
+        '
+        Me.txtCountry.Location = New System.Drawing.Point(222, 119)
+        Me.txtCountry.Name = "txtCountry"
+        Me.txtCountry.Size = New System.Drawing.Size(420, 20)
+        Me.txtCountry.TabIndex = 21
+        '
+        'txtPCArea
+        '
+        Me.txtPCArea.Location = New System.Drawing.Point(222, 99)
+        Me.txtPCArea.Name = "txtPCArea"
+        Me.txtPCArea.Size = New System.Drawing.Size(420, 20)
+        Me.txtPCArea.TabIndex = 20
+        '
+        'txtAddress
+        '
+        Me.txtAddress.Location = New System.Drawing.Point(222, 79)
+        Me.txtAddress.Name = "txtAddress"
+        Me.txtAddress.Size = New System.Drawing.Size(420, 20)
+        Me.txtAddress.TabIndex = 19
+        '
+        'txtCompanyName
+        '
+        Me.txtCompanyName.Location = New System.Drawing.Point(222, 59)
+        Me.txtCompanyName.Name = "txtCompanyName"
+        Me.txtCompanyName.Size = New System.Drawing.Size(420, 20)
+        Me.txtCompanyName.TabIndex = 18
+        '
+        'txtTitle
+        '
+        Me.txtTitle.Location = New System.Drawing.Point(222, 39)
+        Me.txtTitle.Name = "txtTitle"
+        Me.txtTitle.Size = New System.Drawing.Size(420, 20)
+        Me.txtTitle.TabIndex = 17
+        '
+        'lstOfficeAddress
+        '
+        Me.lstOfficeAddress.FormattingEnabled = True
+        Me.lstOfficeAddress.Location = New System.Drawing.Point(11, 19)
+        Me.lstOfficeAddress.Name = "lstOfficeAddress"
+        Me.lstOfficeAddress.Size = New System.Drawing.Size(194, 134)
+        Me.lstOfficeAddress.TabIndex = 16
+        '
+        'lblPNR
+        '
+        Me.lblPNR.BackColor = System.Drawing.Color.Aqua
+        Me.lblPNR.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblPNR.ForeColor = System.Drawing.Color.Blue
+        Me.lblPNR.Location = New System.Drawing.Point(20, 429)
+        Me.lblPNR.Name = "lblPNR"
+        Me.lblPNR.Size = New System.Drawing.Size(197, 89)
+        Me.lblPNR.TabIndex = 15
         '
         'frmOSMLoG
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(694, 462)
-        Me.Controls.Add(Me.GroupBox4)
+        Me.ClientSize = New System.Drawing.Size(929, 569)
+        Me.Controls.Add(Me.lblPNR)
+        Me.Controls.Add(Me.fraSignedBy)
         Me.Controls.Add(Me.lblSegs)
         Me.Controls.Add(Me.lblPax)
         Me.Controls.Add(Me.cmdExit)
         Me.Controls.Add(Me.cmdCreatePDF)
         Me.Controls.Add(Me.cmdFileDestination)
         Me.Controls.Add(Me.txtFileDestination)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.lblFileDestination)
+        Me.Controls.Add(Me.fraPortAgent)
+        Me.Controls.Add(Me.fraReaonForTravel)
+        Me.Controls.Add(Me.fraLOGLayout)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.Name = "frmOSMLoG"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "OSM Letter of Guarantee"
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox3.PerformLayout()
-        Me.GroupBox4.ResumeLayout(False)
-        Me.GroupBox4.PerformLayout()
+        Me.fraLOGLayout.ResumeLayout(False)
+        Me.fraLOGLayout.PerformLayout()
+        Me.fraReaonForTravel.ResumeLayout(False)
+        Me.fraReaonForTravel.PerformLayout()
+        Me.fraPortAgent.ResumeLayout(False)
+        Me.fraPortAgent.PerformLayout()
+        Me.fraSignedBy.ResumeLayout(False)
+        Me.fraSignedBy.PerformLayout()
+        CType(Me.picSignature, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.picLogo, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -319,13 +395,13 @@ Partial Class frmOSMLoG
 
     Friend WithEvents optPerPax As RadioButton
     Friend WithEvents optPerPNR As RadioButton
-    Friend WithEvents GroupBox1 As GroupBox
-    Friend WithEvents GroupBox2 As GroupBox
+    Friend WithEvents fraLOGLayout As GroupBox
+    Friend WithEvents fraReaonForTravel As GroupBox
     Friend WithEvents optOnSigners As RadioButton
     Friend WithEvents optOffSigners As RadioButton
-    Friend WithEvents GroupBox3 As GroupBox
+    Friend WithEvents fraPortAgent As GroupBox
     Friend WithEvents lstPortAgent As ListBox
-    Friend WithEvents Label1 As Label
+    Friend WithEvents lblFileDestination As Label
     Friend WithEvents txtFileDestination As TextBox
     Friend WithEvents fileBrowser As FolderBrowserDialog
     Friend WithEvents cmdFileDestination As Button
@@ -338,7 +414,15 @@ Partial Class frmOSMLoG
     Friend WithEvents optOnSignersBrazil As RadioButton
     Friend WithEvents lblOSMMultipleSearchSeparator As Label
     Friend WithEvents txtOSMAgentsFilter As TextBox
-    Friend WithEvents GroupBox4 As GroupBox
-    Friend WithEvents optSignedByPHL As RadioButton
-    Friend WithEvents optSignedBy As RadioButton
+    Friend WithEvents fraSignedBy As GroupBox
+    Friend WithEvents txtTelephone As TextBox
+    Friend WithEvents txtCountry As TextBox
+    Friend WithEvents txtPCArea As TextBox
+    Friend WithEvents txtAddress As TextBox
+    Friend WithEvents txtCompanyName As TextBox
+    Friend WithEvents txtTitle As TextBox
+    Friend WithEvents lstOfficeAddress As ListBox
+    Friend WithEvents picSignature As PictureBox
+    Friend WithEvents picLogo As PictureBox
+    Friend WithEvents lblPNR As Label
 End Class

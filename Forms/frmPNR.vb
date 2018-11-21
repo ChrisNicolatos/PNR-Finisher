@@ -1,31 +1,27 @@
 ﻿Option Strict Off
 Option Explicit On
 Public Class frmPNR
-    Private Const VersionText As String = "Athens PNR Finisher (30/10/2018 14:30) "
+    Private Const VersionText As String = "Athens PNR Finisher (21/11/2018 12:07)"
+    ' 08/11/2018 17:11
+    ' Show EMD Tickets and ancillary services description
+    ' Show RIR and *RI
     Private Structure PaxNamesPos
         Dim StartPos As Integer
         Dim EndPos As Integer
     End Structure
 
-    Private WithEvents mobjPNR As New GDSReadPNR
+    Private mobjPNR As New GDSReadPNR
     Private mSelectedPNRGDSCode As Utilities.EnumGDSCode
     Private mSelectedItnGDSCode As Utilities.EnumGDSCode
 
     Private mflgReadPNR As Boolean
     Private mintMaxString As Integer = 80
 
-    Private mobjAirlinePoints As New AirlinePointsCollection
-    Private mobjAirlineNotes As New AirlineNotesCollection
-    Private mstrAirlineAlert As String
-    Private mobjConditionalEntry As New ConditionalGDSEntryCollection
 
     Private mobjCustomerSelected As CustomerItem
-    Private mobjCustomers As New CustomerCollection
-
     Private mobjSubDepartmentSelected As SubDepartmentItem
     Private mobjCRMSelected As CRMItem
     Private mobjVesselSelected As VesselItem
-    Private mobjAveragePrice As New AveragePriceCollection
     Private mobjGender As New ReferenceGenderCollection
     Private mudtPaxNames() As PaxNamesPos
 
@@ -132,6 +128,7 @@ Public Class frmPNR
             End If
 
             mobjPNR.ExistingElements.Clear()
+            mobjPNR.NewElements.Clear()
 
             mflgAPISUpdate = False
             mflgExpiryDateOK = False
@@ -338,11 +335,6 @@ Public Class frmPNR
                     MessageBox.Show(.Segments.AirlineAlert, "AIRLINE ALERT", MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 End If
 
-                Dim pFromDate As Date = DateAdd(DateInterval.Month, -3, Today)
-
-                pFromDate = DateSerial(Year(pFromDate), Month(pFromDate), 1)
-
-                mobjAveragePrice.SetValues(pFromDate, .Itinerary)
                 PrepareAirlinePoints()
             End With
             DisplayCustomer()
@@ -474,9 +466,10 @@ Public Class frmPNR
             lstAirlineEntries.Items.Clear()
 
             If mobjCustomerSelected.ID <> 0 Then
+                Dim pAirlinePoints As New AirlinePointsCollection
                 For Each pSeg As GDSSegItem In mobjPNR.Segments.Values
-                    mobjAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline, mobjPNR.GDSCode)
-                    For Each pItem As AirlinePointsItem In mobjAirlinePoints.Values
+                    pAirlinePoints.Load(mobjCustomerSelected.ID, pSeg.Airline, mobjPNR.GDSCode)
+                    For Each pItem As String In pAirlinePoints
                         pFound = False
                         For i As Integer = 0 To lstAirlineEntries.Items.Count - 1
                             If lstAirlineEntries.Items(i).ToString = pItem.ToString Then
@@ -492,9 +485,10 @@ Public Class frmPNR
             End If
 
             If mflgReadPNR Then
+                Dim pAirlineNotes As New AirlineNotesCollection
                 For Each pSeg As GDSSegItem In mobjPNR.Segments.Values
-                    mobjAirlineNotes.Load(pSeg.Airline, mobjPNR.GDSCode)
-                    For Each pItem As AirlineNotesItem In mobjAirlineNotes.Values
+                    pAirlineNotes.Load(pSeg.Airline, mobjPNR.GDSCode)
+                    For Each pItem As AirlineNotesItem In pAirlineNotes.Values
                         With pItem
                             If Not .Seaman Or Not mobjVesselSelected Is Nothing Then
                                 Dim pGDSText As String = .GDSText
@@ -552,8 +546,9 @@ Public Class frmPNR
                 Next
 
                 If Not mobjCustomerSelected Is Nothing And Not mobjVesselSelected Is Nothing Then
-                    mobjConditionalEntry.Load(MySettings.PCCBackOffice, mobjCustomerSelected.ID, mobjVesselSelected.Name)
-                    For Each pItem As ConditionalGDSEntryItem In mobjConditionalEntry.Values
+                    Dim pConditionalEntry As New ConditionalGDSEntryCollection
+                    pConditionalEntry.Load(MySettings.PCCBackOffice, mobjCustomerSelected.ID, mobjVesselSelected.Name)
+                    For Each pItem As ConditionalGDSEntryItem In pConditionalEntry.Values
                         Dim pGDSCommand As String = ""
                         If mSelectedPNRGDSCode = Utilities.EnumGDSCode.Amadeus Then
                             pGDSCommand = pItem.ConditionalEntry1A
@@ -667,16 +662,15 @@ Public Class frmPNR
                 chkItnClass.Checked = MySettings.ShowClassOfService
                 chkItnAirlineLocator.Checked = MySettings.ShowAirlineLocator
                 chkItnTickets.Checked = MySettings.ShowTickets
+                chkItnEMD.Checked = MySettings.ShowEMD
                 chkItnPaxSegPerTicket.Checked = MySettings.ShowPaxSegPerTkt
                 chkItnSeating.Checked = MySettings.ShowSeating
                 chkItnStopovers.Checked = MySettings.ShowStopovers
                 chkItnTerminal.Checked = MySettings.ShowTerminal
                 chkItnFlyingTime.Checked = MySettings.ShowFlyingTime
                 chkItnCostCentre.Checked = MySettings.ShowCostCentre
-
-                chkItnElecItemsBan.Checked = MySettings.ShowBanElectricalEquipment
-                chkItnBrazilText.Checked = MySettings.ShowBrazilText
-                chkItnUSAText.Checked = MySettings.ShowUSAText
+                chkItnCabinDescription.Checked = MySettings.ShowCabinDescription
+                chkItnItinRemarks.Checked = MySettings.ShowItinRemarks
 
                 cmdItn1AReadPNR.Enabled = False
                 cmdItn1AReadQueue.Enabled = False
@@ -695,15 +689,20 @@ Public Class frmPNR
     Private Sub LoadRemarks()
 
         Try
+            Dim pRemarksCollection As New RemarksCollection
+            pRemarksCollection.Load()
             With lstItnRemarks.Items()
                 .Clear()
-                .Add("SEAMAN FARE DOES NOT PERMIT UPGRADING")
-                .Add("SEAMAN FARE DOES NOT PERMIT PRESEATING BUT WITH UPGRADING")
-                .Add("SEAMAN FARE WITH UPGRADING")
-                .Add("SEAMAN FARE WITH UPGRADING AND PRESEATING")
-                .Add("PLEASE CHECK BELOW AND ADVISE IF OK TO ISSUE")
-                .Add("ALL BOOKINGS ON TIME LIMIT")
-                .Add("ALL FARES ON TODAY'S RATE/ADVANCE PURCHASE")
+                For Each pRem As RemarksItem In pRemarksCollection.Values
+                    .Add(pRem)
+                Next
+                '.Add("SEAMAN FARE DOES NOT PERMIT UPGRADING")
+                '.Add("SEAMAN FARE DOES NOT PERMIT PRESEATING BUT WITH UPGRADING")
+                '.Add("SEAMAN FARE WITH UPGRADING")
+                '.Add("SEAMAN FARE WITH UPGRADING AND PRESEATING")
+                '.Add("PLEASE CHECK BELOW AND ADVISE IF OK TO ISSUE")
+                '.Add("ALL BOOKINGS ON TIME LIMIT")
+                '.Add("ALL FARES ON TODAY'S RATE/ADVANCE PURCHASE")
             End With
 
         Catch ex As Exception
@@ -767,12 +766,14 @@ Public Class frmPNR
     Private Sub PopulateCustomerList(ByVal SearchString As String)
 
         Try
-            mobjCustomers.Load(SearchString)
+            Dim pCustomers As New CustomerCollection
+
+            pCustomers.Load(SearchString)
 
             lstCustomers.Items.Clear()
-            For Each pCustomer As CustomerItem In mobjCustomers.Values
-                If SearchString = "" Or pCustomer.ToString.ToUpper.Contains(SearchString.ToUpper) Then
-                    lstCustomers.Items.Add(pCustomer)
+            For Each pItem As CustomerItem In pCustomers.Values
+                If SearchString = "" Or pItem.ToString.ToUpper.Contains(SearchString.ToUpper) Then
+                    lstCustomers.Items.Add(pItem)
                 End If
             Next
 
@@ -949,6 +950,9 @@ Public Class frmPNR
             End If
             cmbCombo.AutoCompleteSource = AutoCompleteSource.ListItems
             cmbCombo.AutoCompleteMode = AutoCompleteMode.SuggestAppend
+            If pProp.RequiredType = Utilities.CustomPropertyRequiredType.PropertyOptional Then
+                cmbCombo.Items.Add("")
+            End If
             For i As Integer = 0 To pProp.ValuesCount - 1
                 cmbCombo.Items.Add(pProp.Value(i))
             Next
@@ -984,11 +988,7 @@ Public Class frmPNR
     Private Sub SelectCustomer(ByVal pCustomer As CustomerItem)
 
         Try
-            'TODO
             mobjPNR.NewElements.ClearCustomerElements()
-            mobjAirlinePoints.Clear()
-            mobjAirlineNotes.Clear()
-            mobjConditionalEntry.Clear()
             mobjCustomerSelected = pCustomer
             txtCustomer.Text = pCustomer.ToString
             mobjPNR.NewElements.SetItem(mobjCustomerSelected)
@@ -1025,9 +1025,9 @@ Public Class frmPNR
 
             SetEnabled()
 
-            If pCustomer.Alert <> "" Then
+            If pCustomer.AlertForFinisher <> "" Then
 
-                MessageBox.Show(pCustomer.Alert, pCustomer.Code & " " & pCustomer.Name, MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show(pCustomer.AlertForFinisher, pCustomer.Code & " " & pCustomer.Name, MessageBoxButtons.OK, MessageBoxIcon.Error)
 
             End If
         Catch ex As Exception
@@ -1322,7 +1322,7 @@ Public Class frmPNR
 
     End Sub
 
-    Private Sub cmbReasonForTravel_TextChanged(sender As Object, e As EventArgs) Handles cmbReasonForTravel.TextChanged
+    Private Sub cmbReasonForTravel_TextChanged(sender As Object, e As EventArgs) Handles cmbReasonForTravel.TextChanged, cmbReasonForTravel.SelectedIndexChanged
 
         Try
             If Not mflgLoading Then
@@ -1778,6 +1778,7 @@ td {
         Try
             mSelectedItnGDSCode = Utilities.EnumGDSCode.Amadeus
             ItnReadCurrentPNR()
+            ShowPriceOptimiser()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -1787,6 +1788,7 @@ td {
         Try
             mSelectedItnGDSCode = Utilities.EnumGDSCode.Galileo
             ItnReadCurrentPNR()
+            ShowPriceOptimiser()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -2001,7 +2003,21 @@ td {
         End Try
 
     End Sub
-
+    Private Sub chkItnEMD_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnEMD.CheckedChanged
+        Try
+            If Not mflgLoading Then
+                If Not MySettings Is Nothing Then
+                    MySettings.ShowEMD = chkItnEMD.Checked
+                    MySettings.Save()
+                    If cmdItnRefresh.Enabled Then
+                        ReadPNRandCreateItn(True)
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Sub
     Private Sub chkPaxSegPerTicket_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnPaxSegPerTicket.CheckedChanged
 
         Try
@@ -2108,12 +2124,12 @@ td {
         End Try
 
     End Sub
-    Private Sub chkItnElecItemsBan_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnElecItemsBan.CheckedChanged
 
+    Private Sub chkItnCabinDescription_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnCabinDescription.CheckedChanged
         Try
             If Not mflgLoading Then
                 If Not MySettings Is Nothing Then
-                    MySettings.ShowBanElectricalEquipment = chkItnElecItemsBan.Checked
+                    MySettings.ShowCabinDescription = chkItnCabinDescription.Checked
                     MySettings.Save()
                     If cmdItnRefresh.Enabled Then
                         ReadPNRandCreateItn(True)
@@ -2123,15 +2139,12 @@ td {
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
     End Sub
-
-    Private Sub chkBrazilText_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnBrazilText.CheckedChanged
-
+    Private Sub chkItnItinRemarks_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnItinRemarks.CheckedChanged
         Try
             If Not mflgLoading Then
                 If Not MySettings Is Nothing Then
-                    MySettings.ShowBrazilText = chkItnBrazilText.Checked
+                    MySettings.ShowItinRemarks = chkItnItinRemarks.Checked
                     MySettings.Save()
                     If cmdItnRefresh.Enabled Then
                         ReadPNRandCreateItn(True)
@@ -2141,25 +2154,6 @@ td {
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
-    End Sub
-
-    Private Sub chkUSAText_CheckedChanged(sender As Object, e As EventArgs) Handles chkItnUSAText.CheckedChanged
-
-        Try
-            If Not mflgLoading Then
-                If Not MySettings Is Nothing Then
-                    MySettings.ShowUSAText = chkItnUSAText.Checked
-                    MySettings.Save()
-                    If cmdItnRefresh.Enabled Then
-                        ReadPNRandCreateItn(True)
-                    End If
-                End If
-            End If
-        Catch ex As Exception
-            MessageBox.Show(ex.Message)
-        End Try
-
     End Sub
     Private Sub txtPNR_TextChanged(ByVal eventSender As System.Object, ByVal eventArgs As System.EventArgs) Handles txtItnPNR.TextChanged
 
@@ -2217,7 +2211,11 @@ td {
     Private Sub cmdAveragePrice_Click(sender As Object, e As EventArgs) Handles cmdAveragePrice.Click
 
         Try
-            With mobjAveragePrice
+            Dim pAveragePrice As New AveragePriceCollection
+            Dim pFromDate As Date = DateAdd(DateInterval.Month, -3, Today)
+            pFromDate = DateSerial(Year(pFromDate), Month(pFromDate), 1)
+            With pAveragePrice
+                .SetValues(pFromDate, mobjPNR.Itinerary)
                 If .Load() Then
                     lblAvPriceDetails.Text = "From: " & .FromDate & "  " & .Itinerary
                     lblAveragePrice.Text = .TicketCount & " tkts - Avge Price: " & Format(.AveragePrice, "#,##0 EUR")
@@ -2394,7 +2392,6 @@ td {
             Dim xDoctext As String = "<html><head></head><body>"
 
             xDoctext &= "MESSAGE FROM :<br>"
-
             xDoctext &= "<b>ATPI GRIFFINSTONE GREECE</b><br><br>"
 
             For Each pSelectedAgent As OSMEmailItem In lstOSMAgents.SelectedItems
@@ -2799,7 +2796,7 @@ td {
         Dim pstrErrorText As String = ""
         pflgPassportNumberOK = (CStr(Row.Cells("PassportNumber").Value).Trim.Length > 0)
         If Not Date.TryParse(Row.Cells("Birthdate").Value, pdteDate) Then
-            pdteDate = Utilities.DateFromIATA(Row.Cells("Birthdate").Value)
+            pdteDate = DateFromIATA(Row.Cells("Birthdate").Value)
             If pdteDate > Date.MinValue Then
                 pflgBirthDateOK = True
             Else
@@ -2809,7 +2806,7 @@ td {
             pflgBirthDateOK = True
         End If
         If Not Date.TryParse(CStr(Row.Cells("ExpiryDate").Value), pdteDate) Then
-            pdteDate = Utilities.DateFromIATA(CStr(Row.Cells("ExpiryDate").Value))
+            pdteDate = DateFromIATA(CStr(Row.Cells("ExpiryDate").Value))
         End If
         If pdteDate > Now Then
             mflgExpiryDateOK = True
@@ -2968,5 +2965,6 @@ td {
         ShowPriceOptimiser()
 
     End Sub
+
 
 End Class

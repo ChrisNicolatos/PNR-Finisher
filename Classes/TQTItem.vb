@@ -1,6 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
-Public Class TQT
+Public Class TQTItem
     Private Structure ClassProps
         Dim TQTElement As Integer
         Dim Segment As Integer
@@ -37,7 +37,7 @@ Public Class TQT
     End Property
     Public Property Allowance As String
         Get
-            Allowance = mudtProps.Allowance
+            Return mudtProps.Allowance
         End Get
         Set(value As String)
             mudtProps.Allowance = value

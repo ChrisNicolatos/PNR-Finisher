@@ -10,7 +10,9 @@ Friend Class ItnRTBDoc
         mintMaxString = pMaxString
         mstrRemarks = ""
         For iRem As Integer = 0 To pItnRemarks.CheckedItems.Count - 1
-            mstrRemarks &= pItnRemarks.CheckedItems(iRem).ToString & vbCrLf
+            Dim pItem As RemarksItem
+            pItem = CType(pItnRemarks.CheckedItems(iRem), RemarksItem)
+            mstrRemarks &= pItem.Remark & vbCrLf
         Next
 
     End Sub
@@ -49,12 +51,14 @@ Friend Class ItnRTBDoc
                 'TODO - Fix length of output line total 78 characters including spaces
                 pString.Append(MakeRTBDocPart1)
                 pString.Append(MakeRTBDocTickets)
+                If MySettings.ShowItinRemarks Then
+                    pString.Append(MakeRTBDocItinRemarks)
+                End If
                 If Not (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode) And mintMaxString > 0 Then
                     pString.AppendLine(StrDup(mintHeaderLength, "-"))
                 End If
                 pString.AppendLine()
                 pString.Append(mstrRemarks)
-                pString.Append(MakeRTBDocCloseOff)
             Catch ex As Exception
                 Throw New Exception("makeRTBDoc()" & vbCrLf & ex.Message)
             End Try
@@ -145,6 +149,9 @@ Friend Class ItnRTBDoc
                         pHeader.Append("ArrDte ")
                         pHeader.Append(If(MySettings.ShowAirlineLocator, "AL Locator", ""))
                         pHeader.Append(" - BagAl")
+                        If MySettings.ShowCabinDescription Then
+                            pHeader.Append(" Class")
+                        End If
 
                         mintHeaderLength = pHeader.Length
 
@@ -175,12 +182,6 @@ Friend Class ItnRTBDoc
                     'Dim pPrevOff As String = ""
                     For Each pobjSeg In .Segments.Values
                         iSegCount = iSegCount + 1
-                        'If iSegCount > 1 And pPrevOff <> pobjSeg.BoardPoint Then
-                        '    Dim pSegChange As New System.Text.StringBuilder
-                        '    pSegChange.Append("** CHANGE OF AIRPORT **")
-                        '    pString.AppendLine(pSegChange.ToString)
-                        'End If
-                        'pPrevOff = pobjSeg.OffPoint
                         Dim pSeg As New System.Text.StringBuilder
 
                         If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
@@ -199,9 +200,9 @@ Friend Class ItnRTBDoc
                                 pSeg.Append(Format(pobjSeg.DepartTime, "HHmm") & "  ")
                                 pSeg.Append(Format(pobjSeg.ArriveTime, "HHmm"))
                                 If DateDiff(DateInterval.Day, pobjSeg.DepartureDate, pobjSeg.ArrivalDate) > 0 Then
-                                    pSeg.Append("+1 ")
+                                    pSeg.Append("+" & DateDiff(DateInterval.Day, pobjSeg.DepartureDate, pobjSeg.ArrivalDate) & " ")
                                 ElseIf DateDiff(DateInterval.Day, pobjSeg.DepartureDate, pobjSeg.ArrivalDate) < 0 Then
-                                    pSeg.Append("-1 ")
+                                    pSeg.Append(DateDiff(DateInterval.Day, pobjSeg.DepartureDate, pobjSeg.ArrivalDate) & " ")
                                 Else
                                     pSeg.Append("   ")
                                 End If
@@ -220,7 +221,10 @@ Friend Class ItnRTBDoc
                                 Else
                                     pSeg.Append("      OK")
                                 End If
-                                pSeg.Append("    " & mobjPNR.AllowanceForSegment(pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.Airline)) ', ""))
+                                pSeg.Append(mobjPNR.AllowanceForSegment(pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.Airline).PadLeft(8))
+                                'If MySettings.ShowCabinDescription Then
+                                '    pSeg.Append(" " & GetClassOfService(pobjSeg.Airline, pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.ClassOfService).CabinDescription)
+                                'End If
                                 If pAirlineLocator.IndexOf(pobjSeg.AirlineLocator.Trim) = -1 Then
                                     If pAirlineLocator = "" Then
                                         pAirlineLocator = "AIRLINE REF: " & pobjSeg.AirlineLocator.Trim '& "(" & pobjSeg.Airline & " " & pobjSeg.AirlineName & ")"
@@ -263,10 +267,14 @@ Friend Class ItnRTBDoc
                                 End If
                                 pSeg.Append(pobjSeg.ArrivalDateIATA & "   ")
                                 pSeg.Append(If(MySettings.ShowAirlineLocator, pobjSeg.AirlineLocator.PadRight(9, " "c), ""))
-                                pSeg.Append(" - " & mobjPNR.AllowanceForSegment(pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.Airline)) ', ""))
+                                pSeg.Append(" - " & mobjPNR.AllowanceForSegment(pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.Airline).PadLeft(5))
                                 If pobjSeg.Status = "HL" Then
                                     pSeg.Append("   WAITLISTED")
                                 End If
+                                If MySettings.ShowCabinDescription Then
+                                    pSeg.Append(" " & GetClassOfService(pobjSeg.Airline, pobjSeg.BoardPoint, pobjSeg.OffPoint, pobjSeg.ClassOfService).CabinDescription)
+                                End If
+
                                 If MySettings.ShowTerminal And pobjSeg.DepartTerminal <> "" Then
                                     pSeg.Append("   " & pobjSeg.DepartTerminal)
                                 End If
@@ -322,70 +330,91 @@ Friend Class ItnRTBDoc
             Try
                 Dim pString As New System.Text.StringBuilder
                 pString.Clear()
-                With mobjPNR
-                    If (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs _
-                            Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode _
-                            Or MySettings.ShowTickets) _
-                            And .Tickets.Count >= 1 Then
-                        If MySettings.FormatStyle = Utilities.EnumItnFormat.DefaultFormat Then
-                            pString.AppendLine(StrDup(mintHeaderLength, "-"))
-                        ElseIf MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
-                            pString.AppendLine()
-                        End If
-                        If Not (MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs _
-                                Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode) Then
-                            Dim pHeader As String = "Ticket Number   "
-                            If MySettings.ShowPaxSegPerTkt Then
-                                pHeader &= "Routing      Passenger"
-                            End If
-                            pString.AppendLine(pHeader)
-                            If Not MySettings.FormatStyle = Utilities.EnumItnFormat.Plain Then
-                                pString.AppendLine(StrDup(mintHeaderLength, "-"))
-                            End If
-                        End If
+                Dim pHeader As String = ""
+                Dim pAncServicesTitle As String = ""
+                If MySettings.FormatStyle = Utilities.EnumItnFormat.DefaultFormat Then
+                    pHeader = "Ticket Number   "
+                    If MySettings.ShowPaxSegPerTkt Then
+                        pHeader &= "Routing      Passenger"
+                    End If
+                    pAncServicesTitle = "Ancillary Services"
+                End If
 
-                        If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs _
-                            Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
-                            For Each pobjPax In .Passengers.Values
-                                pString.AppendLine()
-                                pString.AppendLine(pobjPax.PaxName)
-                                For Each tkt As GDSTicketItem In .Tickets.Values
+                With mobjPNR
+                    If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Then
+                        For Each pobjPax In .Passengers.Values
+                            pString.AppendLine()
+                            pString.AppendLine(pobjPax.PaxName)
+                            For Each tkt As GDSTicketItem In .Tickets.Values
+                                If tkt.TicketType = "PAX" Then
                                     If tkt.Pax.Trim = pobjPax.PaxName.Trim Or tkt.Pax.Trim.StartsWith(pobjPax.PaxName.Trim) Or pobjPax.PaxName.Trim.StartsWith(tkt.Pax.Trim) Then
                                         Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.Substring(0, tkt.Pax.Length - 2).Trim)
                                         If pFF <> "" Then
-                                            pFF = "Frequent Flyer Number: " & pFF
+                                            pFF = " - Frequent Flyer Number: " & pFF
                                         End If
                                         If tkt.Document > 0 Then
-                                            pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "ETICKET NUMBER: ") _
-                                                           & tkt.IssuingAirline & "-" & tkt.Document & " " & tkt.AirlineCode & " " & Airlines.AirlineName(tkt.AirlineCode) & pFF)
+                                            pString.AppendLine("ETICKET NUMBER: " _
+                                                               & tkt.IssuingAirline & "-" & tkt.Document & " " & tkt.AirlineCode & " " & Airlines.AirlineName(tkt.AirlineCode) & pFF)
                                         Else
                                             pString.AppendLine(pFF)
-
                                         End If
-                                    End If
-                                Next
-                            Next
-                        Else
-                            For Each tkt As GDSTicketItem In .Tickets.Values
-                                If tkt.eTicket Then
-                                    If MySettings.ShowPaxSegPerTkt Then
-
-                                        'todo - Issuing airline is code, we need airline 2 letter code for frequent flyer or maybe ff element has airline number code?
-                                        Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2).Trim)
-                                        If pFF <> "" Then
-                                            pFF = "Frequent Flyer Number: " & pFF
-                                        End If
-                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, "") & "  " & tkt.Segs.PadRight(10).Substring(0, 10) & "   " & tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2) & "  " & pFF)
-                                        For i As Integer = 12 To tkt.Segs.Length - 10 Step 12
-                                            pString.AppendLine(If(tkt.TicketType <> "PAX", "    ", "") & StrDup(16 + If(tkt.Books > 1, 4, 0), " ") & tkt.Segs.Substring(i, 10))
-                                        Next
-                                    Else
-                                        pString.AppendLine(If(tkt.TicketType <> "PAX", tkt.TicketType & " ", "") & tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, ""))
                                     End If
                                 End If
                             Next
-                        End If
+                        Next
+                    Else
+                        For iTickType = 1 To 2 ' 1 for tickets, 2 for EMD
+                            For Each tkt As GDSTicketItem In .Tickets.Values
+                                If MySettings.ShowTickets And iTickType = 1 And tkt.TicketType = "PAX" Then
+                                    ' Tickets
+                                    If pHeader <> "" Then
+                                        pString.AppendLine(StrDup(mintHeaderLength, "-"))
+                                        pString.AppendLine(pHeader)
+                                        pString.AppendLine(StrDup(mintHeaderLength, "-"))
+                                        pHeader = ""
+                                    End If
+                                    If MySettings.ShowPaxSegPerTkt Then
+                                        Dim pFF As String = mobjPNR.FrequentFlyerNumber(tkt.AirlineCode, tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2).Trim)
+                                        If pFF <> "" Then
+                                            pFF = " - Frequent Flyer Number: " & pFF
+                                        End If
 
+                                        Dim pTemp As String = tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, "") & "  "
+                                        pString.AppendLine(pTemp & tkt.Segs.PadRight(10).Substring(0, 10) & "   " & tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2) & pFF)
+                                        pTemp = Space(pTemp.Length)
+                                        For i As Integer = 12 To tkt.Segs.Length - 10 Step 12
+                                            pString.AppendLine(pTemp & tkt.Segs.Substring(i, 10))
+                                        Next
+                                    Else
+                                        pString.AppendLine(tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, ""))
+                                    End If
+                                ElseIf MySettings.ShowEMD And iTickType = 2 And tkt.TicketType <> "PAX" Then
+                                    'EMDs
+                                    If pAncServicesTitle <> "" Then
+                                        pString.AppendLine(StrDup(mintHeaderLength, "-"))
+                                        pString.AppendLine(pAncServicesTitle)
+                                        pString.AppendLine(StrDup(mintHeaderLength, "-"))
+                                        pAncServicesTitle = ""
+                                    End If
+                                    If MySettings.ShowPaxSegPerTkt Then
+                                        Dim pTemp As String = tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, "") & "  "
+                                        pString.AppendLine(pTemp & tkt.Segs.PadRight(10).Substring(0, 10) & "   " & tkt.Pax.PadRight(3).Substring(0, tkt.Pax.PadRight(3).Length - 2))
+                                        pTemp = Space(pTemp.Length)
+                                        For i As Integer = 12 To tkt.Segs.Length - 10 Step 12
+                                            pString.AppendLine(pTemp & tkt.Segs.Substring(i, 10))
+                                        Next
+                                        If tkt.ServicesDescription <> "" Then
+                                            pString.AppendLine(tkt.ServicesDescription)
+                                        End If
+                                    Else
+                                        pString.AppendLine(tkt.IssuingAirline & "-" & tkt.Document & If(tkt.Books > 1, tkt.Conjunction, ""))
+                                        If tkt.ServicesDescription <> "" Then
+                                            pString.AppendLine(tkt.ServicesDescription)
+                                        End If
+                                    End If
+                                End If
+                            Next
+                        Next
                     End If
 
                     If MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefs Or MySettings.FormatStyle = Utilities.EnumItnFormat.SeaChefsWithCode Or MySettings.ShowSeating Then
@@ -409,44 +438,21 @@ Friend Class ItnRTBDoc
             End Try
         End Get
     End Property
-    Private Function MakeRTBDocCloseOff() As String
-
-        Try
+    Private ReadOnly Property MakeRTBDocItinRemarks As String
+        Get
             Dim pString As New System.Text.StringBuilder
-
+            Dim pFound As Boolean = False
             pString.Clear()
-            If MySettings.ShowBrazilText Then
-                pString.AppendLine(" ")
-                pString.AppendLine("***Please be advised that all Seamen entering Brazil are required to have their joining letters, or letter of guarantee written in Portuguese.  These must be provided by their respective shipping companies.  Letters in English are no longer accepted.***")
-                pString.AppendLine(" ")
-            End If
-
-            If MySettings.ShowUSAText Then
-                pString.AppendLine(" ")
-                pString.AppendLine("***Please note, all electronic equipment must be fully charged when travelling to/from the US.***")
-                pString.AppendLine("**TSA SECURE FLIGHT PROGRAMME**")
-                pString.AppendLine("**All passengers who intend to travel to the United States without a U.S. Visa under the terms of the Visa Waiver Program (VWP) must obtain an electronic preauthorisation or ESTA prior to boarding a flight to the U.S.**")
-                pString.AppendLine("Passengers who do not obtain ESTA prior to travel are subject to denied boarding.")
-                pString.AppendLine("A third party, such as a relative, friend or travel agent may submit an ESTA application on behalf of a VWP traveller.")
-                pString.AppendLine("For more details on the Visa Waiver Program, a list of VWP eligible countries and the new ESTA process, please visit the ESTA website at http://www.cbp.gov/ESTA")
-                pString.AppendLine(" ")
-            End If
-
-            If MySettings.ShowBanElectricalEquipment Then
-                pString.AppendLine("Important Security information")
-                pString.AppendLine(" ")
-                pString.AppendLine("UK and US authorities have imposed a ban on electrical items larger than mobile phones being carried in the cabin of inbound flights from specific countries.")
-                pString.AppendLine("These items, including laptops, e-readers and tablets, must now be placed in your hold baggage.")
-                pString.AppendLine("For more information please contact your ATPI consultant or refer to the airline web site.")
-                pString.AppendLine(" ")
-            End If
-
+            For Each pItem As GDSItineraryRemarksItem In mobjPNR.ItineraryRemarks
+                If Not pFound Then
+                    pString.AppendLine(vbCrLf)
+                    pFound = True
+                End If
+                pString.AppendLine(pItem.FreeFlow)
+            Next
             Return pString.ToString
-        Catch ex As Exception
-            Throw New Exception("MakeRTBDocCloseOff()" & vbCrLf & ex.Message)
-        End Try
-
-    End Function
+        End Get
+    End Property
     Public ReadOnly Property RTBMSReportHeader(ByVal FromDate As String, ByVal ToDate As String) As String
         Get
             RTBMSReportHeader = "FROM " & FromDate & " : To " & ToDate & vbCrLf

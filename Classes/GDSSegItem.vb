@@ -470,39 +470,29 @@
         mudtProps.Equipment = ""
 
         Dim pSeg As Integer = 0
-        Dim pOperatedBy As String = ""
-        Dim pRouting As String = ""
-        Dim pBoardPoint As String = ""
         Dim pOffPoint As String = ""
         Dim pFlyingTime As Date = TimeSerial(0, 0, 0)
         For iSVC As Integer = 0 To pSVC.GetUpperBound(0)
             If pSVC(iSVC).Substring(2, 1) = " " AndAlso (IsNumeric(pSVC(iSVC).Substring(0, 2)) Or IsNumeric(pSVC(iSVC).Substring(1, 1))) Then
                 If pSeg > 0 Then
                     ' add new entry to tickets
-                    Dim x As String = ""
                     pSeg = 0
                     mudtProps.EstimatedFlyingTime = ""
-                    pOperatedBy = ""
                     mudtProps.DepartTerminal = ""
                     mudtProps.ArriveTerminal = ""
                 End If
 
                 pSeg = CInt(pSVC(iSVC).Trim.Substring(0, pSVC(iSVC).Trim.IndexOf(" ")))
-                pRouting = pSVC(iSVC).Substring(14, 3) & " " & pSVC(iSVC).Substring(3, 2) & " " & pSVC(iSVC).Substring(17, 3)
                 mudtProps.EstimatedFlyingTime = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0"c)
-                pBoardPoint = pSVC(iSVC).Substring(14, 3)
                 pOffPoint = pSVC(iSVC).Substring(17, 3)
                 pFlyingTime = TimeSerial(CInt(mudtProps.EstimatedFlyingTime.Substring(0, mudtProps.EstimatedFlyingTime.IndexOf(":"))), CInt(mudtProps.EstimatedFlyingTime.Substring(mudtProps.EstimatedFlyingTime.IndexOf(":") + 1, 2)), 0)
                 mudtProps.Equipment = pSVC(iSVC).Substring(21, 5).Trim
             ElseIf pSeg > 0 Then
-                If pSVC(iSVC).IndexOf("OPERATED BY") >= 0 Then
-                    pOperatedBy = pSVC(iSVC).Trim
-                ElseIf pSVC(iSVC).StartsWith(Space(14)) And pSVC(iSVC).Substring(14, 6).Replace(" ", "").Length = 6 And pSVC(iSVC).Substring(20, 1) = Space(1) Then
+                If pSVC(iSVC).StartsWith(Space(14)) And pSVC(iSVC).Substring(14, 6).Replace(" ", "").Length = 6 And pSVC(iSVC).Substring(20, 1) = Space(1) Then
                     If mudtProps.Stopovers <> "" Then
                         mudtProps.Stopovers &= vbCrLf
                     End If
                     mudtProps.Stopovers &= pOffPoint & "-" & Airport.CityAirportName(pOffPoint)
-                    pBoardPoint = pSVC(iSVC).Substring(14, 3)
                     pOffPoint = pSVC(iSVC).Substring(17, 3)
                     Dim pTime As String = pSVC(iSVC).Trim.Substring(pSVC(iSVC).Trim.LastIndexOf(" ") + 1).PadLeft(5, "0"c)
                     pFlyingTime = DateAdd(DateInterval.Hour, CDbl(pTime.Substring(0, pTime.IndexOf(":"))), pFlyingTime)

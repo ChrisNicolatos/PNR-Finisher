@@ -5,7 +5,6 @@ Public Class frmPriceOptimiser
     Private mstrPCC As String
     Private mstrUserID As String
     Private mobjDownsell As DownsellCollection
-    Private mintSelectID As Integer
     <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
     Private Shared Function FindWindow(
        ByVal lpClassName As String,
@@ -15,16 +14,24 @@ Public Class frmPriceOptimiser
     <DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
     Private Shared Function SetForegroundWindow(ByVal hWnd As IntPtr) As Long
     End Function
-
-    ' Here we are looking for notepad by class name and caption
+    ' Here we are looking for Amadeus Selling Platform by class name and caption
     Dim lpszParentClass As String = "Showcase"
     Dim lpszParentWindow As String = "SELLING PLATFORM"
 
     Dim ParenthWnd As New IntPtr(0)
-    Private Sub SwitchWindows()
+    Private Sub SwitchWindows1A()
         ' Find the window and get a pointer to it (IntPtr in VB.NET)
         lpszParentClass = "ATL:2227C358"
         lpszParentWindow = "SELLING PLATFORM"
+        ParenthWnd = FindWindow(lpszParentClass, lpszParentWindow)
+        If Not ParenthWnd.Equals(IntPtr.Zero) Then
+            SetForegroundWindow(ParenthWnd)
+        End If
+    End Sub
+    Private Sub SwitchWindows1G()
+        ' Find the window and get a pointer to it (IntPtr in VB.NET)
+        lpszParentClass = "HwndWrapper[Travelport.Smartpoint.App.exe;;e155e932-bf20-4153-9147-31503041a0cf]"
+        lpszParentWindow = "Window 1"
         ParenthWnd = FindWindow(lpszParentClass, lpszParentWindow)
         If Not ParenthWnd.Equals(IntPtr.Zero) Then
             SetForegroundWindow(ParenthWnd)
@@ -100,6 +107,16 @@ Public Class frmPriceOptimiser
                 .HeaderText = "GDSCommand"
             }
             .Columns.Add(pGDSCommand)
+            Dim pClient As New DataGridViewTextBoxColumn With {
+                .Name = "Client",
+                .HeaderText = "Client"
+            }
+            .Columns.Add(pClient)
+            Dim pAlert As New DataGridViewTextBoxColumn With {
+                .Name = "Alert",
+                .HeaderText = "Alert"
+            }
+            .Columns.Add(pAlert)
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
         End With
     End Sub
@@ -124,7 +141,7 @@ Public Class frmPriceOptimiser
                 .Value = Format(pItem.DateLogged, "dd/MM HH:mm")
             }
             Dim pPCC As New DataGridViewTextBoxCell With {
-                .Value = pItem.PCC
+                .Value = pItem.GDS & "-" & pItem.PCC
             }
             Dim pUser As New DataGridViewTextBoxCell With {
                 .Value = pItem.UserGdsId
@@ -153,6 +170,12 @@ Public Class frmPriceOptimiser
             Dim pGDSCommand As New DataGridViewTextBoxCell With {
                 .Value = pItem.GDSCommand
             }
+            Dim pClient As New DataGridViewTextBoxCell With {
+                .Value = pItem.ClientCode & " " & pItem.ClientName
+            }
+            Dim pAlert As New DataGridViewTextBoxCell With {
+                .Value = pItem.AlertForDownsell
+            }
             Dim pRow As New DataGridViewRow
             pRow.Cells.Add(pId)
             pRow.Cells.Add(pDateLogged)
@@ -166,9 +189,14 @@ Public Class frmPriceOptimiser
             pRow.Cells.Add(pNewTotal)
             pRow.Cells.Add(pNewFareBasis)
             pRow.Cells.Add(pGDSCommand)
-            If pItem.OwnPNR = 2 Then
+            pRow.Cells.Add(pClient)
+            pRow.Cells.Add(pAlert)
+            If pItem.AlertForDownsell <> "" Then
+                pRow.DefaultCellStyle.BackColor = Color.OrangeRed
+            ElseIf pItem.OwnPNR = 2 Then
                 pRow.DefaultCellStyle.BackColor = Color.Yellow
             End If
+
             dgvPNRs.Rows.Add(pRow)
         Next
         lblPCCUser.Text = mstrPCC & "-" & mstrUserID & " : " & dgvPNRs.RowCount & " entries"
@@ -178,28 +206,37 @@ Public Class frmPriceOptimiser
     End Sub
     Private Sub mnuOptimiserIgnore_Click(sender As Object, e As EventArgs) Handles mnuOptimiserIgnore.Click
         Dim pText() As String = mnuOptimiserPNR.Text.Split({"-"}, StringSplitOptions.RemoveEmptyEntries)
-        If pText.GetUpperBound(0) = 1 Then
-            mobjDownsell.IgnorePNR(pText(0), pText(1), "IGNORE")
+        If pText.GetUpperBound(0) = 2 Then
+            mobjDownsell.IgnorePNR(pText(1), pText(2), "IGNORE")
         End If
         LoadDGV()
     End Sub
     Private Sub mnuOptimiserActioned_Click(sender As Object, e As EventArgs) Handles mnuOptimiserActioned.Click
         Dim pText() As String = mnuOptimiserPNR.Text.Split({"-"}, StringSplitOptions.RemoveEmptyEntries)
-        If pText.GetUpperBound(0) = 1 Then
-            mobjDownsell.IgnorePNR(pText(0), pText(1), "ACTIONED")
+        If pText.GetUpperBound(0) = 2 Then
+            mobjDownsell.IgnorePNR(pText(1), pText(2), "ACTIONED")
         End If
         LoadDGV()
     End Sub
     Private Sub mnuOptimiserOpenInGDS_Click(sender As Object, e As EventArgs) Handles mnuOptimiserOpenInGDS.Click
         Dim pText() As String = mnuOptimiserPNR.Text.Split({"-"}, StringSplitOptions.RemoveEmptyEntries)
-        If pText.GetUpperBound(0) = 1 Then
-            Dim pResponse As String = OpenPNR1A(pText(1))
-            If pResponse.Length > 0 Then
-                MessageBox.Show(pResponse)
-            Else
-                'mobjDownsell.IgnorePNR(pText(0), pText(1), "OPENED")
-                'LoadDGV()
-                SwitchWindows()
+        If pText.GetUpperBound(0) = 2 Then
+            If pText(0) = "1A" Then
+                Dim pResponse As String = OpenPNR1A(pText(2))
+                If pResponse.Length > 0 Then
+                    MessageBox.Show(pResponse)
+                Else
+                    'mobjDownsell.IgnorePNR(pText(0), pText(1), "OPENED")
+                    'LoadDGV()
+                    SwitchWindows1A()
+                End If
+            ElseIf pText(0) = "1G" Then
+                Dim pResponse As String = OpenPNR1G(pText(2))
+                If pResponse.Length > 0 Then
+                    MessageBox.Show(pResponse)
+                Else
+                    SwitchWindows1G()
+                End If
             End If
         End If
     End Sub
@@ -230,6 +267,14 @@ Public Class frmPriceOptimiser
             mnuOptimiserActioned.Enabled = True
             mnuOptimiserIgnore.Enabled = True
             mnuOptimiserOpenInGDS.Enabled = True
+            If pText.StartsWith("1A") Then
+                mnuOptimiserOpenInGDS.Text = "Open in Amadeus"
+            ElseIf pText.StartsWith("1G") Then
+                mnuOptimiserOpenInGDS.Text = "Open in Galileo - (Enter *R or *ALL to see the PNR)"
+            Else
+                mnuOptimiserOpenInGDS.Text = ""
+                mnuOptimiserOpenInGDS.Enabled = False
+            End If
         End If
     End Sub
     Private Function OpenPNR1A(ByVal pPNR As String) As String
@@ -246,13 +291,28 @@ Public Class frmPriceOptimiser
                     OpenPNR1A = pResponse
                 End If
             Else
-                Throw New Exception("Amadeus not signed in")
+                OpenPNR1A = "Amadeus not signed in"
             End If
-
-
         Catch ex As Exception
-            MessageBox.Show(ex.Message)
+            OpenPNR1A = ex.Message
         End Try
+    End Function
+    Private Function OpenPNR1G(ByVal pPNR As String) As String
+
+        OpenPNR1G = ""
+        Dim pSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
+        Dim pobjPNR As ObjectModel.ReadOnlyCollection(Of String)
+        Try
+            pobjPNR = pSession1G.SendTerminalCommand("*" & pPNR)
+            If pobjPNR.Count <= 3 Or pobjPNR(0) = "FINISH OR IGNORE" Or pobjPNR(0).StartsWith("AG - DUTY CODE") Then
+                OpenPNR1G = pobjPNR(0)
+            End If
+        Catch ex As Travelport.TravelData.DesktopUserNotSignedOnException
+            OpenPNR1G = "Please sign in to Galileo/Smartpoint"
+        Catch ex As Exception
+            OpenPNR1G = "Cannot open Galileo/Smartpoint" & vbCrLf & ex.Message
+        End Try
+
     End Function
 
     Private Sub cmdRefresh_Click(sender As Object, e As EventArgs) Handles cmdRefresh.Click

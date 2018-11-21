@@ -57,7 +57,7 @@ Public Class frmAPISPax
     Private Sub txtDateOfBirth_TextChanged(sender As Object, e As EventArgs) Handles txtDateOfBirth.TextChanged
         Try
             If Not Date.TryParse(txtDateOfBirth.Text, mobjPax.BirthDate) Then
-                mobjPax.BirthDate = Utilities.DateFromIATA(txtDateOfBirth.Text)
+                mobjPax.BirthDate = DateFromIATA(txtDateOfBirth.Text)
             End If
         Catch ex As Exception
             mobjPax.BirthDate = Date.MinValue
@@ -67,7 +67,7 @@ Public Class frmAPISPax
     Private Sub txtPassportExpiryDate_TextChanged(sender As Object, e As EventArgs) Handles txtPassportExpiryDate.TextChanged
         Try
             If Not Date.TryParse(txtPassportExpiryDate.Text, mobjPax.ExpiryDate) Then
-                mobjPax.ExpiryDate = Utilities.DateFromIATA(txtPassportExpiryDate.Text)
+                mobjPax.ExpiryDate = DateFromIATA(txtPassportExpiryDate.Text)
             End If
         Catch ex As Exception
             mobjPax.ExpiryDate = Date.MinValue

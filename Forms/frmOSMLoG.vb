@@ -1,8 +1,9 @@
 ﻿Friend Class frmOSMLoG
     Private mflgLoading As Boolean
+    Private mobjAddresses As New OSMAddressCollection
+    Private mobjAddressSelected As OSMAddressItem
     Private mOSMAgents As New OSMEmailCollection
     Private mobjAgent As OSMEmailItem
-    Private mOSMAgentIndex As Integer = -1
     Private mobjPNR As GDSReadPNR
 
     Friend Sub New(ByRef pPNR As GDSReadPNR)
@@ -16,26 +17,17 @@
     End Sub
     Public ReadOnly Property PortAgent As OSMEmailItem
         Get
-            PortAgent = mobjAgent
+            Return mobjAgent
         End Get
     End Property
     Public ReadOnly Property NoPortAgent As Boolean
         Get
-            NoPortAgent = chkNoPortAgent.Checked
+            Return chkNoPortAgent.Checked
         End Get
     End Property
-    Public ReadOnly Property SignedBy As String
+    Public ReadOnly Property AddressItem As OSMAddressItem
         Get
-            SignedBy = txtSignedBy.Text
-        End Get
-    End Property
-    Public ReadOnly Property SignatoryType As Integer
-        Get
-            If optSignedByPHL.Checked Then
-                Return 2
-            Else
-                Return 1
-            End If
+            Return mobjAddressSelected
         End Get
     End Property
     Private Sub frmOSMLoG_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -58,6 +50,7 @@
                 txtFileDestination.Text = ""
             End If
             LoadAgents()
+            LoadAddresses()
             ShowPNRDetails()
             EnableSelection()
         Catch ex As Exception
@@ -68,9 +61,17 @@
         End Try
 
     End Sub
+    Private Sub LoadAddresses()
+        lstOfficeAddress.Items.Clear()
+        mobjAddresses.Load
+        For Each pItem As OSMAddressItem In mobjAddresses.Values
+            lstOfficeAddress.Items.Add(pItem)
+        Next
+    End Sub
     Private Sub ShowPNRDetails()
 
         With mobjPNR
+            lblPNR.Text = "PNR: " & .RequestedPNR & vbCrLf & "Client Code: " & .ClientCode & vbCrLf & .ClientName & vbCrLf & .VesselName
             If .Passengers.Count > 1 Then
                 lblPax.Text = .Passengers.Count & " Passengers" & vbCrLf
             Else
@@ -97,7 +98,6 @@
     Private Sub LoadAgents()
 
         mOSMAgents.Load()
-        mOSMAgentIndex = -1
         lstPortAgent.Items.Clear()
         For Each pAgent As OSMEmailItem In mOSMAgents.Values
             lstPortAgent.Items.Add(pAgent)
@@ -114,6 +114,12 @@
     Private Sub EnableSelection()
 
         cmdCreatePDF.Enabled = ((optPerPax.Checked Or optPerPNR.Checked) And (optOnSigners.Checked Or optOffSigners.Checked Or optOnSignersBrazil.Checked) And txtFileDestination.Text <> "" And (Not mobjAgent Is Nothing Or chkNoPortAgent.Checked))
+        If txtSignedBy.Text = "" Then
+            cmdCreatePDF.Enabled = False
+            txtSignedBy.BackColor = Color.Red
+        Else
+            txtSignedBy.BackColor = Color.FromKnownColor(KnownColor.Window)
+        End If
 
     End Sub
 
@@ -123,9 +129,9 @@
             MySettings.OSMLoGPerPax = optPerPax.Checked
             MySettings.OSMLoGOnSigner = optOnSigners.Checked Or optOnSignersBrazil.Checked
             If optOnSignersBrazil.Checked Then
-                MySettings.OSMLoGLanguage = Utilities.EnumLoGLanguage.Brazil
+                MySettings.OSMLoGLanguage = EnumLoGLanguage.Brazil
             Else
-                MySettings.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
+                MySettings.OSMLoGLanguage = EnumLoGLanguage.English
             End If
             MySettings.OSMLoGPath = txtFileDestination.Text
             MySettings.Save()
@@ -157,7 +163,6 @@
     Private Sub txtOSMAgentsFilter_TextChanged(sender As Object, e As EventArgs) Handles txtOSMAgentsFilter.TextChanged
         Try
             lstPortAgent.Items.Clear()
-            mOSMAgentIndex = -1
             If txtOSMAgentsFilter.Text.Trim = "" Then
                 For Each pAgent As OSMEmailItem In mOSMAgents.Values
                     lstPortAgent.Items.Add(pAgent)
@@ -179,6 +184,48 @@
         End Try
     End Sub
     Private Sub txtSignedBy_TextChanged(sender As Object, e As EventArgs) Handles txtSignedBy.TextChanged
-        optSignedBy.Checked = True
+        If Not mobjAddressSelected Is Nothing Then
+            mobjAddressSelected.SignedByName = txtSignedBy.Text
+        End If
+        EnableSelection()
+    End Sub
+
+    Private Sub lstOfficeAddress_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lstOfficeAddress.SelectedIndexChanged
+        If Not lstOfficeAddress Is Nothing Then
+            mobjAddressSelected = lstOfficeAddress.SelectedItem
+            DisplayAddress()
+        End If
+        EnableSelection()
+    End Sub
+    Private Sub DisplayAddress()
+        With mobjAddressSelected
+            If .SignedByName = "" Then
+                If mobjPNR.BookedBy.IndexOf("-") > 0 Then
+                    txtSignedBy.Text = mobjPNR.BookedBy.Substring(0, mobjPNR.BookedBy.IndexOf("-"))
+                Else
+                    txtSignedBy.Text = mobjPNR.BookedBy
+                End If
+            Else
+                txtSignedBy.Text = .SignedByName
+            End If
+            txtTitle.Text = .Title
+            txtCompanyName.Text = .CompanyName
+            txtAddress.Text = .Address
+            txtPCArea.Text = .PCArea
+            txtCountry.Text = .Country
+            txtTelephone.Text = .Telephone
+            If .LogoImage_fk = 0 Then
+                picLogo.Visible = False
+            Else
+                picLogo.Image = .LogoImage
+                picLogo.Visible = True
+            End If
+            If .SignatureImage_fk = 0 Then
+                picSignature.Visible = False
+            Else
+                picSignature.Image = .SignatureImage
+                picSignature.Visible = True
+            End If
+        End With
     End Sub
 End Class

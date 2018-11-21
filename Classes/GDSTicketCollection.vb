@@ -12,7 +12,7 @@
         mobjPNR = pPnr
         ReadTickets()
     End Sub
-    Public Sub addTicket(ByVal pGDSLine As String, ByVal pTicketType As Integer, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Integer, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String)
+    Public Sub addTicket(ByVal pGDSLine As String, ByVal pTicketType As Integer, ByVal pTicketNumber As Decimal, ByVal pTicketCount As Integer, ByVal IssuingAirline As String, ByVal AirlineCode As String, ByVal eTicket As Boolean, ByVal Segs As String, ByVal Pax As String, ByVal TicketType As String, ByVal ServicesDescription As String)
 
         Dim pobjTicket As GDSTicketItem
 
@@ -21,7 +21,7 @@
                 pobjTicket = New GDSTicketItem
 
                 mintCount = mintCount + 1
-                pobjTicket.SetValues(pGDSLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType)
+                pobjTicket.SetValues(pGDSLine, pTicketType, pTicketNumber, pTicketCount, IssuingAirline, AirlineCode, eTicket, Segs, Pax, TicketType, ServicesDescription)
                 MyBase.Add(Format(mintCount), pobjTicket)
             End If
         Catch ex As Exception

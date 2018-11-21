@@ -7,7 +7,8 @@
         Dim EntityKindLT As Integer
         Dim HasVessels As Boolean
         Dim HasDepartments As Boolean
-        Dim Alert As String
+        Dim AlertForFinisher As String
+        Dim AlertForDownsell As String
         Dim GalileoTrackingCode As String
     End Structure
     Private mudtProps As ClassProps
@@ -23,51 +24,65 @@
 
     Public ReadOnly Property ID() As Integer
         Get
-            ID = mudtProps.ID
+            Return mudtProps.ID
         End Get
     End Property
 
     Public ReadOnly Property Code() As String
         Get
-            Code = mudtProps.Code
+            Return mudtProps.Code
         End Get
     End Property
 
     Public ReadOnly Property Name() As String
         Get
-            Name = mudtProps.Name.ToUpper
+            Return mudtProps.Name.ToUpper
         End Get
     End Property
     Public ReadOnly Property Logo As String
         Get
-            Return mudtProps.Logo.ToUpper
+            If mudtProps.Logo Is Nothing Then
+                Return ""
+            Else
+                Return mudtProps.Logo.ToUpper
+            End If
         End Get
     End Property
     Public ReadOnly Property EntityKindLT() As Integer
         Get
-            EntityKindLT = mudtProps.EntityKindLT
+            Return mudtProps.EntityKindLT
         End Get
     End Property
 
     Public ReadOnly Property HasVessels() As Boolean
         Get
-            HasVessels = mudtProps.HasVessels
+            Return mudtProps.HasVessels
         End Get
     End Property
 
     Public ReadOnly Property HasDepartments() As Boolean
         Get
-            HasDepartments = mudtProps.HasDepartments
+            Return mudtProps.HasDepartments
         End Get
     End Property
-    Public ReadOnly Property Alert As String
+    Public ReadOnly Property AlertForFinisher As String
         Get
-            Alert = mudtProps.Alert
+            Return mudtProps.AlertForFinisher
+        End Get
+    End Property
+    Public ReadOnly Property AlertForDownsell As String
+        Get
+            If mudtProps.AlertForDownsell Is Nothing Then
+                Return ""
+            Else
+                Return mudtProps.AlertForDownsell
+            End If
+
         End Get
     End Property
     Public ReadOnly Property GalileoTrackingCode As String
         Get
-            GalileoTrackingCode = mudtProps.GalileoTrackingCode
+            Return mudtProps.GalileoTrackingCode
         End Get
     End Property
     Public ReadOnly Property CustomerProperties As CustomPropertiesCollection
@@ -76,18 +91,19 @@
                 mobjCustomProperties.Load(mudtProps.ID)
                 mflgCustomProperties = True
             End If
-            CustomerProperties = mobjCustomProperties
+            Return mobjCustomProperties
         End Get
     End Property
 
-    Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String, ByVal pLogo As String, ByVal pEntityKindLT As Integer, ByVal pAlert As String, ByVal pGalileoTrackingCode As String)
+    Friend Sub SetValues(ByVal pID As Integer, ByVal pCode As String, ByVal pName As String, ByVal pLogo As String, ByVal pEntityKindLT As Integer, ByVal pAlertForFinisher As String, ByVal pAlertForDownsell As String, ByVal pGalileoTrackingCode As String)
         With mudtProps
             .ID = pID
             .Code = pCode
             .Name = pName
             .Logo = pLogo
             .EntityKindLT = pEntityKindLT
-            .Alert = pAlert.Trim
+            .AlertForFinisher = pAlertForFinisher.Trim
+            .AlertForDownsell = pAlertForDownsell.Trim
             .GalileoTrackingCode = pGalileoTrackingCode
             ' TFEntityKind (from DB table [TravelForceCosmos].[dbo].[LookupTable])
             ' 404 = Other
@@ -124,7 +140,7 @@
         End With
         With pobjReader
             If pobjReader.Read Then
-                SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("Logo")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
+                SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("Logo")), CInt(.Item("TFEntityKindLT")), mobjAlerts.AlertForFinisher(MySettings.PCCBackOffice, CStr(.Item("Code"))), mobjAlerts.AlertForDownsell(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
                 .Close()
             End If
         End With

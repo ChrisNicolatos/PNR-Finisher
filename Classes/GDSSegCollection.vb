@@ -5,7 +5,7 @@
     Private mMaxCityNameLength As Integer = 11
     Private mMaxAirportShortNameLength As Integer = 11
     Private mAirlineAlert As String = ""
-    Private mAirlineAlerts As New AlertsCollection
+    Private mAirlineAlerts As AlertsCollection
     Private mAmadeusQueue As String
     Private mGalileoQueue As String
     Public Overloads Sub Clear()
@@ -14,7 +14,7 @@
         mMaxCityNameLength = 11
         mMaxAirportShortNameLength = 11
         mAirlineAlert = ""
-        mAirlineAlerts = New AlertsCollection
+        mAirlineAlerts = New AlertsCollection()
         mAmadeusQueue = ""
         mGalileoQueue = ""
     End Sub
@@ -56,6 +56,9 @@
         mMaxAirportShortNameLength = 11 ' Math.Max(pobjClass.OffPointAirportShortName.Length, mMaxAirportShortNameLength)
 
         Dim pAirlineAlert As String = ""
+        If mAirlineAlerts Is Nothing Then
+            mAirlineAlerts = New AlertsCollection()
+        End If
         pAirlineAlert = mAirlineAlerts.AirlineAlert(pobjClass.Airline)
         If pAirlineAlert <> "" And mAirlineAlert.IndexOf(pAirlineAlert) = -1 Then
             mAirlineAlert &= pAirlineAlert & vbCrLf

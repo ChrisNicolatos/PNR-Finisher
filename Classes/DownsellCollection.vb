@@ -4,6 +4,7 @@ Public Class DownsellCollection
     Inherits Collections.Generic.Dictionary(Of Integer, DownsellItem)
     Private mstrPCC As String = ""
     Private mstrUserID As String = ""
+    Private mCustomers As New CustomerCollectionAll
     Public Function CountNonVerified(ByVal PCC As String, ByVal UserID As String) As Integer
         Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
         Dim pobjComm As New SqlClient.SqlCommand
@@ -21,7 +22,7 @@ Public Class DownsellCollection
 
             .CommandText = "SELECT COUNT(*)
             FROM AmadeusReports.dbo.DownsellPNRLog
-            WHERE ISNULL(doVerifiedbyUser, 0) = 0 AND doPCC + '|' + doUserGdsId in (
+            WHERE ISNULL(doVerifiedbyUser, 0) = 0 AND (doPCC + '|' + doUserGdsId in (
             SELECT  pfPCC + '|' + pfUser AS UserKey
             FROM AmadeusReports.dbo.PNRFinisherUserName
             LEFT JOIN AmadeusReports.dbo.PNRFinisherUsers
@@ -32,17 +33,22 @@ Public Class DownsellCollection
             FROM AmadeusReports.dbo.PNRFinisherUsers
             LEFT JOIN AmadeusReports.dbo.PNRFinisherUserName
             ON pfUserName_fk = pfnID
-            WHERE pfPCC = @PCC AND pfUser = @UserID)=1"
+            WHERE pfPCC = @PCC AND pfUser = @UserID)=1)"
             CountNonVerified = CInt(.ExecuteScalar)
         End With
         pobjConn.Close()
     End Function
     Public Sub Load(ByVal PCC As String, ByVal UserID As String)
+        Dim pCustomer As CustomerItem
+
         MyBase.Clear()
         If PCC <> "" And UserID <> "" Then
             mstrPCC = PCC
             mstrUserID = UserID
 
+            If mCustomers Is Nothing OrElse mCustomers.Count = 0 Then
+                mCustomers.Load()
+            End If
             Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
             Dim pobjComm As New SqlClient.SqlCommand
             Dim pobjReader As SqlClient.SqlDataReader
@@ -63,6 +69,7 @@ Public Class DownsellCollection
                           ,doUserGdsId
                           ,doDateLogged
                           ,doDownsellDecision
+                          ,doClientCode
                           ,doPaxName
                           ,doItinerary
                           ,doTotal
@@ -83,6 +90,7 @@ SELECT DISTINCT 2 AS OwnPNR
       ,doUserGdsId
       ,doDateLogged
       ,doDownsellDecision
+      ,doClientCode
       ,doPaxName
       ,doItinerary
       ,doTotal
@@ -110,9 +118,10 @@ SELECT DISTINCT 2 AS OwnPNR
                 Do While .Read
                     pID += 1
                     pobjClass = New DownsellItem
+                    pCustomer = mCustomers.GetCustomerByCode(CStr(.Item("doClientCode")))
                     pobjClass.SetValues(CInt(.Item("OwnPNR")), CStr(.Item("doPCC")), CStr(.Item("doGDS")), CStr(.Item("doPNR")) _
-                    , CStr(.Item("doUserGdsId")), CDate(.Item("doDateLogged")), CStr(.Item("doDownsellDecision")) _
-                          , CStr(.Item("doPaxName")), CStr(.Item("doItinerary")), CDec(.Item("doTotal")), CDec(.Item("doDownsellTotal")) _
+                    , CStr(.Item("doUserGdsId")), CDate(.Item("doDateLogged")), CStr(.Item("doDownsellDecision")), CStr(.Item("doClientCode")) _
+                          , pCustomer.Logo, pCustomer.AlertForDownsell, CStr(.Item("doPaxName")), CStr(.Item("doItinerary")), CDec(.Item("doTotal")), CDec(.Item("doDownsellTotal")) _
                           , CStr(.Item("doFareBasis")), CStr(.Item("doDownsellFareBasis")), CStr(.Item("doGDSCommand")))
                     MyBase.Add(pID, pobjClass)
                 Loop

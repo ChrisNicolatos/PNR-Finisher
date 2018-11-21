@@ -104,15 +104,13 @@ Partial Class frmPNR
         Me.optItnAirportname = New System.Windows.Forms.RadioButton()
         Me.optItnAirportCode = New System.Windows.Forms.RadioButton()
         Me.fraItnOptions = New System.Windows.Forms.GroupBox()
+        Me.chkItnItinRemarks = New System.Windows.Forms.CheckBox()
+        Me.chkItnCabinDescription = New System.Windows.Forms.CheckBox()
         Me.chkItnCostCentre = New System.Windows.Forms.CheckBox()
         Me.chkItnFlyingTime = New System.Windows.Forms.CheckBox()
-        Me.lblItnTextToBeAdded = New System.Windows.Forms.Label()
         Me.chkItnSeating = New System.Windows.Forms.CheckBox()
-        Me.chkItnUSAText = New System.Windows.Forms.CheckBox()
         Me.chkItnStopovers = New System.Windows.Forms.CheckBox()
-        Me.chkItnBrazilText = New System.Windows.Forms.CheckBox()
         Me.chkItnTerminal = New System.Windows.Forms.CheckBox()
-        Me.chkItnElecItemsBan = New System.Windows.Forms.CheckBox()
         Me.chkItnPaxSegPerTicket = New System.Windows.Forms.CheckBox()
         Me.chkItnTickets = New System.Windows.Forms.CheckBox()
         Me.chkItnClass = New System.Windows.Forms.CheckBox()
@@ -159,6 +157,7 @@ Partial Class frmPNR
         Me.lstOSMToEmail = New System.Windows.Forms.ListBox()
         Me.cmdOSMRefresh = New System.Windows.Forms.Button()
         Me.ttpToolTip = New System.Windows.Forms.ToolTip(Me.components)
+        Me.chkItnEMD = New System.Windows.Forms.CheckBox()
         Me.tabPNR.SuspendLayout()
         Me.tabPageFinisher.SuspendLayout()
         CType(Me.dgvApis, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -1069,15 +1068,14 @@ Partial Class frmPNR
         '
         'fraItnOptions
         '
+        Me.fraItnOptions.Controls.Add(Me.chkItnEMD)
+        Me.fraItnOptions.Controls.Add(Me.chkItnItinRemarks)
+        Me.fraItnOptions.Controls.Add(Me.chkItnCabinDescription)
         Me.fraItnOptions.Controls.Add(Me.chkItnCostCentre)
         Me.fraItnOptions.Controls.Add(Me.chkItnFlyingTime)
-        Me.fraItnOptions.Controls.Add(Me.lblItnTextToBeAdded)
         Me.fraItnOptions.Controls.Add(Me.chkItnSeating)
-        Me.fraItnOptions.Controls.Add(Me.chkItnUSAText)
         Me.fraItnOptions.Controls.Add(Me.chkItnStopovers)
-        Me.fraItnOptions.Controls.Add(Me.chkItnBrazilText)
         Me.fraItnOptions.Controls.Add(Me.chkItnTerminal)
-        Me.fraItnOptions.Controls.Add(Me.chkItnElecItemsBan)
         Me.fraItnOptions.Controls.Add(Me.chkItnPaxSegPerTicket)
         Me.fraItnOptions.Controls.Add(Me.chkItnTickets)
         Me.fraItnOptions.Controls.Add(Me.chkItnClass)
@@ -1086,16 +1084,38 @@ Partial Class frmPNR
         Me.fraItnOptions.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.fraItnOptions.Location = New System.Drawing.Point(172, 192)
         Me.fraItnOptions.Name = "fraItnOptions"
-        Me.fraItnOptions.Size = New System.Drawing.Size(137, 377)
+        Me.fraItnOptions.Size = New System.Drawing.Size(137, 393)
         Me.fraItnOptions.TabIndex = 6
         Me.fraItnOptions.TabStop = False
         Me.fraItnOptions.Text = "Options"
+        '
+        'chkItnItinRemarks
+        '
+        Me.chkItnItinRemarks.AutoSize = True
+        Me.chkItnItinRemarks.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.chkItnItinRemarks.Location = New System.Drawing.Point(6, 292)
+        Me.chkItnItinRemarks.Name = "chkItnItinRemarks"
+        Me.chkItnItinRemarks.Size = New System.Drawing.Size(121, 17)
+        Me.chkItnItinRemarks.TabIndex = 15
+        Me.chkItnItinRemarks.Text = "Itin.Remarks RIR RI"
+        Me.chkItnItinRemarks.UseVisualStyleBackColor = True
+        '
+        'chkItnCabinDescription
+        '
+        Me.chkItnCabinDescription.AutoSize = True
+        Me.chkItnCabinDescription.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.chkItnCabinDescription.Location = New System.Drawing.Point(6, 270)
+        Me.chkItnCabinDescription.Name = "chkItnCabinDescription"
+        Me.chkItnCabinDescription.Size = New System.Drawing.Size(109, 17)
+        Me.chkItnCabinDescription.TabIndex = 14
+        Me.chkItnCabinDescription.Text = "Cabin Description"
+        Me.chkItnCabinDescription.UseVisualStyleBackColor = True
         '
         'chkItnCostCentre
         '
         Me.chkItnCostCentre.AutoSize = True
         Me.chkItnCostCentre.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnCostCentre.Location = New System.Drawing.Point(7, 249)
+        Me.chkItnCostCentre.Location = New System.Drawing.Point(6, 248)
         Me.chkItnCostCentre.Name = "chkItnCostCentre"
         Me.chkItnCostCentre.Size = New System.Drawing.Size(81, 17)
         Me.chkItnCostCentre.TabIndex = 13
@@ -1113,90 +1133,44 @@ Partial Class frmPNR
         Me.chkItnFlyingTime.Text = "Flying Time"
         Me.chkItnFlyingTime.UseVisualStyleBackColor = True
         '
-        'lblItnTextToBeAdded
-        '
-        Me.lblItnTextToBeAdded.AutoSize = True
-        Me.lblItnTextToBeAdded.Location = New System.Drawing.Point(6, 270)
-        Me.lblItnTextToBeAdded.Name = "lblItnTextToBeAdded"
-        Me.lblItnTextToBeAdded.Size = New System.Drawing.Size(127, 13)
-        Me.lblItnTextToBeAdded.TabIndex = 8
-        Me.lblItnTextToBeAdded.Text = "TEXT TO BE ADDED"
-        '
         'chkItnSeating
         '
         Me.chkItnSeating.AutoSize = True
         Me.chkItnSeating.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnSeating.Location = New System.Drawing.Point(6, 153)
+        Me.chkItnSeating.Location = New System.Drawing.Point(6, 160)
         Me.chkItnSeating.Name = "chkItnSeating"
         Me.chkItnSeating.Size = New System.Drawing.Size(118, 17)
         Me.chkItnSeating.TabIndex = 5
         Me.chkItnSeating.Text = "Seating assignment"
         Me.chkItnSeating.UseVisualStyleBackColor = True
         '
-        'chkItnUSAText
-        '
-        Me.chkItnUSAText.AutoSize = True
-        Me.chkItnUSAText.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnUSAText.Location = New System.Drawing.Point(6, 343)
-        Me.chkItnUSAText.Name = "chkItnUSAText"
-        Me.chkItnUSAText.Size = New System.Drawing.Size(72, 17)
-        Me.chkItnUSAText.TabIndex = 11
-        Me.chkItnUSAText.Text = "USA Text"
-        Me.ttpToolTip.SetToolTip(Me.chkItnUSAText, resources.GetString("chkItnUSAText.ToolTip"))
-        Me.chkItnUSAText.UseVisualStyleBackColor = True
-        '
         'chkItnStopovers
         '
         Me.chkItnStopovers.AutoSize = True
         Me.chkItnStopovers.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnStopovers.Location = New System.Drawing.Point(6, 203)
+        Me.chkItnStopovers.Location = New System.Drawing.Point(6, 204)
         Me.chkItnStopovers.Name = "chkItnStopovers"
         Me.chkItnStopovers.Size = New System.Drawing.Size(102, 17)
         Me.chkItnStopovers.TabIndex = 7
         Me.chkItnStopovers.Text = "Show stopovers"
         Me.chkItnStopovers.UseVisualStyleBackColor = True
         '
-        'chkItnBrazilText
-        '
-        Me.chkItnBrazilText.AutoSize = True
-        Me.chkItnBrazilText.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnBrazilText.Location = New System.Drawing.Point(6, 318)
-        Me.chkItnBrazilText.Name = "chkItnBrazilText"
-        Me.chkItnBrazilText.Size = New System.Drawing.Size(84, 17)
-        Me.chkItnBrazilText.TabIndex = 10
-        Me.chkItnBrazilText.Text = "BRAZIL text"
-        Me.ttpToolTip.SetToolTip(Me.chkItnBrazilText, resources.GetString("chkItnBrazilText.ToolTip"))
-        Me.chkItnBrazilText.UseVisualStyleBackColor = True
-        '
         'chkItnTerminal
         '
         Me.chkItnTerminal.AutoSize = True
         Me.chkItnTerminal.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnTerminal.Location = New System.Drawing.Point(6, 178)
+        Me.chkItnTerminal.Location = New System.Drawing.Point(6, 182)
         Me.chkItnTerminal.Name = "chkItnTerminal"
         Me.chkItnTerminal.Size = New System.Drawing.Size(92, 17)
         Me.chkItnTerminal.TabIndex = 6
         Me.chkItnTerminal.Text = "Show terminal"
         Me.chkItnTerminal.UseVisualStyleBackColor = True
         '
-        'chkItnElecItemsBan
-        '
-        Me.chkItnElecItemsBan.AutoSize = True
-        Me.chkItnElecItemsBan.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.chkItnElecItemsBan.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnElecItemsBan.Location = New System.Drawing.Point(6, 295)
-        Me.chkItnElecItemsBan.Name = "chkItnElecItemsBan"
-        Me.chkItnElecItemsBan.Size = New System.Drawing.Size(127, 17)
-        Me.chkItnElecItemsBan.TabIndex = 9
-        Me.chkItnElecItemsBan.Text = "2017 Elec. Items Ban"
-        Me.ttpToolTip.SetToolTip(Me.chkItnElecItemsBan, resources.GetString("chkItnElecItemsBan.ToolTip"))
-        Me.chkItnElecItemsBan.UseVisualStyleBackColor = False
-        '
         'chkItnPaxSegPerTicket
         '
         Me.chkItnPaxSegPerTicket.AutoSize = True
         Me.chkItnPaxSegPerTicket.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnPaxSegPerTicket.Location = New System.Drawing.Point(6, 128)
+        Me.chkItnPaxSegPerTicket.Location = New System.Drawing.Point(6, 138)
         Me.chkItnPaxSegPerTicket.Name = "chkItnPaxSegPerTicket"
         Me.chkItnPaxSegPerTicket.Size = New System.Drawing.Size(115, 17)
         Me.chkItnPaxSegPerTicket.TabIndex = 4
@@ -1207,7 +1181,7 @@ Partial Class frmPNR
         '
         Me.chkItnTickets.AutoSize = True
         Me.chkItnTickets.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnTickets.Location = New System.Drawing.Point(6, 103)
+        Me.chkItnTickets.Location = New System.Drawing.Point(6, 94)
         Me.chkItnTickets.Name = "chkItnTickets"
         Me.chkItnTickets.Size = New System.Drawing.Size(61, 17)
         Me.chkItnTickets.TabIndex = 3
@@ -1218,7 +1192,7 @@ Partial Class frmPNR
         '
         Me.chkItnClass.AutoSize = True
         Me.chkItnClass.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnClass.Location = New System.Drawing.Point(6, 53)
+        Me.chkItnClass.Location = New System.Drawing.Point(6, 50)
         Me.chkItnClass.Name = "chkItnClass"
         Me.chkItnClass.Size = New System.Drawing.Size(102, 17)
         Me.chkItnClass.TabIndex = 1
@@ -1240,7 +1214,7 @@ Partial Class frmPNR
         '
         Me.chkItnAirlineLocator.AutoSize = True
         Me.chkItnAirlineLocator.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
-        Me.chkItnAirlineLocator.Location = New System.Drawing.Point(6, 78)
+        Me.chkItnAirlineLocator.Location = New System.Drawing.Point(6, 72)
         Me.chkItnAirlineLocator.Name = "chkItnAirlineLocator"
         Me.chkItnAirlineLocator.Size = New System.Drawing.Size(93, 17)
         Me.chkItnAirlineLocator.TabIndex = 2
@@ -1256,7 +1230,7 @@ Partial Class frmPNR
         Me.rtbItnDoc.Font = New System.Drawing.Font("Courier New", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
         Me.rtbItnDoc.Location = New System.Drawing.Point(315, 199)
         Me.rtbItnDoc.Name = "rtbItnDoc"
-        Me.rtbItnDoc.Size = New System.Drawing.Size(1115, 370)
+        Me.rtbItnDoc.Size = New System.Drawing.Size(1115, 386)
         Me.rtbItnDoc.TabIndex = 11
         Me.rtbItnDoc.Text = ""
         '
@@ -1658,6 +1632,17 @@ Partial Class frmPNR
         Me.cmdOSMRefresh.Text = "Refresh"
         Me.cmdOSMRefresh.UseVisualStyleBackColor = True
         '
+        'chkItnEMD
+        '
+        Me.chkItnEMD.AutoSize = True
+        Me.chkItnEMD.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(161, Byte))
+        Me.chkItnEMD.Location = New System.Drawing.Point(6, 116)
+        Me.chkItnEMD.Name = "chkItnEMD"
+        Me.chkItnEMD.Size = New System.Drawing.Size(50, 17)
+        Me.chkItnEMD.TabIndex = 16
+        Me.chkItnEMD.Text = "EMD"
+        Me.chkItnEMD.UseVisualStyleBackColor = True
+        '
         'frmPNR
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1723,7 +1708,6 @@ Partial Class frmPNR
     Friend WithEvents tabPageFinisher As System.Windows.Forms.TabPage
     Friend WithEvents tabPageItinerary As System.Windows.Forms.TabPage
     Friend WithEvents lstItnRemarks As System.Windows.Forms.CheckedListBox
-    Friend WithEvents chkItnElecItemsBan As System.Windows.Forms.CheckBox
     Public WithEvents cmdItn1AReadCurrent As System.Windows.Forms.Button
     Friend WithEvents fraItnAirportName As System.Windows.Forms.GroupBox
     Friend WithEvents optItnAirportBoth As System.Windows.Forms.RadioButton
@@ -1744,8 +1728,6 @@ Partial Class frmPNR
     Friend WithEvents lblAveragePrice As System.Windows.Forms.Label
     Friend WithEvents lblAvPriceDetails As System.Windows.Forms.Label
     Friend WithEvents chkItnPaxSegPerTicket As System.Windows.Forms.CheckBox
-    Friend WithEvents chkItnUSAText As System.Windows.Forms.CheckBox
-    Friend WithEvents chkItnBrazilText As System.Windows.Forms.CheckBox
     Friend WithEvents chkItnStopovers As System.Windows.Forms.CheckBox
     Friend WithEvents chkItnTerminal As System.Windows.Forms.CheckBox
     Friend WithEvents chkItnSeating As System.Windows.Forms.CheckBox
@@ -1784,7 +1766,6 @@ Partial Class frmPNR
     Friend WithEvents webOSMDoc As System.Windows.Forms.WebBrowser
     Friend WithEvents cmdOSMEmailClear As System.Windows.Forms.Button
     Friend WithEvents ttpToolTip As System.Windows.Forms.ToolTip
-    Friend WithEvents lblItnTextToBeAdded As System.Windows.Forms.Label
     Friend WithEvents chkItnFlyingTime As System.Windows.Forms.CheckBox
     Friend WithEvents cmdItn1AReadQueue As System.Windows.Forms.Button
     Friend WithEvents cmdItnRefresh As System.Windows.Forms.Button
@@ -1823,4 +1804,7 @@ Partial Class frmPNR
     Friend WithEvents lstAirlineEntries As CheckedListBox
     Friend WithEvents chkOSMFullPaxSDetails As CheckBox
     Friend WithEvents cmdPriceOptimiser As Button
+    Friend WithEvents chkItnCabinDescription As CheckBox
+    Friend WithEvents chkItnItinRemarks As CheckBox
+    Friend WithEvents chkItnEMD As CheckBox
 End Class

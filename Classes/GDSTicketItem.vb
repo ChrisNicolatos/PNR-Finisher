@@ -26,6 +26,7 @@
         Dim Segs As String
         Dim Pax As String
         Dim TicketType As String
+        Dim ServicesDescription As String
 
     End Structure
     Private mudtProps As ClassProps
@@ -74,7 +75,7 @@
     Public ReadOnly Property eTicket() As Boolean
         Get
 
-            eTicket = mudtProps.eTicket
+            Return mudtProps.eTicket
 
         End Get
     End Property
@@ -90,10 +91,15 @@
     End Property
     Public ReadOnly Property TicketType As String
         Get
-            TicketType = mudtProps.TicketType
+            Return mudtProps.TicketType
         End Get
     End Property
-    Friend Sub SetValues(ByRef pGDSLine As String, ByRef pStockType As Integer, ByRef pDocument As Decimal, ByRef pBooks As Integer, ByRef pIssuingAirline As String, ByVal AirlineCode As String, ByRef peTicket As Boolean, pSegs As String, pPax As String, pTicketType As String)
+    Public ReadOnly Property ServicesDescription As String
+        Get
+            Return mudtProps.ServicesDescription
+        End Get
+    End Property
+    Friend Sub SetValues(ByVal pGDSLine As String, ByVal pStockType As Integer, ByVal pDocument As Decimal, ByVal pBooks As Integer, ByVal pIssuingAirline As String, ByVal AirlineCode As String, ByVal peTicket As Boolean, ByVal pSegs As String, ByVal pPax As String, ByVal pTicketType As String, ByVal pServicesDescription As String)
 
         With mudtProps
             .GDSLine = pGDSLine
@@ -106,6 +112,7 @@
             .Segs = pSegs
             .Pax = pPax
             .TicketType = pTicketType
+            .ServicesDescription = pServicesDescription
         End With
 
     End Sub

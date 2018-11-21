@@ -1,7 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 Public Class AirlinePointsCollection
-    Inherits System.Collections.Generic.Dictionary(Of Integer, AirlinePointsItem)
+    Inherits System.Collections.Generic.List(Of String)
 
     Public Sub Load(ByVal pCustID As Integer, ByVal pIATACode As String, ByVal GDSCode As Utilities.EnumGDSCode)
 
@@ -32,11 +32,11 @@ Public Class AirlinePointsCollection
                 If GDSCode = Utilities.EnumGDSCode.Amadeus Then
                     pCommandText = "SELECT pnfAmadeusEntry AS Remarks " &
                                    "  FROM AmadeusReports.dbo.PNRFinisherCorporateDeals " &
-                                   "  WHERE pnfClientId_fkey = " & pCustID & " AND pnfAirlineCode = '" & pIATACode & "' "
+                                   "  WHERE pnfClientId_fkey = " & pCustID & " AND pnfAirlineCode = '" & pIATACode & "' AND ISNULL(pnfAmadeusEntry, '') <>''  "
                 ElseIf GDSCode = Utilities.EnumGDSCode.Galileo Then
                     pCommandText = "SELECT pnfGalileoEntry AS Remarks " &
                                    "  FROM AmadeusReports.dbo.PNRFinisherCorporateDeals " &
-                                   "  WHERE pnfClientId_fkey = " & pCustID & " AND pnfAirlineCode = '" & pIATACode & "' "
+                                   "  WHERE pnfClientId_fkey = " & pCustID & " AND pnfAirlineCode = '" & pIATACode & "' AND ISNULL(pnfGalileoEntry, '') <>'' "
                 Else
                     Throw New Exception("FrequentFlyer.Collection.Load()" & vbCrLf & "GDS is not selected")
                 End If
@@ -50,8 +50,6 @@ Public Class AirlinePointsCollection
         Dim pobjConn As New SqlClient.SqlConnection(ConnectionString) ' ActiveConnection)
         Dim pobjComm As New SqlClient.SqlCommand
         Dim pobjReader As SqlClient.SqlDataReader
-        Dim pobjClass As AirlinePointsItem
-        Dim pID As Integer = 0
 
         pobjConn.Open()
         pobjComm = pobjConn.CreateCommand
@@ -64,10 +62,7 @@ Public Class AirlinePointsCollection
 
         With pobjReader
             Do While .Read
-                pID += 1
-                pobjClass = New AirlinePointsItem
-                pobjClass.SetValues(CStr(.Item("Remarks")))
-                MyBase.Add(pID, pobjClass)
+                MyBase.Add(CStr(.Item("Remarks")))
             Loop
             .Close()
         End With

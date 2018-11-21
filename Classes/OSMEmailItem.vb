@@ -27,7 +27,22 @@
         End With
 
     End Sub
-    Public Sub New(ByVal pType As String, Optional ByVal pVessel_FK As Integer = 0)
+    Public Sub New(ByVal pType As String)
+
+        With mudtprops
+            .Id = 0
+            .Vessel_FK = 0
+            .Name = ""
+            .Details = ""
+            .EmailType = pType
+            .Email = ""
+            .VesselName = ""
+            .isNew = True
+            CheckValid()
+        End With
+
+    End Sub
+    Public Sub New(ByVal pType As String, ByVal pVessel_FK As Integer)
 
         With mudtprops
             .Id = 0

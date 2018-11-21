@@ -7,6 +7,9 @@
         Dim UserGdsId As String
         Dim DateLogged As Date
         Dim DownsellDecision As String
+        Dim ClientCode As String
+        Dim ClientName As String
+        Dim AlertForDownsell As String
         Dim PaxName As String
         Dim Itinerary As String
         Dim Total As Decimal
@@ -51,6 +54,21 @@
             Return mudtProps.DownsellDecision
         End Get
     End Property
+    Public ReadOnly Property ClientCode As String
+        Get
+            Return mudtProps.ClientCode
+        End Get
+    End Property
+    Public ReadOnly Property ClientName As String
+        Get
+            Return mudtProps.ClientName
+        End Get
+    End Property
+    Public ReadOnly Property AlertForDownsell As String
+        Get
+            Return mudtProps.AlertForDownsell
+        End Get
+    End Property
     Public ReadOnly Property PaxName As String
         Get
             Return mudtProps.PaxName
@@ -88,7 +106,7 @@
     End Property
     Public Sub SetValues(ByVal pOwnPNR As Integer, ByVal pPCC As String, ByVal pGDS As String, ByVal pPNR As String _
                           , ByVal pUserGdsId As String, ByVal pDateLogged As Date, ByVal pDownsellDecision As String _
-                          , ByVal pPaxName As String, ByVal pItinerary As String _
+                          , ByVal pClientCode As String, ByVal pClientName As String, ByVal pAlertForDownsell As String, ByVal pPaxName As String, ByVal pItinerary As String _
                           , ByVal pTotal As Decimal, ByVal pDownsellTotal As Decimal, ByVal pFareBasis As String, ByVal pDownsellFareBasis As String _
                           , ByVal pGDSCommand As String)
         With mudtProps
@@ -99,6 +117,9 @@
             .UserGdsId = pUserGdsId
             .DateLogged = pDateLogged
             .DownsellDecision = pDownsellDecision
+            .ClientCode = pClientCode
+            .ClientName = pClientName
+            .AlertForDownsell = pAlertForDownsell
             .PaxName = pPaxName
             .Itinerary = pItinerary
             .Total = pTotal

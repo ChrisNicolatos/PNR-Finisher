@@ -100,7 +100,7 @@ Friend Class GDSNumberParser
                 pintEndOfString = .TicketNumberText.Length
                 For i = 1 To .TicketNumberText.Length
                     pflgOK = False
-                    pstrTemp = Mid(.TicketNumberText, i, 1)
+                    pstrTemp = .TicketNumberText.Substring(i - 1, 1)
                     If pstrTemp >= "0" And pstrTemp <= "9" Then
                         pflgOK = True
                     ElseIf pstrTemp = "-" Then
@@ -170,21 +170,21 @@ Friend Class GDSNumberParser
                 End If
 
                 If pintAirlineFrom > 0 And pintAirlineTo > pintAirlineFrom Then
-                    .AirlineNumber = Format(Utilities.myCurr(Mid(.TicketNumberText, pintAirlineFrom, pintAirlineTo - pintAirlineFrom + 1)), "000")
+                    .AirlineNumber = Format(myCurr(Mid(.TicketNumberText, pintAirlineFrom, pintAirlineTo - pintAirlineFrom + 1)), "000")
                 End If
 
                 If pintTicketFrom > 0 And pintTicketTo > pintTicketFrom Then
-                    pstrTicket = Mid(.TicketNumberText, pintTicketFrom, pintTicketTo - pintTicketFrom + 1)
-                    .DocumentNumber = Utilities.myCurr(pstrTicket)
+                    pstrTicket = .TicketNumberText.Substring(pintTicketFrom - 1, pintTicketTo - pintTicketFrom + 1)
+                    .DocumentNumber = myCurr(pstrTicket)
                     .Books = 1
                 End If
 
                 If pintConjFrom > 0 And pintConjTo >= pintConjFrom Then
-                    pstrTemp = Mid(.TicketNumberText, pintConjFrom, pintConjTo - pintConjFrom + 1)
+                    pstrTemp = .TicketNumberText.Substring(pintConjFrom - 1, pintConjTo - pintConjFrom + 1)
                     pstrTemp2 = pstrTicket
                     If pstrTemp.Length <= pstrTemp2.Length Then
                         Mid(pstrTemp2, pstrTemp2.Length - pstrTemp.Length + 1, pstrTemp.Length) = pstrTemp
-                        pcurrDoc2 = Utilities.myCurr(pstrTemp2)
+                        pcurrDoc2 = myCurr(pstrTemp2)
                         If pcurrDoc2 > .DocumentNumber Then
                             .Books = CInt(pcurrDoc2 - .DocumentNumber + 1)
                         End If

@@ -14,6 +14,7 @@ Friend Class Config
         Dim pCCDBInitialCatalog As String
         Dim pCCDBUserId As String
         Dim pCCDBUserPassword As String
+        Dim pCCDBBranchCode As String
         Dim pCCIATANumber As String
         Dim PCCFormalOfficeName As String
 
@@ -25,17 +26,17 @@ Friend Class Config
         Dim AirportName As Integer
         Dim ShowAirlineLocator As Boolean
         Dim ShowClassOfService As Boolean
-        Dim ShowBanElectricalEquipment As Boolean
-        Dim ShowBrazilText As Boolean
-        Dim ShowUSAText As Boolean
         Dim ShowTickets As Boolean
+        Dim ShowEMD As Boolean
         Dim ShowPaxSegPerTkt As Boolean
         Dim ShowStopovers As Boolean
         Dim ShowTerminal As Boolean
         Dim ShowFlyingTime As Boolean
         Dim ShowCostCentre As Boolean
+        Dim ShowCabinDescription As Boolean
         Dim ShowSeating As Boolean
         Dim ShowVessel As Boolean
+        Dim ShowitinRemarks As Boolean
         Dim Administrator As Boolean
         Dim FormatStyle As Utilities.EnumItnFormat
         Dim LastVersionTextShown As Integer
@@ -43,7 +44,7 @@ Friend Class Config
         Dim OSMLoGPerPax As Boolean
         Dim OSMLoGOnsigner As Boolean
         Dim OSMLoGPath As String
-        Dim OSMLoGLanguage As Utilities.EnumLoGLanguage
+        Dim OSMLoGLanguage As EnumLoGLanguage
         Dim Location As String
         Dim PriceOptimiser As Boolean
     End Structure
@@ -124,21 +125,6 @@ Friend Class Config
             mudtProps.OSMVesselGroup = value
         End Set
     End Property
-    Public ReadOnly Property IsDirty As Boolean
-        Get
-            IsDirty = mflgIsDirtyPCC Or mflgIsDirtyUser
-        End Get
-    End Property
-    Public ReadOnly Property IsDirtyPCC As Boolean
-        Get
-            IsDirtyPCC = mflgIsDirtyPCC
-        End Get
-    End Property
-    Public ReadOnly Property IsDirtyUser As Boolean
-        Get
-            IsDirtyUser = mflgIsDirtyUser
-        End Get
-    End Property
     Public Property ShowAirlineLocator As Boolean
         Get
             ShowAirlineLocator = mudtProps.ShowAirlineLocator
@@ -161,48 +147,37 @@ Friend Class Config
             mudtProps.ShowClassOfService = value
         End Set
     End Property
-    Public Property ShowBanElectricalEquipment As Boolean
-        Get
-            ShowBanElectricalEquipment = mudtProps.ShowBanElectricalEquipment
-        End Get
-        Set(value As Boolean)
-            If value <> mudtProps.ShowBanElectricalEquipment Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.ShowBanElectricalEquipment = value
-        End Set
-    End Property
-    Public Property ShowBrazilText As Boolean
-        Get
-            ShowBrazilText = mudtProps.ShowBrazilText
-        End Get
-        Set(value As Boolean)
-            If value <> mudtProps.ShowBrazilText Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.ShowBrazilText = value
-        End Set
-    End Property
-    Public Property ShowUSAText As Boolean
-        Get
-            ShowUSAText = mudtProps.ShowUSAText
-        End Get
-        Set(value As Boolean)
-            If value <> mudtProps.ShowUSAText Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.ShowUSAText = value
-        End Set
-    End Property
     Public Property ShowTickets As Boolean
         Get
-            ShowTickets = mudtProps.ShowTickets
+            Return mudtProps.ShowTickets
         End Get
         Set(value As Boolean)
             If value <> mudtProps.ShowTickets Then
                 mflgIsDirtyUser = True
             End If
             mudtProps.ShowTickets = value
+        End Set
+    End Property
+    Public Property ShowEMD As Boolean
+        Get
+            Return mudtProps.ShowEMD
+        End Get
+        Set(value As Boolean)
+            If value <> mudtProps.ShowEMD Then
+                mflgIsDirtyUser = True
+            End If
+            mudtProps.ShowEMD = value
+        End Set
+    End Property
+    Public Property ShowItinRemarks As Boolean
+        Get
+            Return mudtProps.ShowitinRemarks
+        End Get
+        Set(value As Boolean)
+            If value <> mudtProps.ShowitinRemarks Then
+                mflgIsDirtyUser = True
+            End If
+            mudtProps.ShowitinRemarks = value
         End Set
     End Property
     Public Property ShowPaxSegPerTkt As Boolean
@@ -260,6 +235,17 @@ Friend Class Config
             mudtProps.ShowCostCentre = value
         End Set
     End Property
+    Public Property ShowCabinDescription As Boolean
+        Get
+            ShowCabinDescription = mudtProps.ShowCabinDescription
+        End Get
+        Set(value As Boolean)
+            If value <> mudtProps.ShowCabinDescription Then
+                mflgIsDirtyUser = True
+            End If
+            mudtProps.ShowCabinDescription = value
+        End Set
+    End Property
     Public Property ShowSeating As Boolean
         Get
             ShowSeating = mudtProps.ShowSeating
@@ -315,11 +301,11 @@ Friend Class Config
             mudtProps.OSMLoGPath = value
         End Set
     End Property
-    Public Property OSMLoGLanguage As Utilities.EnumLoGLanguage
+    Public Property OSMLoGLanguage As EnumLoGLanguage
         Get
             OSMLoGLanguage = mudtProps.OSMLoGLanguage
         End Get
-        Set(value As Utilities.EnumLoGLanguage)
+        Set(value As EnumLoGLanguage)
             mudtProps.OSMLoGLanguage = value
         End Set
     End Property
@@ -328,171 +314,96 @@ Friend Class Config
             PCCId = mudtProps.PCCId
         End Get
     End Property
-    Public Property OfficeCityCode As String
+    Public ReadOnly Property OfficeCityCode As String
         Get
-            OfficeCityCode = mudtProps.OfficeCityCode.ToUpper
+            Return mudtProps.OfficeCityCode.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.OfficeCityCode Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.OfficeCityCode = value
-        End Set
     End Property
-    Public Property CountryCode As String
+    Public ReadOnly Property CountryCode As String
         Get
-            CountryCode = mudtProps.CountryCode.ToUpper
+            Return mudtProps.CountryCode.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.CountryCode Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.CountryCode = value
-        End Set
     End Property
-    Public Property OfficeName As String
+    Public ReadOnly Property OfficeName As String
         Get
-            OfficeName = mudtProps.OfficeName.ToUpper
+            Return mudtProps.OfficeName.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.OfficeName Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.OfficeName = value
-        End Set
     End Property
-    Public Property FormalOfficeName As String
+    Public ReadOnly Property FormalOfficeName As String
         Get
-            FormalOfficeName = mudtProps.PCCFormalOfficeName
+            Return mudtProps.PCCFormalOfficeName
         End Get
-        Set(value As String)
-            If value <> mudtProps.PCCFormalOfficeName Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.PCCFormalOfficeName = value
-        End Set
     End Property
-    Public Property CityName As String
+    Public ReadOnly Property CityName As String
         Get
-            CityName = mudtProps.CityName.ToUpper
+            Return mudtProps.CityName.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.CityName Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.CityName = value
-        End Set
     End Property
-    Public Property Phone As String
+    Public ReadOnly Property Phone As String
         Get
-            Phone = mudtProps.Phone.ToUpper
+            Return mudtProps.Phone.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.Phone Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.Phone = value
-        End Set
     End Property
-    Public Property AOHPhone As String
+    Public ReadOnly Property AOHPhone As String
         Get
-            AOHPhone = mudtProps.AOHPhone.ToUpper
+            Return mudtProps.AOHPhone.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.AOHPhone Then
-                mflgIsDirtyPCC = True
-            End If
-            mudtProps.AOHPhone = value
-        End Set
     End Property
-    Public Property PCCBackOffice As Integer
+    Public ReadOnly Property PCCBackOffice As Integer
         Get
-            PCCBackOffice = mudtProps.PCCBackOffice
+            Return mudtProps.PCCBackOffice
         End Get
-        Set(value As Integer)
-            mudtProps.PCCBackOffice = value
-        End Set
     End Property
-    Public Property PCCDBDataSource As String
+    Public ReadOnly Property PCCDBDataSource As String
         Get
             Return mudtProps.pCCDBDataSource
         End Get
-        Set(value As String)
-            mudtProps.pCCDBDataSource = value
-        End Set
     End Property
-
-    Public Property PCCDBInitialCatalog As String
+    Public ReadOnly Property PCCDBInitialCatalog As String
         Get
             Return mudtProps.pCCDBInitialCatalog
         End Get
-        Set(value As String)
-            mudtProps.pCCDBInitialCatalog = value
-        End Set
     End Property
-
-    Public Property PCCDBUserId As String
+    Public ReadOnly Property PCCDBUserId As String
         Get
             Return mudtProps.pCCDBUserId
         End Get
-        Set(value As String)
-            mudtProps.pCCDBUserId = value
-        End Set
     End Property
 
-    Public Property PCCDBUserPassword As String
+    Public ReadOnly Property PCCDBUserPassword As String
         Get
             Return mudtProps.pCCDBUserPassword
         End Get
-        Set(value As String)
-            mudtProps.pCCDBUserPassword = value
-        End Set
     End Property
-    Public Property IATANumber As String
+    Public ReadOnly Property PCCBranchCode As String
         Get
-            IATANumber = mudtProps.pCCIATANumber
+            Return mudtProps.pCCDBBranchCode
         End Get
-        Set(value As String)
-            mudtProps.pCCIATANumber = value
-        End Set
+    End Property
+    Public ReadOnly Property IATANumber As String
+        Get
+            Return mudtProps.pCCIATANumber
+        End Get
     End Property
     Public ReadOnly Property AgentID As Integer
         Get
             AgentID = mudtProps.AgentId
         End Get
     End Property
-    Public Property AgentQueue As String
+    Public ReadOnly Property AgentQueue As String
         Get
-            AgentQueue = mudtProps.AgentQueue.ToUpper
+            Return mudtProps.AgentQueue.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.AgentQueue Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.AgentQueue = value
-        End Set
     End Property
-    Public Property AgentOPQueue As String
+    Public ReadOnly Property AgentOPQueue As String
         Get
-            AgentOPQueue = mudtProps.AgentOPQueue.ToUpper
+            Return mudtProps.AgentOPQueue.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.AgentOPQueue Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.AgentOPQueue = value
-        End Set
     End Property
-    Public Property AgentName As String
+    Public ReadOnly Property AgentName As String
         Get
-            AgentName = mudtProps.AgentName.ToUpper
+            Return mudtProps.AgentName.ToUpper
         End Get
-        Set(value As String)
-            If value <> mudtProps.AgentName Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.AgentName = value
-        End Set
     End Property
     Public Property Location As String
         Get
@@ -502,32 +413,15 @@ Friend Class Config
             mudtProps.Location = value
         End Set
     End Property
-    Public Property PriceOptimiser As Boolean
+    Public ReadOnly Property PriceOptimiser As Boolean
         Get
             Return mudtProps.PriceOptimiser
         End Get
-        Set(value As Boolean)
-            mudtProps.PriceOptimiser = value
-        End Set
     End Property
-    Public Property LastVersionTextShown As Integer
+    Public ReadOnly Property AgentEmail As String
         Get
-            Return mudtProps.LastVersionTextShown
+            Return mudtProps.AgentEmail.ToUpper
         End Get
-        Set(value As Integer)
-            mudtProps.LastVersionTextShown = value
-        End Set
-    End Property
-    Public Property AgentEmail As String
-        Get
-            AgentEmail = mudtProps.AgentEmail.ToUpper
-        End Get
-        Set(value As String)
-            If value <> mudtProps.AgentEmail Then
-                mflgIsDirtyUser = True
-            End If
-            mudtProps.AgentEmail = value
-        End Set
     End Property
     Public Property AirportName As Integer
         Get
@@ -576,13 +470,16 @@ Friend Class Config
                            " ,pfpOfficePhone " &
                            " ,pfpAOHPhone " &
                            " ,pfpBO_fkey " &
-                           " ,pfpDBDataSource " &
-                           " ,pfpDBInitialCatalog " &
-                           " ,pfpDBUserId " &
-                           " ,pfpDBUserPassword " &
+                           " ,coalesce(pfrBODBDataSource,'') AS pfpDBDataSource " &
+                           " ,coalesce(pfrBODBInitialCatalog, '') AS pfpDBInitialCatalog " &
+                           " ,coalesce(pfrBODBUserId, '') AS pfpDBUserId " &
+                           " ,coalesce(pfrBODBUserPassword, '') AS pfpDBUserPassword " &
+                           " ,coalesce(pfrBODBBranchCode, '') AS pfrBODBBranchCode " &
                            " ,pfpIATANumber " &
                            " ,pfpFormalOfficeName " &
                            " FROM [AmadeusReports].[dbo].[PNRFinisherPCC] " &
+                           " LEFT JOIN AmadeusReports.dbo.PNRFinisherBackOffice " &
+                           " ON pfpBO_fkey = pfrBOId " &
                            " WHERE pfpPCC = @PCC"
 
             pobjReader = .ExecuteReader
@@ -601,6 +498,7 @@ Friend Class Config
                 mudtProps.pCCDBInitialCatalog = CStr(.Item("pfpDBInitialCatalog"))
                 mudtProps.pCCDBUserId = CStr(.Item("pfpDBUserId"))
                 mudtProps.pCCDBUserPassword = CStr(.Item("pfpDBUserPassword"))
+                mudtProps.pCCDBBranchCode = CStr(.Item("pfrBODBBranchCode"))
                 mudtProps.pCCIATANumber = CStr(.Item("pfpIATANumber"))
                 mudtProps.PCCFormalOfficeName = CStr(.Item("pfpFormalOfficeName"))
             Else
@@ -616,6 +514,7 @@ Friend Class Config
                 mudtProps.pCCDBInitialCatalog = ""
                 mudtProps.pCCDBUserId = ""
                 mudtProps.pCCDBUserPassword = ""
+                mudtProps.pCCDBBranchCode = ""
                 mudtProps.pCCIATANumber = ""
                 mudtProps.PCCFormalOfficeName = ""
             End If
@@ -674,15 +573,18 @@ Friend Class Config
                                "     ,pfAirportName =" & AirportName &
                                "     ,pfAirlineLocator =" & If(ShowAirlineLocator, 1, 0) &
                                "     ,pfClassOfService =" & If(ShowClassOfService, 1, 0) &
-                               "     ,pfBanElectricalEquipment =" & If(ShowBanElectricalEquipment, 1, 0) &
-                               "     ,pfBrazilText =" & If(ShowBrazilText, 1, 0) &
-                               "     ,pfUSAText =" & If(ShowUSAText, 1, 0) &
-                               "     ,pfTickets =" & If(ShowTickets, 1, 0) &
+                               "     ,pfBanElectricalEquipment = 0" &
+                               "     ,pfBrazilText = 0" &
+                               "     ,pfUSAText = 0" &
+                               "     ,pfShowEMD =" & If(ShowEMD, 1, 0) &
                                "     ,pfPaxSegPerTkt =" & If(ShowPaxSegPerTkt, 1, 0) &
                                "     ,pfShowStopovers =" & If(ShowStopovers, 1, 0) &
                                "     ,pfShowTerminal =" & If(ShowTerminal, 1, 0) &
                                "     ,pfFlyingTime =" & If(ShowFlyingTime, 1, 0) &
                                "     ,pfCostCentre =" & If(ShowCostCentre, 1, 0) &
+                               "     ,pfShowCabinDescription =" & If(ShowCabinDescription, 1, 0) &
+                               "     ,pfShowItinRemarks =" & If(ShowItinRemarks, 1, 0) &
+                               "     ,pfTickets =" & If(ShowTickets, 1, 0) &
                                "     ,pfSeating =" & If(ShowSeating, 1, 0) &
                                "     ,pfVessel =" & If(ShowVessel, 1, 0) &
                                "     ,pfPlainFormat = 0" &
@@ -720,9 +622,6 @@ Friend Class Config
                            "       ,[pfAirportName] " &
                            "       ,[pfAirlineLocator] " &
                            "       ,[pfClassOfService] " &
-                           "       ,[pfBanElectricalEquipment] " &
-                           "       ,[pfBrazilText] " &
-                           "       ,[pfUSAText] " &
                            "       ,[pfTickets] " &
                            "       ,[pfPaxSegPerTkt] " &
                            "       ,[pfShowStopovers] " &
@@ -740,6 +639,9 @@ Friend Class Config
                            "       ,ISNULL(pfOSMLOGPath,'') AS pfOSMLOGPath " &
                            "       ,ISNULL(pfnLocation,'') AS pfnLocation " &
                            "       ,ISNULL(pfnPriceOptimiser,0) AS pfnPriceOptimiser " &
+                           "       ,ISNULL(pfShowCabinDescription,0) AS pfShowCabinDescription " &
+                           "       ,ISNULL(pfShowItinRemarks, 0) AS pfShowItinRemarks " &
+                           "       ,ISNULL(pfShowEMD, 0) AS pfShowEMD " &
                            "   FROM [AmadeusReports].[dbo].[PNRFinisherUsers] " &
                            "   LEFT JOIN [AmadeusReports].[dbo].[PNRFinisherUserName] ON pfnID = pfUserName_fk " &
                            "   WHERE pfPCC = '" & mobjGDSUser.PCC & "' AND pfUser = '" & mobjGDSUser.User & "'"
@@ -756,15 +658,15 @@ Friend Class Config
                 mudtProps.AirportName = CInt(.Item("pfAirportName"))
                 mudtProps.ShowAirlineLocator = CBool(.Item("pfAirlineLocator"))
                 mudtProps.ShowClassOfService = CBool(.Item("pfClassOfService"))
-                mudtProps.ShowBanElectricalEquipment = CBool(.Item("pfBanElectricalEquipment"))
-                mudtProps.ShowBrazilText = CBool(.Item("pfBrazilText"))
-                mudtProps.ShowUSAText = CBool(.Item("pfUSAText"))
                 mudtProps.ShowTickets = CBool(.Item("pfTickets"))
+                mudtProps.ShowEMD = CBool(.Item("pfShowEMD"))
                 mudtProps.ShowPaxSegPerTkt = CBool(.Item("pfPaxSegPerTkt"))
                 mudtProps.ShowStopovers = CBool(.Item("pfShowStopovers"))
                 mudtProps.ShowTerminal = CBool(.Item("pfShowTerminal"))
                 mudtProps.ShowFlyingTime = CBool(.Item("pfFlyingTime"))
                 mudtProps.ShowCostCentre = CBool(.Item("pfCostCentre"))
+                mudtProps.ShowCabinDescription = CBool(.Item("pfShowCabinDescription"))
+                mudtProps.ShowitinRemarks = CBool(.Item("pfShowItinRemarks"))
                 mudtProps.ShowSeating = CBool(.Item("pfSeating"))
                 mudtProps.ShowVessel = CBool(.Item("pfVessel"))
                 mudtProps.Administrator = CBool(.Item("pfAdministrator"))
@@ -774,7 +676,7 @@ Friend Class Config
                 mudtProps.OSMLoGOnsigner = CBool(.Item("pfOSMLOGOnSigner"))
                 mudtProps.OSMLoGPath = CStr(.Item("pfOSMLOGPath"))
                 mudtProps.LastVersionTextShown = 0 ' .Item("pfLastVersionTextShown_fk")
-                mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
+                mudtProps.OSMLoGLanguage = EnumLoGLanguage.English
                 mudtProps.Location = CStr(.Item("pfnLocation"))
                 mudtProps.PriceOptimiser = CBool(.Item("pfnPriceOptimiser"))
             Else
@@ -786,15 +688,15 @@ Friend Class Config
                 mudtProps.AirportName = 0
                 mudtProps.ShowAirlineLocator = False
                 mudtProps.ShowClassOfService = False
-                mudtProps.ShowBanElectricalEquipment = False
-                mudtProps.ShowBrazilText = False
-                mudtProps.ShowUSAText = False
                 mudtProps.ShowTickets = False
+                mudtProps.ShowEMD = False
                 mudtProps.ShowPaxSegPerTkt = False
                 mudtProps.ShowStopovers = False
                 mudtProps.ShowTerminal = False
                 mudtProps.ShowFlyingTime = False
                 mudtProps.ShowCostCentre = False
+                mudtProps.ShowCabinDescription = False
+                mudtProps.ShowitinRemarks = False
                 mudtProps.ShowSeating = False
                 mudtProps.ShowVessel = False
                 mudtProps.Administrator = False
@@ -804,7 +706,7 @@ Friend Class Config
                 mudtProps.OSMLoGPerPax = False
                 mudtProps.OSMLoGOnsigner = False
                 mudtProps.OSMLoGPath = ""
-                mudtProps.OSMLoGLanguage = Utilities.EnumLoGLanguage.English
+                mudtProps.OSMLoGLanguage = EnumLoGLanguage.English
                 mudtProps.Location = ""
                 mudtProps.PriceOptimiser = False
             End If
@@ -849,32 +751,6 @@ Friend Class Config
         End Get
 
     End Property
-    Public ReadOnly Property GDSReferenceID(ByVal Key As String) As String
-        Get
-            Try
-                GDSReferenceID = ConvertGDSValue(mGDSReferences.Item(Key).RefId)
-            Catch ex As Exception
-                Throw New Exception("Key:" & Key & " not found in the collection")
-            End Try
-        End Get
-
-    End Property
-    Public ReadOnly Property GDSReferenceDetail(ByVal Key As String) As String
-        Get
-            Try
-                GDSReferenceDetail = ConvertGDSValue(mGDSReferences.Item(Key).RefDetail)
-            Catch ex As Exception
-                Throw New Exception("Key:" & Key & " not found in the collection")
-            End Try
-        End Get
-
-    End Property
-    Public ReadOnly Property CloseOffValue(ByVal CloseOffEntry As String) As String
-        Get
-            CloseOffValue = ConvertGDSValue(CloseOffEntry)
-        End Get
-    End Property
-
     Public Function ConvertGDSValue(ByVal ValueToConvert As String) As String
 
         ' "CountryCode"           ' %MID%

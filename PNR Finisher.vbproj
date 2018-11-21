@@ -42,7 +42,7 @@
     <InstallUrl>\\gr-ath-pc063\pnr finisher ath\</InstallUrl>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>58</ApplicationRevision>
+    <ApplicationRevision>65</ApplicationRevision>
     <ApplicationVersion>2.0.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -125,7 +125,6 @@
     <Compile Include="Classes\AirlineNotesCollection.vb" />
     <Compile Include="Classes\AirlineNotesItem.vb" />
     <Compile Include="Classes\AirlinePointsCollection.vb" />
-    <Compile Include="Classes\AirlinePointsItem.vb" />
     <Compile Include="Classes\AlertsCollection.vb" />
     <Compile Include="Classes\AlertsItem.vb" />
     <Compile Include="Classes\ApisPaxCollection.vb" />
@@ -134,6 +133,7 @@
     <Compile Include="Classes\AveragePriceItem.vb" />
     <Compile Include="Classes\BackOfficeCollection.vb" />
     <Compile Include="Classes\BackOfficeItem.vb" />
+    <Compile Include="Classes\ClassOfServiceItem.vb" />
     <Compile Include="Classes\CloseOffEntriesCollection.vb" />
     <Compile Include="Classes\CloseOffEntriesItem.vb" />
     <Compile Include="Classes\ConditionalGDSEntryCollection.vb" />
@@ -162,10 +162,13 @@
     <Compile Include="Classes\EMailItem.vb" />
     <Compile Include="Classes\FrequentFlyerCollection.vb" />
     <Compile Include="Classes\FrequentFlyerItem.vb" />
+    <Compile Include="Classes\GDSAssociationsCollection.vb" />
     <Compile Include="Classes\GDSCollection.vb" />
     <Compile Include="Classes\GDSExistingCollection.vb" />
     <Compile Include="Classes\GDSExistingItem.vb" />
     <Compile Include="Classes\GDSItem.vb" />
+    <Compile Include="Classes\GDSItineraryRemarksCollection.vb" />
+    <Compile Include="Classes\GDSItineraryRemarksItem.vb" />
     <Compile Include="Classes\GDSNewCollection.vb" />
     <Compile Include="Classes\GDSNewItem.vb" />
     <Compile Include="Classes\GDSPaxCollection.vb" />
@@ -184,6 +187,8 @@
     <Compile Include="Classes\OpenSegmentItem.vb" />
     <Compile Include="Classes\OptionQueueCollection.vb" />
     <Compile Include="Classes\OptionQueueItem.vb" />
+    <Compile Include="Classes\OSMAddressCollection.vb" />
+    <Compile Include="Classes\OSMAddressItem.vb" />
     <Compile Include="Classes\OSMEmailCollection.vb" />
     <Compile Include="Classes\OSMEmailItem.vb" />
     <Compile Include="Classes\OSMPaxCollection.vb" />
@@ -201,12 +206,14 @@
     <Compile Include="Classes\ReferenceGenderCollection.vb" />
     <Compile Include="Classes\ReferenceItem.vb" />
     <Compile Include="Classes\ReferenceSalutationsCollection.vb" />
+    <Compile Include="Classes\RemarksCollection.vb" />
+    <Compile Include="Classes\RemarksItem.vb" />
     <Compile Include="Classes\SSRCollection.vb" />
     <Compile Include="Classes\SSRitem.vb" />
     <Compile Include="Classes\SubDepartmentCollection.vb" />
     <Compile Include="Classes\SubDepartmentItem.vb" />
     <Compile Include="Classes\TicketElementItem.vb" />
-    <Compile Include="Classes\TQT.vb" />
+    <Compile Include="Classes\TQTItem.vb" />
     <Compile Include="Classes\VesselCollection.vb" />
     <Compile Include="Classes\VesselItem.vb" />
     <Compile Include="Forms\frmPriceOptimiser.Designer.vb">
@@ -299,6 +306,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="Classes\ClassOfServiceCollection.vb" />
     <Compile Include="Shared Classes\Utilities.vb" />
     <Compile Include="Shared Classes\modPNR.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

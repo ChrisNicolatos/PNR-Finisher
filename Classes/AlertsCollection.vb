@@ -25,38 +25,59 @@ Public Class AlertsCollection
                                "     , ISNULL(pnaAirline, '') AS pnaAirline " &
                                "     , ISNULL(pnaAmadeusQueue, '') AS pnaAmadeusQueue " &
                                "     , ISNULL(pnaGalileoQueue, '') AS pnaGalileoQueue " &
-                               "FROM [AmadeusReports].[dbo].[PNRFinisherAlerts]"
+                               "     , ISNULL(pnaAlertForDownsell, '') AS pnaAlertForDownsell " &
+                               " FROM [AmadeusReports].[dbo].[PNRFinisherAlerts]"
             pobjReader = .ExecuteReader
         End With
 
         With pobjReader
             Do While .Read
                 pobjClass = New AlertsItem
-                pobjClass.SetValues(CInt(.Item("pnaBOId_fkey")), CStr(.Item("pnaClientCode")), CStr(.Item("pnaAlert")), CStr(.Item("pnaOriginCountry")), CStr(.Item("pnaDestinationCountry")), CStr(.Item("pnaAirline")), CStr(.Item("pnaAmadeusQueue")), CStr(.Item("pnaGalileoQueue")))
+                pobjClass.SetValues(CInt(.Item("pnaBOId_fkey")), CStr(.Item("pnaClientCode")), CStr(.Item("pnaAlert")), CStr(.Item("pnaOriginCountry")), CStr(.Item("pnaDestinationCountry")), CStr(.Item("pnaAirline")), CStr(.Item("pnaAmadeusQueue")), CStr(.Item("pnaGalileoQueue")), CStr(.Item("pnaAlertForDownsell")))
                 MyBase.Add(.Item("pnaID").ToString, pobjClass)
             Loop
         End With
         mAlertsLoaded = True
     End Sub
-    Public ReadOnly Property Alert(ByVal pBackOfficeId As Integer, ByVal pClientCode As String) As String
+    Public ReadOnly Property AlertForFinisher(ByVal pBackOfficeId As Integer, ByVal pClientCode As String) As String
         Get
-            Alert = ""
+            If Not mAlertsLoaded Then
+                Load()
+            End If
+            AlertForFinisher = ""
             For Each pItem As AlertsItem In MyBase.Values
-                If pItem.BackOfficeID = pBackOfficeId And pClientCode = pItem.ClientCode Then
-                    Alert = pItem.Alert
+                If pItem.BackOfficeID = pBackOfficeId And pClientCode = pItem.ClientCode And pItem.AlertForFinisher <> "" Then
+                    AlertForFinisher = pItem.AlertForFinisher
                     Exit For
                 End If
             Next
         End Get
     End Property
-    Public ReadOnly Property Alert(ByVal pOriginCountry As String, ByVal pDestinationCountry As String) As String
+    Public ReadOnly Property AlertForDownsell(ByVal pBackOfficeId As Integer, ByVal pClientCode As String) As String
         Get
-            Alert = ""
+            If Not mAlertsLoaded Then
+                Load()
+            End If
+            AlertForDownsell = ""
+            For Each pItem As AlertsItem In MyBase.Values
+                If pItem.BackOfficeID = pBackOfficeId And pClientCode = pItem.ClientCode And pItem.AlertForDownsell <> "" Then
+                    AlertForDownsell = pItem.AlertForDownsell
+                    Exit For
+                End If
+            Next
+        End Get
+    End Property
+    Public ReadOnly Property AlertForFinisher(ByVal pOriginCountry As String, ByVal pDestinationCountry As String) As String
+        Get
+            If Not mAlertsLoaded Then
+                Load()
+            End If
+            AlertForFinisher = ""
             For Each pItem As AlertsItem In MyBase.Values
                 If (pItem.OriginCountry = pOriginCountry And pItem.DestinationCountry = pDestinationCountry) _
                         Or (pItem.OriginCountry = pOriginCountry And pItem.DestinationCountry = "") _
-                        Or (pItem.DestinationCountry = pDestinationCountry And pItem.OriginCountry = "") Then
-                    Alert &= pItem.Alert & vbCrLf
+                        Or (pItem.DestinationCountry = pDestinationCountry And pItem.OriginCountry = "") And pItem.AlertForFinisher <> "" Then
+                    AlertForFinisher &= pItem.AlertForFinisher & vbCrLf
                 End If
             Next
         End Get
@@ -68,8 +89,8 @@ Public Class AlertsCollection
             End If
             AirlineAlert = ""
             For Each pItem As AlertsItem In MyBase.Values
-                If pItem.Airline = AirlineCode AndAlso AirlineAlert.IndexOf(pItem.Alert) = -1 Then
-                    AirlineAlert &= pItem.Alert & vbCrLf
+                If pItem.Airline = AirlineCode AndAlso AirlineAlert.IndexOf(pItem.AlertForFinisher) = -1 Then
+                    AirlineAlert &= pItem.AlertForFinisher & vbCrLf
                 End If
             Next
         End Get

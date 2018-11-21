@@ -29,12 +29,12 @@
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         dgvRow.Cells(5).Value = PaxItem.Nationality ' Nationality
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
-        dgvRow.Cells(6).Value = Utilities.DateToIATA(PaxItem.BirthDate) ' Birth date
+        dgvRow.Cells(6).Value = DateToIATA(PaxItem.BirthDate) ' Birth date
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         dgvRow.Cells(7).Value = PaxItem.Gender ' Gender
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         If PaxItem.ExpiryDate > Date.MinValue Then
-            dgvRow.Cells(8).Value = Utilities.DateToIATA(PaxItem.ExpiryDate) ' Expiry Date
+            dgvRow.Cells(8).Value = DateToIATA(PaxItem.ExpiryDate) ' Expiry Date
         End If
         dgvApis.Rows.Add(dgvRow)
     End Sub
@@ -59,13 +59,13 @@
         If Birthdate = Date.MinValue Then
             dgvRow.Cells(6).Value = "" ' Birth date
         Else
-            dgvRow.Cells(6).Value = Utilities.DateToIATA(Birthdate) ' Birth date
+            dgvRow.Cells(6).Value = DateToIATA(Birthdate) ' Birth date
         End If
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         dgvRow.Cells(7).Value = Gender ' Gender
         dgvRow.Cells.Add(New DataGridViewTextBoxCell)
         If Expirydate > Date.MinValue Then
-            dgvRow.Cells(8).Value = Utilities.DateToIATA(Expirydate) ' Expiry Date
+            dgvRow.Cells(8).Value = DateToIATA(Expirydate) ' Expiry Date
         End If
         dgvApis.Rows.Add(dgvRow)
     End Sub

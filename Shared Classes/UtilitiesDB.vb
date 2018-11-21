@@ -18,6 +18,11 @@ Public NotInheritable Class UtilitiesDB
     Private Shared mPnrDataCatalog As String = ""
     Private Shared mPnrUserName As String = ""
     Private Shared mPnrPassword As String = ""
+
+    Private Shared mTWS_MISDataSource As String = ""
+    Private Shared mTWS_MISDataCatalog As String = ""
+    Private Shared mTWS_MISUserName As String = ""
+    Private Shared mTWS_MISPassword As String = ""
     Private Sub New()
     End Sub
     Public Shared ReadOnly Property PNRDataSource As String
@@ -68,6 +73,17 @@ Public NotInheritable Class UtilitiesDB
                                   ";Password=" & mPnrPassword
         End Get
     End Property
+    Public Shared ReadOnly Property ConnectionStringTWS_MIS() As String
+        Get
+            If mTWS_MISDataSource = "" Then
+                ReadDBConnections()
+            End If
+            ConnectionStringTWS_MIS = "Data Source=" & mTWS_MISDataSource &
+                                  ";Initial Catalog=" & mTWS_MISDataCatalog &
+                                  ";User ID=" & mTWS_MISUserName &
+                                  ";Password=" & mTWS_MISPassword
+        End Get
+    End Property
     Private Shared Sub ReadDBConnections()
 
         Dim pFileExists As Boolean = False
@@ -99,12 +115,50 @@ Public NotInheritable Class UtilitiesDB
                             mPnrPassword = pValues(1).Trim
                     End Select
                 Next
+                GetTWS_MISCredentials()
             Else
                 Throw New Exception("Settings File Error" & vbCrLf & mstrDBConnectionFileActual)
             End If
         Else
             Throw New Exception("DB Connection file does not exist. Please contact you system administrator" & vbCrLf & mstrDBConnectionFileActual)
         End If
+
+    End Sub
+    Private Shared Sub GetTWS_MISCredentials()
+        Dim pobjConn As New SqlClient.SqlConnection(UtilitiesDB.ConnectionStringPNR) ' ActiveConnection)
+        Dim pobjComm As New SqlClient.SqlCommand
+        Dim pobjReader As SqlClient.SqlDataReader
+
+        pobjConn.Open()
+        pobjComm = pobjConn.CreateCommand
+
+        With pobjComm
+            .CommandType = CommandType.Text
+            .CommandText = "SELECT [pfrBODBDataSource]
+                                  ,[pfrBODBInitialCatalog]
+                                  ,[pfrBODBUserId]
+                                  ,[pfrBODBUserPassword]
+                              FROM [AmadeusReports].[dbo].[PNRFinisherBackOffice]
+                              WHERE pfrBOName = 'TWS_MIS'"
+            pobjReader = .ExecuteReader
+        End With
+
+        With pobjReader
+            If .Read Then
+                mTWS_MISDataSource = CStr(.Item("pfrBODBDataSource"))
+                mTWS_MISDataCatalog = CStr(.Item("pfrBODBInitialCatalog"))
+                mTWS_MISUserName = CStr(.Item("pfrBODBUserId"))
+                mTWS_MISPassword = CStr(.Item("pfrBODBUserPassword"))
+            Else
+                mTWS_MISDataSource = ""
+                mTWS_MISDataCatalog = ""
+                mTWS_MISUserName = ""
+                mTWS_MISPassword = ""
+
+            End If
+            .Close()
+        End With
+        pobjConn.Close()
 
     End Sub
 End Class

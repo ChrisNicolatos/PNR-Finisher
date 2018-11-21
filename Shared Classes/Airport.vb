@@ -15,31 +15,31 @@ Friend Class Airport
     Public Shared ReadOnly Property CityAirportName(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
-            CityAirportName = mCityAirportName
+            Return mCityAirportName
         End Get
     End Property
     Public Shared ReadOnly Property CityName(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
-            CityName = mCityName
+            Return mCityName
         End Get
     End Property
     Public Shared ReadOnly Property AirportShortname(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
-            AirportShortname = mAirportShortname
+            Return mAirportShortname
         End Get
     End Property
     Public Shared ReadOnly Property CountryName(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
-            CountryName = mCountryName
+            Return mCountryName
         End Get
     End Property
     Public Shared ReadOnly Property CountryCode(ByVal CityCode As String) As String
         Get
             ReadCityName(CityCode)
-            CountryCode = mCountryCode
+            Return mCountryCode
         End Get
     End Property
     Private Shared Sub ReadCityName(ByVal airportCode As String)

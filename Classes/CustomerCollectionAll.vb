@@ -2,25 +2,36 @@
 
     Inherits Collections.Generic.Dictionary(Of Integer, CustomerItem)
 
-    Dim mobjAlerts As New AlertsCollection
+    Dim mobjAlerts As AlertsCollection
     Dim mintPCCBackoffice As Integer
     Public ReadOnly Property PCCBackOffice As Integer
         Get
             PCCBackOffice = mintPCCBackoffice
         End Get
     End Property
-
+    Public ReadOnly Property GetCustomerByCode(ByVal pCode As String) As CustomerItem
+        Get
+            GetCustomerByCode = New CustomerItem
+            For Each pItem As CustomerItem In MyBase.Values
+                If pItem.Code = pCode Then
+                    GetCustomerByCode = pItem
+                    Exit For
+                End If
+            Next
+        End Get
+    End Property
     Public Sub Load()
 
         Dim pCommandText As String
 
         Try
+            mobjAlerts = New AlertsCollection()
             mobjAlerts.Load()
 
             pCommandText = PrepareClientSelectCommand()
             ReadCustomers(pCommandText)
         Catch ex As Exception
-            Throw New Exception("Customers.Load()" & vbCrLf & ex.Message)
+            Throw New Exception("CustomerCollectionAll.Load()" & vbCrLf & ex.Message)
         End Try
 
     End Sub
@@ -55,7 +66,7 @@
                                              " From [Disco_Instone_EU].[dbo].[Company] " &
                                              " Left Join Disco_Instone_EU.dbo.CompProfile " &
                                              " On Company.Account_Id = CompProfile.Account_Id " &
-                                             " Where CompProfile.Branch = 19 " &
+                                             " Where CompProfile.Branch = '" & MySettings.PCCBranchCode & "' " &
                                              " ORDER BY Account_Abbriviation "
             Case Else
                 PrepareClientSelectCommand = ""
@@ -82,7 +93,7 @@
         With pobjReader
             Do While .Read
                 pobjClass = New CustomerItem
-                pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("Logo")), CInt(.Item("TFEntityKindLT")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
+                pobjClass.SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), CStr(.Item("Logo")), CInt(.Item("TFEntityKindLT")), mobjAlerts.AlertForFinisher(MySettings.PCCBackOffice, CStr(.Item("Code"))), mobjAlerts.AlertForDownsell(MySettings.PCCBackOffice, CStr(.Item("Code"))), CStr(.Item("GalileoTrackingCode")))
                 MyBase.Add(pobjClass.ID, pobjClass)
             Loop
             .Close()

@@ -14,7 +14,7 @@
             Dim pItem As CustomerItem
 
             For Each pItem In mAllCustomer.Values
-                If pItem.Code.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or pItem.Name.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or pItem.Logo.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Then
+                If pItem.Code.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or (Not IsNumeric(SearchString) And (pItem.Name.ToUpper.IndexOf(SearchString.ToUpper) >= 0 Or pItem.Logo.ToUpper.IndexOf(SearchString.ToUpper) >= 0)) Then
                     MyBase.Add(pItem.ID, pItem)
                 End If
             Next

@@ -52,7 +52,6 @@
         Dim SegNo As Short
         Dim BaggageAllowance As String
     End Structure
-    Private mintRawIndex As Integer
     Private WithEvents mobjSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
 
     Private mobjPassengers As New GDSPaxColl
@@ -66,14 +65,14 @@
     Private mobjOptionQueue As New OptionQueueCollection
     Private mobjSSR As New SSRCollection
     Private mobjFreqFlyer As New FrequentFlyerCollection
-
+    Private mobjItinRemarks As New GDSItineraryRemarksCollection
     Private mstrOfficeOfResponsibility As String
     Private mstrPNRNumber As String
     Private mdteDepartureDate As Date
     Private mstrItinerary As String
     Private mSegsFirstElement As Integer
     Private mSegsLastElement As Integer
-    Private mudtAllowance() As TQT
+    Private mudtAllowance() As TQTItem
     Private mstrSeats As String
 
     Public Sub ReadRaw(ByVal RequestedPNR As String)
@@ -104,6 +103,7 @@
         mobjOptionQueue.Clear()
         mobjSSR.Clear()
         mobjFreqFlyer.Clear()
+        mobjItinRemarks.Clear()
         mstrSeats = ""
 
         GetOfficeOfResponsibility1G()
@@ -115,9 +115,11 @@
         GetOpenSegment1G()
         GetOptionQueueElement1G()
         GetTickets()
+        GetEMDs()
         GetSSR1G()
         GetDI1G()
         GetFreqFlyers()
+        GetRI()
 
     End Sub
     Private Function SendTerminalCommand(ByVal TerminalEntry As String) As String()
@@ -165,7 +167,7 @@
             Tickets = mobjTickets
         End Get
     End Property
-    Public ReadOnly Property Allowance As TQT()
+    Public ReadOnly Property Allowance As TQTItem()
         Get
             Allowance = mudtAllowance
         End Get
@@ -178,6 +180,11 @@
     Public ReadOnly Property RequestedPNR As String
         Get
             RequestedPNR = mstrPNRNumber
+        End Get
+    End Property
+    Public ReadOnly Property ItineraryRemarks As GDSItineraryRemarksCollection
+        Get
+            Return mobjItinRemarks
         End Get
     End Property
     Private Sub GetPassengers1G()
@@ -279,7 +286,7 @@
                     pCarrier = .Substring(pStart + 2, 2).Trim
                     pFlightNumber = .Substring(pStart + 5, 4).Trim
                     pClassOfService = .Substring(pStart + 10, 1).Trim
-                    pDepartureDate = Utilities.DateFromIATA(.Substring(pStart + 13, 5))
+                    pDepartureDate = DateFromIATA(.Substring(pStart + 13, 5))
                     pOrigin = .Substring(pStart + 19, 3).Trim
                     pDestination = .Substring(pStart + 22, 3).Trim
                     pStatus = .Substring(pStart + 26, 2).Trim
@@ -453,7 +460,7 @@
                 Else
                     pRemark = pRem(1)
                 End If
-                pActionDate = Utilities.DateFromIATA(pRem(0).Substring(pRem(0).Length - 5))
+                pActionDate = DateFromIATA(pRem(0).Substring(pRem(0).Length - 5))
                 If pItems.GetUpperBound(0) = 2 Then
                     pPCC = pItems(1)
                 End If
@@ -488,7 +495,7 @@
                 pRemark = ""
             End If
             pPCC = pItem(0)
-            pActionDateTime = Utilities.DateFromIATA(pItem(1).Substring(pItem(1).Length - 5)) + TimeSerial(pItem(2).Substring(0, 2), pItem(2).Substring(2), 0).TimeOfDay
+            pActionDateTime = DateFromIATA(pItem(1).Substring(pItem(1).Length - 5)) + TimeSerial(pItem(2).Substring(0, 2), pItem(2).Substring(2), 0).TimeOfDay
             mobjOptionQueue.AddItem(pElement, pPCC, pActionDateTime, pQueue, pRemark)
         Next
     End Sub
@@ -561,6 +568,10 @@
             FrequentFlyers = mobjFreqFlyer
         End Get
     End Property
+    Private Sub GetRI()
+        Dim pRI() As String = SendTerminalCommand("*RI")
+        mobjItinRemarks.Load1G(pRI)
+    End Sub
     Private Sub GetTickets()
         Dim pFF() As String = SendTerminalCommand("*FF")
         ReDim mudtAllowance(0)
@@ -598,11 +609,21 @@
                             pPax(pPax(0).PaxNumber).Paxname = pFFx(iPFF).Substring(5).Trim
                         End If
 
-                        If iPFF < pFFx.GetUpperBound(0) _
-                            AndAlso pFFx(iPFF + 1).StartsWith(Space(13)) _
-                            AndAlso IsNumeric(pFFx(iPFF + 1).Trim.Substring(pFFx(iPFF + 1).Trim.Length - 13)) _
-                            AndAlso Not IsNumeric(pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 13)) Then
-                            ' if the next line starts with spaces, then the ticket number is on the next line
+                        Dim pTemp1 As String = ""
+                        Dim pTemp2 As String = ""
+                        If iPFF < pFFx.GetUpperBound(0) Then
+                            pTemp1 = pFFx(iPFF + 1).Substring(pFFx(iPFF + 1).LastIndexOf(" "))
+                            If pTemp1.Length > 13 Then
+                                pTemp1 = pTemp1.Substring(0, 13)
+                            End If
+                        End If
+                        If pFFx(iPFF).Trim.Length > 13 Then
+                            pTemp2 = pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 13)
+                        End If
+                        If iPFF < pFFx.GetUpperBound(0) AndAlso pFFx(iPFF + 1).StartsWith(Space(13)) AndAlso pFFx(iPFF + 1).LastIndexOf(" ") <= pFFx(iPFF + 1).Length _
+                            AndAlso IsNumeric(pTemp1) AndAlso Not IsNumeric(pTemp2) Then
+
+                            ' if the next line starts with spaces, then the ticket number might be on the next line
                             pPax(pPax(0).PaxNumber).TicketNumber = pFFx(iPFF + 1).Trim.Substring(pFFx(iPFF + 1).Trim.LastIndexOf(" ")).Trim
                             pFFx(iPFF + 1) = ""
                         ElseIf IsNumeric(pFFx(iPFF).Trim.Substring(pFFx(iPFF).Trim.Length - 2)) Then
@@ -639,7 +660,7 @@
                     Dim pTktSeg As String = ""
                     For j1 As Integer = 1 To pSeg(0).SegNo
                         ReDim Preserve mudtAllowance(mudtAllowance.GetUpperBound(0) + 1)
-                        mudtAllowance(mudtAllowance.GetUpperBound(0)) = New TQT
+                        mudtAllowance(mudtAllowance.GetUpperBound(0)) = New TQTItem
                         With mudtAllowance(mudtAllowance.GetUpperBound(0))
                             .TQTElement = pFFid
                             .Pax = pPax(i1).PaxNumber
@@ -659,30 +680,86 @@
                             End Try
                         End With
                     Next
-                    mobjTickets.addTicket("FA", 1, CDbl("0" & pPax(i1).DocumentNumber), pPax(i1).Books, pPax(i1).Airline, Airlines.AirlineCode(pPax(i1).Airline), True, pTktSeg, pPax(i1).Paxname, "PAX")
+                    mobjTickets.addTicket("FA", 1, CDbl("0" & pPax(i1).DocumentNumber), pPax(i1).Books, pPax(i1).Airline, Airlines.AirlineCode(pPax(i1).Airline), True, pTktSeg, pPax(i1).Paxname, "PAX", "")
 
 
                 Next
             End If
         Next
+        If mobjTickets.Count = 0 Then
+            GetTicketsFromHTE()
+        End If
         mstrSeats &= GetSeats()
 
-        'For Each pPax As GDSPax.GDSPaxItem In Passengers.Values
-        '    mstrSeats &= GetSeatsCharacteristics(pPax.ElementNo)
-        'Next
     End Sub
-    Private Function GetSeatsCharacteristics(ByVal PaxNo As Short) As String
-        Dim pSeats() As String = SendTerminalCommand("SC*P" & PaxNo)
-        GetSeatsCharacteristics = ""
-        If pSeats(0).IndexOf("DATA NOT FOUND") = -1 Then
-            For i As Integer = 1 To pSeats.Count - 1
-                If pSeats(i).Length > 2 AndAlso pSeats(i).Substring(2, 1) = "." AndAlso IsNumeric(pSeats(i).Substring(1, 1)) Then
-                    pSeats(i) = pSeats(i).Substring(0, 12) & " " & pSeats(i).Substring(15)
+    Private Sub GetTicketsFromHTE()
+        Dim pHTE() As String = SendTerminalCommand("*HTE")
+        'ReDim mudtAllowance(0)
+        mobjTickets.Clear()
+        If pHTE(0).StartsWith("TKT:") Then
+            GetTicketsHTEParser(pHTE)
+        Else
+            For i As Integer = 0 To pHTE.GetUpperBound(0)
+                If pHTE(i).StartsWith(">*TE") Then
+                    Dim pTE() As String = SendTerminalCommand(pHTE(i).Substring(1, 6))
+                    GetTicketsHTEParser(pTE)
                 End If
-                GetSeatsCharacteristics &= pSeats(i).Replace("NO CHARACTERISTICS EXIST", "") & vbCrLf
             Next
         End If
-    End Function
+    End Sub
+    Private Sub GetTicketsHTEParser(ByVal pTE As String())
+        Dim pPax(0) As PaxFFProps
+        pPax(0).PaxNumber = 0
+        Dim pSeg(0) As SegFFProps
+        pSeg(0).SegNo = 0
+        Dim pTktSeg As String = ""
+        Dim pItin As String = ""
+        For i1 As Integer = 0 To pTE.GetUpperBound(0)
+            If pTE(i1).StartsWith("TKT") And pTE(i1).Length > 30 Then
+                pPax(0).PaxNumber += 1
+                ReDim Preserve pPax(pPax(0).PaxNumber)
+                pPax(pPax(0).PaxNumber).PaxNumber = pPax(0).PaxNumber
+                pPax(pPax(0).PaxNumber).Paxname = pTE(i1).Substring(31).Trim
+                pPax(pPax(0).PaxNumber).TicketNumber = pTE(i1).Substring(5, 20).Replace(" ", "")
+            ElseIf pTE(i1).Length > 32 And pTE(i1).StartsWith(Space(3)) And Not pTE(i1).StartsWith("   USE  CR FLT") And Not pTE(i1).StartsWith(Space(10)) Then
+                pItin = pTE(i1).Substring(26, 3) & " " & pTE(i1).Substring(8, 2) & " " & pTE(i1).Substring(29, 3)
+                If pTktSeg <> "" Then
+                    pTktSeg &= vbCrLf
+                End If
+                pTktSeg &= pItin
+            ElseIf pTktSeg <> "" And Not pTE(i1).StartsWith(Space(1)) Then
+                Exit For
+            End If
+        Next
+        mobjTickets.addTicket("FA", 1, CDbl("0" & pPax(pPax(0).PaxNumber).DocumentNumber), pPax(pPax(0).PaxNumber).Books, pPax(pPax(0).PaxNumber).Airline, Airlines.AirlineCode(pPax(pPax(0).PaxNumber).Airline), True, pTktSeg, pPax(pPax(0).PaxNumber).Paxname, "PAX", "")
+    End Sub
+    Private Sub GetEMDs()
+        Dim pPax(0) As PaxFFProps
+        pPax(0).PaxNumber = 0
+        Dim pEMDDescription As String = ""
+        Dim pEMD() As String = SendTerminalCommand("EMDL")
+        If pEMD(0).StartsWith("EMDL - ") Then
+            For i As Integer = 1 To pEMD.GetUpperBound(0)
+                If pEMD(i).Length > 5 AndAlso pEMD(i).Substring(3, 1) = "." AndAlso IsNumeric(pEMD(i).Substring(0, 3).Trim) Then
+                    Dim pEMDD() As String = SendTerminalCommand("EMDD" & pEMD(i).Substring(0, 3).Trim)
+                    Dim pTemp() As String = pEMDD(0).Split({" "}, StringSplitOptions.RemoveEmptyEntries)
+                    If pTemp.GetUpperBound(0) > 1 Then
+                        pPax(0).PaxNumber += 1
+                        ReDim Preserve pPax(pPax(0).PaxNumber)
+                        pPax(pPax(0).PaxNumber).PaxNumber = pPax(0).PaxNumber
+                        If i < pEMD.GetUpperBound(0) AndAlso pEMD(i + 1).IndexOf("/") > 0 Then
+                            pPax(pPax(0).PaxNumber).Paxname = pEMD(i + 1)
+                        Else
+                            pPax(pPax(0).PaxNumber).Paxname = pTemp(1)
+                        End If
+                        pPax(pPax(0).PaxNumber).TicketNumber = pTemp(0)
+                        pEMDDescription = pEMDD(2).Substring(4, 29).Trim
+                        mobjTickets.addTicket("FA", 1, CDbl("0" & pPax(pPax(0).PaxNumber).DocumentNumber), pPax(pPax(0).PaxNumber).Books, pPax(pPax(0).PaxNumber).Airline, Airlines.AirlineCode(pPax(pPax(0).PaxNumber).Airline), False, "", pPax(pPax(0).PaxNumber).Paxname, "EMD", pEMDDescription)
+                    End If
+                End If
+            Next
+        End If
+    End Sub
     Private Function GetSeats() As String
         Dim pSeats() As String = SendTerminalCommand("*SD")
         GetSeats = ""
@@ -718,8 +795,9 @@
         For i = 2 To pSSR.GetUpperBound(0)
             If pSSR(i) <> "" Then
                 For j = i + 1 To pSSR.GetUpperBound(0)
-                    If pSSR(j).StartsWith(Space(20)) Then
-                        pSSR(i) &= pSSR(j).Substring(20)
+                    If pSSR(j).StartsWith(Space(20)) And pSSR(i).Length > 1 Then
+                        pSSR(i) = pSSR(i).Substring(0, pSSR(i).Length - 1) & pSSR(j).Substring(21)
+                        'pSSR(i) &= pSSR(j).Substring(20)
                         pSSR(j) = ""
                     Else
                         Exit For
@@ -754,7 +832,7 @@
                     If pSSRCode = "DOCS" Then
                         Dim pTextItems() As String = pText.Split("/")
                         pPassportNumber = pTextItems(3)
-                        pDateOfBirth = Utilities.DateFromIATA(pTextItems(5))
+                        pDateOfBirth = DateFromIATA(pTextItems(5))
                         pLastName = pTextItems(8)
                         pFirstName = pTextItems(9).Split("-")(0)
                     End If
@@ -791,7 +869,7 @@
                     pElement = pOpenSegs(i).Substring(0, pStart).Trim
                     Dim pSegType As String = pOpenSegs(i).Substring(pStart + 2, 1)
                     Dim pRemType As String = pOpenSegs(i).Substring(pStart + 5, 13)
-                    Dim pRemDate As Date = Utilities.DateFromIATA(pOpenSegs(i).Substring(pStart + 18, 5))
+                    Dim pRemDate As Date = DateFromIATA(pOpenSegs(i).Substring(pStart + 18, 5))
                     Dim pRemark As String = pOpenSegs(i).Substring(pStart + 24).Trim
                     mobjOpenSegments.AddItem(pElement, pSegType, pRemType, pRemDate, pRemark)
                 End If

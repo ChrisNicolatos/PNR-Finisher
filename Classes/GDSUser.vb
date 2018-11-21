@@ -5,11 +5,6 @@ Friend Class GDSUser
         Dim GDSCode As Utilities.EnumGDSCode
         Dim PCC As String
         Dim User As String
-        Private Sub New(ByVal pGDS As String)
-            GDSCode = Utilities.EnumGDSCode.Unknown
-            PCC = ""
-            User = ""
-        End Sub
     End Structure
     Private WithEvents mobjSession1A As k1aHostToolKit.HostSession
     '    Private mobjSession1G As New Travelport.TravelData.Factory.GalileoDesktopFactory("SPG720", "MYCONNECTION", False, True, "SMRT")
@@ -85,8 +80,10 @@ Friend Class GDSUser
             End If
         Catch ex As Travelport.TravelData.DesktopUserNotSignedOnException
             Throw New Exception("Please start Galileo/Smartpoint")
+        Catch ex As Travelport.TravelData.DesktopNotStartedException
+            Throw New Exception("Please Sign in to PCC")
         Catch ex As Exception
-            Throw New Exception(ex.Message)
+            Throw New Exception("Please Sign in to PCC")
         End Try
 
     End Sub

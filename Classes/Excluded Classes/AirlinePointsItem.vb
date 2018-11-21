@@ -41,18 +41,20 @@ Public Class AirlinePointsItem
             PointsCommand = mudtProps.PointsCommand
         End Get
     End Property
-
-    Friend Sub SetValues(ByVal pCustID As Integer, ByVal pCustCode As String, ByVal pCustName As String,
-                             ByVal pAirlineCode As String, ByVal pAirlineName As String, ByVal pPointsCommand As String)
-        With mudtProps
-            .CustomerID = pCustID
-            .CustomerCode = pCustCode
-            .CustomerName = pCustName
-            .AirlineCode = pAirlineCode
-            .AirlineName = pAirlineName
-            .PointsCommand = pPointsCommand
-        End With
-    End Sub
+    Public Overrides Function ToString() As String
+        Return mudtProps.PointsCommand
+    End Function
+    'Friend Sub SetValues(ByVal pCustID As Integer, ByVal pCustCode As String, ByVal pCustName As String,
+    '                         ByVal pAirlineCode As String, ByVal pAirlineName As String, ByVal pPointsCommand As String)
+    '    With mudtProps
+    '        .CustomerID = pCustID
+    '        .CustomerCode = pCustCode
+    '        .CustomerName = pCustName
+    '        .AirlineCode = pAirlineCode
+    '        .AirlineName = pAirlineName
+    '        .PointsCommand = pPointsCommand
+    '    End With
+    'End Sub
     Friend Sub SetValues(ByVal pPointsCommand As String)
         With mudtProps
             .CustomerID = 0

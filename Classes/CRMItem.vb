@@ -6,7 +6,7 @@
         Dim Alert As String
     End Structure
     Private mudtProps As ClassProps
-    Private mobjAlerts As New AlertsCollection
+    Private mobjAlerts As New AlertsCollection()
     Public Overrides Function ToString() As String
         With mudtProps
             Return .Code & " " & .Name
@@ -67,7 +67,7 @@
 
         With pobjReader
             Do While .Read
-                SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), mobjAlerts.Alert(MySettings.PCCBackOffice, CStr(.Item("Code"))))
+                SetValues(CInt(.Item("Id")), CStr(.Item("Code")), CStr(.Item("Name")), mobjAlerts.AlertForFinisher(MySettings.PCCBackOffice, CStr(.Item("Code"))))
             Loop
             .Close()
         End With
